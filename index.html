@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>XCC · Echipa</title>
+<meta name="description" content="Echipament, echipe și transport pentru Xtreme Character Challenge.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23CF171F'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='13' fill='white' text-anchor='middle'%3EXCC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,800..900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding-top:env(safe-area-inset-top,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: black 4M-style top bar; left menu (fixed on desktop, drawer on phone); one page at a time in the main column */
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --line:#E4E7EC; --fg:#101828; --muted:#475467;
+  --accent:#CF171F; --accent-fg:#FFFFFF; --bar:#000000; --bar-fg:#FFFFFF; --bar-muted:#98A2B3;
+  --moss:#067647; --moss-soft:#ECFDF3; --need:#B54708; --need-soft:#FEF0C7;
+  --display:"Archivo","Arial Narrow",Impact,sans-serif;
+  --body:"Inter",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B0B0C; --surface:#161618; --line:#2B2B30; --fg:#F4F4F5; --muted:#A1A1AA;
+  --accent:#E8343C; --accent-fg:#FFFFFF; --bar:#000000; --bar-fg:#FFFFFF; --bar-muted:#98A2B3;
+  --moss:#47CD89; --moss-soft:#0E2A1C; --need:#FDB022; --need-soft:#3A2908; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0B0C; --surface:#161618; --line:#2B2B30; --fg:#F4F4F5; --muted:#A1A1AA;
+  --accent:#E8343C; --accent-fg:#FFFFFF; --bar:#000000; --bar-fg:#FFFFFF; --bar-muted:#98A2B3;
+  --moss:#47CD89; --moss-soft:#0E2A1C; --need:#FDB022; --need-soft:#3A2908; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);font-feature-settings:"tnum"}
+
+/* top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bar);color:var(--bar-fg);padding-inline:16px}
+.topbar .in{display:flex;align-items:center;gap:12px;height:56px}
+.burger{display:none;background:none;border:0;color:var(--bar-fg);font-size:1.4rem;line-height:1;padding:6px;cursor:pointer}
+.brand{display:flex;align-items:center;gap:10px;color:var(--bar-fg);text-decoration:none;font:700 .95rem var(--body)}
+.mark{background:var(--accent);color:#fff;font:900 .95rem var(--display);font-stretch:62%;padding:4px 8px;letter-spacing:.03em}
+.brand .full{white-space:nowrap}
+.topbar .who-mini{margin-left:auto;font:500 .85rem var(--body);color:var(--bar-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.topbar .who-mini b{color:var(--bar-fg)}
+
+/* shell */
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 56px)}
+.side{background:var(--surface);border-right:1px solid var(--line);padding-block:18px;display:flex;flex-direction:column;gap:2px;position:sticky;top:calc(56px + env(safe-area-inset-top,0px));height:calc(100vh - 56px - env(safe-area-inset-top,0px));overflow:auto}
+.side .grp{font:600 .72rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:14px 20px 6px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:var(--fg);font:600 .95rem var(--body);padding:10px 17px;cursor:pointer}
+.nav:hover{background:var(--bg)}
+.nav[aria-current="page"]{border-left-color:var(--accent);background:var(--bg);color:var(--accent)}
+.nav .ico{width:20px;text-align:center;flex:none}
+.nav .badge{margin-left:auto;font:600 .75rem var(--body);color:var(--muted)}
+.side .foot{margin-top:auto;padding:16px 20px 8px;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line)}
+.side .foot a{color:var(--muted);font-size:.85rem}
+.scrim{display:none}
+main{padding-inline:16px;padding-block:24px 64px;min-width:0}
+.page{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .burger{display:block}
+  .brand .full{display:none}
+  .side{position:fixed;left:0;top:calc(56px + env(safe-area-inset-top,0px));bottom:0;height:auto;width:min(280px,82vw);z-index:25;transform:translateX(-102%);transition:transform .2s ease;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  body.menu-open .side{transform:none}
+  body.menu-open .scrim{display:block;position:fixed;inset:0;top:56px;background:rgba(0,0,0,.45);z-index:20;border:0}
+}
+
+/* type */
+.eyebrow{font:600 .78rem var(--body);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+h1.pg{font:900 clamp(2.2rem,9vw,3.4rem)/.9 var(--display);font-stretch:62%;text-transform:uppercase;margin:0;text-wrap:balance}
+h1.pg span{color:var(--accent)}
+.lead{margin:0;color:var(--muted);max-width:62ch}
+h2{font:900 1.35rem var(--display);font-stretch:62%;text-transform:uppercase;letter-spacing:.01em;color:var(--fg);margin:14px 0 2px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:10px;height:10px;background:var(--accent);flex:none}
+.lbl{font:600 .75rem var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.status{font-size:.88rem;color:var(--muted)}
+.status.err{color:var(--need)}
+.saved{color:var(--moss)!important}
+.count{font:600 .82rem var(--body);color:var(--muted)}
+
+/* hero */
+.hero{position:relative;border-radius:6px;overflow:hidden;min-height:clamp(260px,46vw,400px);background:#111;color:#fff;display:flex;align-items:flex-end}
+.hero img,.hero svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.78) 100%)}
+.hero .txt{position:relative;z-index:1;padding:22px;display:flex;flex-direction:column;gap:8px}
+.hero h1{margin:0;font:900 clamp(2.6rem,11vw,5rem)/.85 var(--display);font-stretch:62%;text-transform:uppercase;text-wrap:balance}
+.hero h1 span{color:var(--accent)}
+.hero p{margin:0;font-weight:500;color:#E4E7EC}
+.hero .cd{display:inline-flex;align-self:flex-start;background:var(--accent);color:#fff;font:700 .85rem var(--body);padding:4px 10px}
+
+/* tiles & cards */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:4px;text-align:left;cursor:pointer;color:var(--fg);font:inherit}
+.tile:hover{border-color:var(--accent)}
+.tile .n{font:900 2.2rem/1 var(--display);font-stretch:62%}
+.tile .t{font:600 .78rem var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tile .s{font-size:.85rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card h3{margin:0;font:900 1.5rem/1 var(--display);font-stretch:62%;text-transform:uppercase}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* controls */
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=datetime-local],select{flex:1;min-width:0;font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 12px}
+input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:600 .95rem var(--body);border:1px solid var(--accent);border-radius:4px;padding:9px 16px;background:var(--accent);color:var(--accent-fg);cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost,.btn.warn{background:transparent;color:var(--accent)}
+.btn.dark{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.btn.sm{padding:5px 10px;font-size:.82rem}
+.btn.arm{background:var(--accent);color:var(--accent-fg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.subtabs{display:flex;border:1px solid var(--fg);border-radius:4px;overflow:hidden;width:fit-content;max-width:100%}
+.subtab{font:600 .9rem var(--body);background:transparent;color:var(--fg);border:0;padding:8px 14px;cursor:pointer}
+.subtab[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);text-align:center}
+
+/* checklist */
+.item{display:grid;grid-template-columns:1fr;gap:6px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.item label{display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0}
+.item input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.item .name{font-weight:600}
+.item.done .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--moss)}
+.item .note{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.item .note input{font-size:.92rem;padding:6px 8px}
+.q{font:600 .75rem var(--body);border:1px solid var(--line);background:none;color:var(--muted);border-radius:4px;padding:5px 8px;cursor:pointer}
+.q.need[aria-pressed="true"]{background:var(--need-soft);color:var(--need);border-color:var(--need)}
+.q.skip[aria-pressed="true"]{background:var(--line);color:var(--fg);border-color:var(--muted)}
+.q.lend[aria-pressed="true"]{background:var(--moss-soft);color:var(--moss);border-color:var(--moss)}
+.sublbl{margin-top:10px}
+.savebar{position:sticky;bottom:0;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));padding-top:12px;background:var(--bg);display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)}
+
+/* overview */
+.it{padding:10px 0;border-bottom:1px dashed var(--line);display:flex;flex-direction:column;gap:6px}
+.it .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:.82rem;padding:2px 8px;border-radius:4px;background:var(--surface);border:1px solid var(--line)}
+.tag.ok{background:var(--moss-soft);border-color:transparent;color:var(--moss)}
+.tag.need{background:var(--need-soft);border-color:transparent;color:var(--need)}
+.tag.lend{border-color:var(--moss);color:var(--moss)}
+.ready{font:600 .75rem var(--body);text-transform:uppercase;padding:2px 8px;border-radius:4px;background:var(--moss-soft);color:var(--moss)}
+
+/* transport */
+.car .meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;color:var(--muted)}
+.seats{display:flex;flex-wrap:wrap;gap:6px}
+.seat{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:4px;padding:6px 10px;font-size:.88rem;min-width:110px}
+.seat::before{content:"";width:10px;height:12px;border-radius:3px 3px 1px 1px;background:var(--line);flex:none}
+.seat.taken::before{background:var(--fg)}
+.seat.driver{border-color:var(--fg)}
+.seat.driver::before{background:var(--accent)}
+.seat.free{color:var(--muted);border-style:dashed}
+.seat.me{border-color:var(--accent);color:var(--accent);font-weight:600}
+.fullcar{font:600 .75rem var(--body);text-transform:uppercase;padding:2px 8px;border-radius:4px;background:var(--fg);color:var(--bg)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.grid2 label{display:flex;flex-direction:column;gap:4px;font:600 .8rem var(--body);color:var(--muted)}
+
+/* admin */
+.linkbox{font:500 .9rem var(--body);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;word-break:break-all;user-select:all}
+.adm ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.prow,.irow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.prow .name{flex:1;min-width:120px;font-weight:600}
+.irow input[type=text]{padding:6px 8px;font-size:.9rem}
+.irow .cat{flex:0 1 170px}
+.thumb{width:100%;max-width:320px;aspect-ratio:16/9;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+body.noside .shell{grid-template-columns:minmax(0,1fr)}
+body.noside .side,body.noside .burger{display:none!important}
+.card form a,.card > a{color:var(--accent);font-size:.9rem}
+.side .foot a{color:var(--accent)}
+
+</style>
+</head>
+<body>
+<header class="topbar"><div class="in">
+  <button class="burger" id="burger" aria-label="Deschide meniul" aria-expanded="false">☰</button>
+  <a href="#acasa" class="brand" id="home" title="Acasă"><span class="mark">XCC</span><span class="full">Xtreme Character Challenge</span></a>
+  <span class="who-mini" id="whoMini"></span>
+</div></header>
+<div class="shell">
+  <nav class="side" id="side" aria-label="Meniu" hidden>
+    <button class="nav" data-go="home"><span class="ico">⌂</span>Acasă</button>
+    <div class="grp">Echipament</div>
+    <button class="nav" data-go="ind"><span class="ico">◧</span>Echipament individual<span class="badge" id="b-ind"></span></button>
+    <button class="nav" data-go="team"><span class="ico">⛺</span>Echipament de echipă<span class="badge" id="b-team"></span></button>
+    <div class="grp">Drum</div>
+    <button class="nav" data-go="transport"><span class="ico">🚗</span>Transport<span class="badge" id="b-tr"></span></button>
+    <div class="grp">Grup</div>
+    <button class="nav" data-go="group"><span class="ico">☷</span>Echipa<span class="badge" id="b-grp"></span></button>
+    <button class="nav" data-go="admin" id="nav-admin" hidden><span class="ico">⚙</span>Admin<span class="badge" id="b-adm"></span></button>
+    <div class="foot">
+      <span class="status" id="sideWho"></span>
+      <a href="https://www.4mro.ro/regulament-xcc" target="_blank" rel="noopener">Regulament XCC ↗</a>
+    </div>
+  </nav>
+  <button class="scrim" id="scrim" aria-label="Închide meniul"></button>
+  <main><div class="page" id="page"></div></main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ===== XCC app – Supabase backend ===== */
+const SUPABASE_URL = "https://fmdkcbvkohbgxrceegja.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZGtjYnZrb2hiZ3hyY2VlZ2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NTA4NjUsImV4cCI6MjEwNjUyNjg2NX0.Stx7byO_C52xGXl4bKkoHrofXroZfd6_UeqlV9mTHU8";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const S = { items: [], profiles: [], cars: [], teams: [], cfg: {}, uid: null, me: null, page: "home",
+  loaded: false, authMode: "login", recovering: false, groupTab: "ppl", groupTeam: "all", carForm: null, renaming: false };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SITE = location.origin + location.pathname;
+const PAGES = ["home","ind","team","transport","group","admin","profile"];
+
+const isOpt = it => /op[tț]ional/i.test(it.cat||"");
+const isTeam = it => /^echip/i.test(it.cat||"") || /\/\s*echip/i.test(it.name||"");
+const subLabel = it => isOpt(it) ? "" : (it.cat||"").replace(/\s*obligatoriu\s*/i, "").trim();
+const reqItems = () => S.items.filter(i => !isOpt(i) && !isTeam(i));
+const teamItems = () => S.items.filter(isTeam);
+const people = () => S.profiles.filter(p => p.status === "approved");
+const pending = () => S.profiles.filter(p => p.status === "pending");
+const isAdmin = () => S.me?.role === "admin" && S.me?.status === "approved";
+const approved = () => S.me?.status === "approved";
+const pname = uid => S.profiles.find(p => p.id === uid)?.name || "Cineva";
+const carOf = uid => { const r = S.profiles.find(p => p.id === uid)?.ride; return S.cars.find(c => c.id === r) ? r : null; };
+const teamOf = uid => { const t = S.profiles.find(p => p.id === uid)?.team; return S.teams.find(x => x.id === t) ? t : ""; };
+const teamName = tid => S.teams.find(x => x.id === tid)?.name || "Fără echipă";
+const mates = () => { const t = teamOf(S.uid); return t ? people().filter(p => teamOf(p.id) === t) : []; };
+const ridersOf = car => people().filter(p => p.ride === car.id && p.id !== car.owner);
+const noRide = () => people().filter(p => !carOf(p.id));
+const freeSeats = () => S.cars.reduce((n, c) => n + Math.max(0, (c.seats||0) - ridersOf(c).length), 0);
+
+let savedT;
+function status(msg, err){
+  const el = $("status"); if (!el) return;
+  el.hidden = !msg; el.textContent = msg || ""; el.classList.toggle("err", !!err); el.classList.remove("saved");
+}
+function flashSaved(){
+  const el = $("status"); if (!el) return;
+  el.hidden = false; el.textContent = "Salvat ✓"; el.classList.remove("err"); el.classList.add("saved");
+  clearTimeout(savedT); savedT = setTimeout(() => { if ($("status")?.classList.contains("saved")) status(""); }, 1800);
+}
+async function write(fn){
+  try {
+    const r = await fn();
+    if (r?.error) throw r.error;
+    flashSaved(); scheduleReload(150); return r ?? true;
+  } catch(e){
+    const m = e?.message || "";
+    status(/plin/i.test(m) ? "Mașina s-a umplut între timp." : /organizator/i.test(m) ? m : "Nu s-a salvat. Încearcă din nou.", true);
+    console.error(e); return false;
+  }
+}
+function arm(b, label){
+  if (b.dataset.armed) return true;
+  b.dataset.armed = "1"; const old = b.textContent; b.textContent = label || "Sigur? Apasă iar"; b.classList.add("arm");
+  setTimeout(() => { if (b.isConnected){ delete b.dataset.armed; b.textContent = old; b.classList.remove("arm"); } }, 4000);
+  return false;
+}
+
+/* ---------- data ---------- */
+async function loadAll(){
+  const cfg = await sb.from("config").select("*").eq("id", 1).maybeSingle();
+  S.cfg = cfg.data || {};
+  if (!S.uid){ S.loaded = true; render(); return; }
+  const [pr, it, tm, cr] = await Promise.all([
+    sb.from("profiles").select("*").order("created_at"),
+    sb.from("items").select("*").order("ord"),
+    sb.from("teams").select("*").order("created_at"),
+    sb.from("cars").select("*").order("created_at"),
+  ]);
+  S.profiles = pr.data || []; S.items = it.data || []; S.teams = tm.data || []; S.cars = cr.data || [];
+  S.me = S.profiles.find(p => p.id === S.uid) || null;
+  S.loaded = true;
+  render();
+}
+let reloadT;
+function scheduleReload(ms = 400){ clearTimeout(reloadT); reloadT = setTimeout(loadAll, ms); }
+let channel;
+function subscribe(){
+  if (channel) sb.removeChannel(channel);
+  channel = sb.channel("xcc-live")
+    .on("postgres_changes", { event: "*", schema: "public" }, () => scheduleReload())
+    .subscribe();
+}
+
+/* ---------- navigation ---------- */
+function go(page){
+  if (!PAGES.includes(page) || (page === "admin" && !isAdmin())) page = "home";
+  flushNotes();
+  S.page = page; S.carForm = null; S.renaming = false;
+  document.body.classList.remove("menu-open"); $("burger").setAttribute("aria-expanded", "false");
+  try { history.replaceState(null, "", "#" + (page === "home" ? "acasa" : page)); } catch {}
+  render(true); window.scrollTo({ top: 0 });
+}
+$("side").addEventListener("click", e => {
+  const b = e.target.closest("[data-go]"); if (b){ go(b.dataset.go); return; }
+  if (e.target.id === "logout"){ e.preventDefault(); sb.auth.signOut(); }
+});
+$("home").onclick = e => { e.preventDefault(); go("home"); };
+$("burger").onclick = () => { const o = document.body.classList.toggle("menu-open"); $("burger").setAttribute("aria-expanded", o); };
+$("scrim").onclick = () => { document.body.classList.remove("menu-open"); $("burger").setAttribute("aria-expanded", "false"); };
+
+/* ---------- pieces ---------- */
+function heroArt(){
+  if (S.cfg.hero_url) return `<img src="${esc(S.cfg.hero_url)}" alt="">`;
+  return `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1d22"/><stop offset="1" stop-color="#3a1416"/></linearGradient></defs>
+    <rect width="800" height="400" fill="url(#sky)"/><circle cx="560" cy="165" r="62" fill="#CF171F"/>
+    <path d="M0 250 L90 190 L160 225 L260 140 L340 205 L420 160 L520 230 L610 175 L700 215 L800 170 L800 400 L0 400Z" fill="#2a2c31"/>
+    <path d="M0 300 L120 235 L200 270 L300 215 L390 265 L470 230 L560 285 L660 240 L800 280 L800 400 L0 400Z" fill="#17181b"/>
+    <path d="M0 345 L80 320 L95 300 L110 320 L170 330 L230 300 L245 278 L260 300 L330 335 L420 318 L520 340 L600 312 L615 290 L630 312 L700 330 L800 318 L800 400 L0 400Z" fill="#0a0a0b"/></svg>`;
+}
+function daysLeft(){
+  if (!S.cfg.start_date) return null;
+  const d = new Date(S.cfg.start_date + "T00:00:00"), now = new Date();
+  return Math.ceil((d - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+}
+function fmtDate(iso){ try { return new Date(iso + "T00:00:00").toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric" }); } catch { return iso; } }
+function hero(){
+  const dl = daysLeft();
+  return `<section class="hero">${heroArt()}<div class="txt">
+    ${dl !== null && dl >= 0 ? `<span class="cd">${dl === 0 ? "Azi plecăm" : `Încă ${dl} ${dl === 1 ? "zi" : "zile"}`}</span>` : ""}
+    <h1>Xtreme <span>Character</span> Challenge</h1>
+    <p>72 de ore în sălbăticie · ${esc(S.cfg.start_date ? fmtDate(S.cfg.start_date) : "noiembrie 2026")}</p></div></section>`;
+}
+
+/* ---------- auth screens ---------- */
+function pageAuth(){
+  if (S.recovering) return hero() + `<div class="status" id="status" hidden></div>
+    <article class="card"><h3>Parolă nouă</h3>
+      <form class="stack" id="newPassForm">
+        <input type="password" id="np" placeholder="Parola nouă (minim 8 caractere)" minlength="8" autocomplete="new-password" required>
+        <button class="btn" type="submit">Salvează parola</button></form></article>`;
+  const m = S.authMode;
+  return hero() + `<div class="status" id="status" hidden></div>
+    <article class="card">
+      <div class="subtabs" role="tablist">
+        <button class="subtab" data-auth="login" aria-selected="${m==="login"}">Intră în cont</button>
+        <button class="subtab" data-auth="signup" aria-selected="${m==="signup"}">Creează cont</button></div>
+      ${m === "forgot" ? `<h3>Am uitat parola</h3><form class="stack" id="forgotForm">
+          <input type="email" id="fe" placeholder="Emailul tău" autocomplete="email" required>
+          <button class="btn" type="submit">Trimite link de resetare</button>
+          <a href="#" data-auth="login">Înapoi la intrare</a></form>`
+      : m === "signup" ? `<p class="status" style="margin:0">Îți faci contul o singură dată. După ce Clau îl aprobă, intri cu emailul și parola de pe orice telefon sau laptop.</p>
+        <form class="stack" id="signupForm">
+          <input type="text" id="sn" placeholder="Numele tău (cum te știe echipa)" maxlength="30" autocomplete="name" required>
+          <input type="email" id="se" placeholder="Email" autocomplete="email" required>
+          <input type="password" id="sp" placeholder="Parolă (minim 8 caractere)" minlength="8" autocomplete="new-password" required>
+          <button class="btn" type="submit">Creează contul</button></form>`
+      : `<form class="stack" id="loginForm">
+          <input type="email" id="le" placeholder="Email" autocomplete="email" required>
+          <input type="password" id="lp" placeholder="Parolă" autocomplete="current-password" required>
+          <button class="btn" type="submit">Intră în cont</button>
+          <a href="#" data-auth="forgot">Am uitat parola</a></form>`}
+    </article>`;
+}
+function pagePending(){
+  const rej = S.me?.status === "rejected";
+  return hero() + `<article class="card"><h3>${rej ? "Cont neaprobat" : "Contul tău așteaptă aprobarea"}</h3>
+    <p class="status" style="margin:0">${rej ? "Organizatorul nu a aprobat contul. Dacă e o greșeală, scrie-i lui Clau." :
+      `Salut, <b>${esc(S.me?.name || "")}</b>! Clau primește cererea ta și te aprobă în curând. Pagina se actualizează singură când ești aprobat.`}</p>
+    <div class="row"><button class="btn ghost" id="logoutBtn">Ieși din cont</button></div></article>`;
+}
+
+/* ---------- app pages ---------- */
+function pageHome(){
+  const p = S.me, req = reqItems(), team = teamItems(), myTeam = teamOf(S.uid);
+  const mine = req.filter(i => p.items?.[i.id]?.ok).length;
+  const covered = team.filter(i => mates().some(x => x.items?.[i.id]?.ok)).length;
+  return hero() + `<div class="status" id="status" hidden></div>
+    ${isAdmin() && pending().length ? `<button class="tile" data-go="admin" style="border-color:var(--accent)"><span class="t">De aprobat</span><span class="n">${pending().length}</span><span class="s">${pending().length === 1 ? "cont nou așteaptă" : "conturi noi așteaptă"} aprobarea ta</span></button>` : ""}
+    <div class="tiles">
+      <button class="tile" data-go="ind"><span class="t">Echipamentul tău</span><span class="n">${mine}/${req.length}</span><span class="s">obligatorii bifate</span></button>
+      <button class="tile" data-go="team"><span class="t">${myTeam ? esc(teamName(myTeam)) : "Echipa ta"}</span><span class="n">${myTeam ? `${covered}/${team.length}` : "–"}</span><span class="s">${myTeam ? "lucruri de echipă acoperite" : "încă fără echipă; te repartizăm după listele de la 4M"}</span></button>
+      <button class="tile" data-go="transport"><span class="t">Transport</span><span class="n">${S.cars.length}</span><span class="s">${S.cars.length === 1 ? "mașină" : "mașini"} · ${freeSeats()} locuri libere · ${noRide().length} fără loc</span></button>
+      <button class="tile" data-go="group"><span class="t">Echipa</span><span class="n">${people().length}</span><span class="s">${people().length === 1 ? "om înscris" : "oameni înscriși"}</span></button>
+    </div>
+    <p class="status">Lipsa echipamentului obligatoriu înseamnă descalificare, iar organizatorul nu asigură nimic din listă. Folosește meniul ca să mergi la fiecare secțiune.</p>`;
+}
+function teamInfo(){
+  const t = teamOf(S.uid);
+  if (!t) return '<div class="empty" style="text-align:left">Încă nu ești într-o echipă. Echipele le facem după ce primim listele pe email de la 4M. Până atunci poți bifa ce ai putea aduce.</div>';
+  const m = mates();
+  const rows = teamItems().map(it => {
+    const who = m.filter(x => x.items?.[it.id]?.ok).map(x => esc(x.name));
+    return `<div class="it"><div class="top"><b>${esc(it.name)}</b>${who.length ? `<span class="tag ok">${who.join(", ")}</span>` : (isOpt(it) ? '<span class="count">opțional</span>' : '<span class="tag need">nimeni încă</span>')}</div></div>`;
+  }).join("");
+  return `<article class="card"><div class="top"><h3>${esc(teamName(t))}</h3><span class="count">${m.length} ${m.length===1?"om":"oameni"}: ${m.map(x => esc(x.name)).join(", ")}</span></div>${rows}</article>`;
+}
+function checklist(kind){
+  const p = S.me;
+  const head = kind === "team"
+    ? `<div class="eyebrow">Echipament</div><h1 class="pg">Echipament de <span>echipă</span></h1>
+       <p class="lead">E nevoie de câte unul pe echipă. Bifează doar ce aduci tu pentru toată echipa, ca să nu vină toți cu același lucru.</p>${teamInfo()}`
+    : `<div class="eyebrow">Echipament</div><h1 class="pg">Echipament <span>individual</span></h1>
+       <p class="lead">Bifează ce ai. Dacă îți lipsește ceva, apasă „Am nevoie”; dacă ai în plus, „Pot împrumuta”.</p>`;
+  const list = S.items.filter(it => kind === "team" ? isTeam(it) : !isTeam(it));
+  const row = it => {
+    const st = p.items?.[it.id] || {}, skip = st.flag === "skip";
+    return `<div class="item ${st.ok||skip?"done":""}" data-i="${esc(it.id)}">
+      <label><input type="checkbox" id="c-${esc(it.id)}" ${st.ok?"checked":""}><span class="name">${esc(it.name)}</span>${skip?'<span class="count">nu iau</span>':""}</label>
+      <div class="note">
+        ${isOpt(it) ? `<button class="q skip" data-flag="skip" aria-pressed="${skip}">Nu iau</button>` : ""}
+        ${kind === "team" ? "" : `<button class="q need" data-flag="need" aria-pressed="${st.flag==="need"}">Am nevoie</button>
+        <button class="q lend" data-flag="lend" aria-pressed="${st.flag==="lend"}">Pot împrumuta</button>`}
+        <input type="text" id="n-${esc(it.id)}" value="${esc(st.note)}" placeholder="notă…" maxlength="80">
+      </div></div>`;
+  };
+  const section = (title, its) => {
+    if (!its.length) return "";
+    const done = its.filter(it => p.items?.[it.id]?.ok || p.items?.[it.id]?.flag === "skip").length;
+    const g = {}; for (const it of its) (g[subLabel(it)] ??= []).push(it);
+    const groups = Object.entries(g);
+    return `<h2>${title} <span class="count">${done}/${its.length}</span></h2>` + groups.map(([lab, l]) =>
+      (groups.length > 1 && lab ? `<div class="lbl sublbl">${esc(lab)}</div>` : "") + l.map(row).join("")).join("");
+  };
+  return head + '<div class="status" id="status" hidden></div>' +
+    `<div>${section("Obligatoriu", list.filter(i => !isOpt(i))) + section("Opțional", list.filter(isOpt)) || '<div class="empty">Nimic aici încă.</div>'}</div>
+     <div class="savebar"><button class="btn" type="button" id="saveAll">Salvează</button><span class="status">Bifele se salvează singure; butonul salvează imediat și notele.</span></div>`;
+}
+function pageTransport(){
+  const myCar = carOf(S.uid), mineOwned = S.cars.find(c => c.owner === S.uid), f = S.carForm;
+  const form = f ? `<article class="card"><h3>${f.id ? "Editează mașina" : "Adaug mașina mea"}</h3>
+    <form class="stack" id="carForm"><div class="grid2">
+      <label>Mașina<input type="text" id="cf-label" value="${esc(f.label||"")}" placeholder="ex. Dacia Duster gri" maxlength="40"></label>
+      <label>Locuri libere pentru pasageri<input type="number" id="cf-seats" min="0" max="8" value="${esc(f.seats ?? 3)}"></label>
+      <label>Pleacă din<input type="text" id="cf-from" value="${esc(f.from_city||"")}" placeholder="ex. Oradea" maxlength="40"></label>
+      <label>Când pleacă<input type="text" id="cf-when" value="${esc(f.when_text||"")}" placeholder="ex. joi, ora 14" maxlength="40"></label></div>
+      <label class="lbl" style="display:flex;flex-direction:column;gap:4px">Notă<input type="text" id="cf-note" value="${esc(f.note||"")}" placeholder="ex. am loc pentru rucsacii mari" maxlength="80"></label>
+      <div class="row"><button class="btn" type="submit">Salvează mașina</button><button class="btn ghost" type="button" id="cf-cancel">Anulează</button></div>
+    </form></article>` : "";
+  const cards = S.cars.map(c => {
+    const riders = ridersOf(c), free = Math.max(0, (c.seats||0) - riders.length);
+    const isMine = c.owner === S.uid, inIt = myCar === c.id && !isMine;
+    const seats = [`<span class="seat driver ${isMine?"me":""}">${esc(pname(c.owner))} · șofer</span>`]
+      .concat(riders.map(r => `<span class="seat taken ${r.id===S.uid?"me":""}">${esc(r.name)}</span>`))
+      .concat(Array.from({length: free}, () => '<span class="seat free">liber</span>')).join("");
+    let act = "";
+    if (isMine) act = `<button class="btn sm ghost" data-car="edit">Editează</button><button class="btn sm warn" data-car="del">Șterge mașina</button>`;
+    else if (inIt) act = `<button class="btn sm ghost" data-car="leave">Renunț la loc</button>`;
+    else if (free > 0 && !mineOwned) act = `<button class="btn sm" data-car="join">${myCar ? "Mută-mă aici" : "Iau un loc"}</button>`;
+    if (isAdmin() && !isMine) act += `<button class="btn sm warn" data-car="del">Șterge (admin)</button>`;
+    return `<article class="card car" data-cid="${esc(c.id)}">
+      <div class="top"><h3>${esc(c.label || "Mașină")}</h3>${free === 0 ? '<span class="fullcar">Plină</span>' : `<span class="count">${free} ${free===1?"loc liber":"locuri libere"}</span>`}</div>
+      <div class="meta">${c.from_city ? `<span>Din <b>${esc(c.from_city)}</b></span>` : ""}${c.when_text ? `<span>Pleacă <b>${esc(c.when_text)}</b></span>` : ""}</div>
+      <div class="seats">${seats}</div>${c.note ? `<p class="status" style="margin:0">${esc(c.note)}</p>` : ""}
+      ${act ? `<div class="row">${act}</div>` : ""}</article>`;
+  }).join("");
+  const waiting = noRide();
+  const assign = isAdmin() && people().length ? `<article class="card"><h3>Repartizare (admin)</h3><p class="status">Mută pe oricine în altă mașină.</p>
+    ${people().map(x => `<div class="prow"><span class="name">${esc(x.name)}</span>
+      <select data-assign="${esc(x.id)}" aria-label="Mașina lui ${esc(x.name)}"><option value="">Fără loc</option>
+      ${S.cars.map(c => `<option value="${esc(c.id)}" ${carOf(x.id)===c.id?"selected":""}>${esc(c.label||"Mașină")} · ${esc(pname(c.owner))}</option>`).join("")}</select></div>`).join("")}</article>` : "";
+  return `<div class="eyebrow">Drum</div><h1 class="pg">Trans<span>port</span></h1>
+    <p class="lead">Cine are mașină o adaugă cu locurile libere. Ceilalți își iau un loc. Lista „Încă fără loc” arată cine mai trebuie dus.</p>
+    <div class="status" id="status" hidden></div>
+    <div class="tiles"><div class="tile" style="cursor:default"><span class="t">Mașini</span><span class="n">${S.cars.length}</span></div>
+      <div class="tile" style="cursor:default"><span class="t">Locuri libere</span><span class="n">${freeSeats()}</span></div>
+      <div class="tile" style="cursor:default"><span class="t">Fără loc</span><span class="n">${waiting.length}</span></div></div>
+    ${!mineOwned && !f ? `<div class="row"><button class="btn" id="addCar">+ Am mașină</button>${myCar ? "" : '<span class="status">sau ia un loc într-o mașină de mai jos</span>'}</div>` : ""}
+    ${form}${cards || '<div class="empty">Nicio mașină încă. Dacă ai mașină, apasă „Am mașină”.</div>'}
+    <h2>Încă fără loc <span class="count">${waiting.length}</span></h2>
+    ${waiting.length ? `<div class="tags">${waiting.map(x => `<span class="tag ${x.id===S.uid?"need":""}">${esc(x.name)}</span>`).join("")}</div>` : '<p class="status">Toată lumea are loc.</p>'}
+    ${assign}`;
+}
+function pageGroup(){
+  const t = S.groupTab, ft = S.groupTeam;
+  const shown = ft === "all" ? people() : people().filter(p => teamOf(p.id) === (ft === "none" ? "" : ft));
+  let body;
+  if (!shown.length) body = '<div class="empty">Nimeni aici încă.</div>';
+  else if (t === "ppl"){
+    const req = reqItems(), team = teamItems(), opt = S.items.filter(isOpt);
+    const list = (arr, cls, fn) => arr.length ? `<div class="tags">${arr.map(x => `<span class="tag ${cls}">${fn(x)}</span>`).join("")}</div>` : "";
+    body = '<div class="stack">' + shown.map(p => {
+      const st = id => p.items?.[id] || {};
+      const has = req.filter(i => st(i.id).ok).length, missing = req.filter(i => !st(i.id).ok);
+      const withNote = i => esc(i.name) + (st(i.id).note ? ": " + esc(st(i.id).note) : "");
+      const sec = (title, html) => html ? `<div><div class="lbl">${title}</div>${html}</div>` : "";
+      const car = S.cars.find(c => c.id === carOf(p.id));
+      return `<article class="card">
+        <div class="top"><h3>${esc(p.name)}</h3>${missing.length ? `<span class="count">${has}/${req.length} obligatorii</span>` : '<span class="ready">Gata de drum</span>'}</div>
+        <div class="bar"><i style="width:${req.length ? has/req.length*100 : 0}%"></i></div>
+        ${sec("Îi lipsește", list(missing, "", i => esc(i.name)))}
+        ${sec("Are nevoie", list(S.items.filter(i => st(i.id).flag==="need"), "need", withNote))}
+        ${sec("Poate împrumuta", list(S.items.filter(i => st(i.id).flag==="lend"), "lend", withNote))}
+        ${sec("Aduce pentru echipă", list(team.filter(i => st(i.id).ok), "ok", i => esc(i.name)))}
+        ${sec("Opționale pe care le ia", list(opt.filter(i => st(i.id).ok), "ok", i => esc(i.name)))}
+        ${sec("Echipa", `<span class="tag ${teamOf(p.id) ? "" : "need"}">${esc(teamName(teamOf(p.id)))}</span>`)}
+        ${sec("Transport", car ? `<span class="tag ok">${car.owner === p.id ? "Șofer" : "Pasager"} · ${esc(car.label || "Mașină")}</span>` : '<span class="tag need">Încă fără loc</span>')}
+        ${sec("Note", list(S.items.filter(i => st(i.id).note && !st(i.id).flag), "", i => esc(i.name) + ": " + esc(st(i.id).note)))}
+      </article>`;
+    }).join("") + '</div>';
+  } else {
+    const total = shown.length, g = {};
+    for (const it of S.items) (g[isTeam(it) ? "Echipă" : isOpt(it) ? "Opțional" : "Individual obligatoriu"] ??= []).push(it);
+    body = Object.entries(g).map(([cat, its]) => `<h2>${esc(cat)}</h2>` + its.map(it => {
+      const has = shown.filter(p => p.items?.[it.id]?.ok);
+      const tags = shown.map(p => {
+        const st = p.items?.[it.id] || {};
+        if (!st.ok && !st.flag && !st.note) return "";
+        const cls = st.flag==="need" ? "need" : st.flag==="lend" ? "lend" : st.ok ? "ok" : "";
+        const extra = st.flag==="need" ? " · are nevoie" : st.flag==="lend" ? " · împrumută" : st.flag==="skip" ? " · nu ia" : "";
+        return `<span class="tag ${cls}">${st.ok?"✓ ":""}${esc(p.name)}${extra}${st.note?": "+esc(st.note):""}</span>`;
+      }).join("");
+      return `<div class="it"><div class="top"><b>${esc(it.name)}</b><span class="count">${has.length}/${total}</span></div>
+        <div class="bar"><i style="width:${has.length/total*100}%"></i></div>${tags?`<div class="tags">${tags}</div>`:""}</div>`;
+    }).join("")).join("");
+  }
+  return `<div class="eyebrow">Grup</div><h1 class="pg">Echi<span>pa</span></h1>
+    <p class="lead">Cine ce are, ce-i lipsește, în ce echipă e și cu ce mașină vine.</p>
+    <div class="subtabs" role="tablist"><button class="subtab" data-gt="ppl" aria-selected="${t==="ppl"}">Pe om</button>
+      <button class="subtab" data-gt="gear" aria-selected="${t==="gear"}">Pe echipament</button></div>
+    ${S.teams.length ? `<div class="row"><span class="lbl" style="margin:0">Arată</span><select id="teamFilter" aria-label="Filtrează după echipă" style="flex:0 1 240px">
+      <option value="all" ${ft==="all"?"selected":""}>Toată lumea</option>
+      ${S.teams.map(x => `<option value="${esc(x.id)}" ${ft===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}
+      <option value="none" ${ft==="none"?"selected":""}>Fără echipă</option></select></div>` : ""}` + body;
+}
+function pageProfile(){
+  return `<div class="eyebrow">Contul meu</div><h1 class="pg">Pro<span>fil</span></h1><div class="status" id="status" hidden></div>
+    <article class="card"><h3>Numele</h3><form class="row" id="nameForm">
+      <input type="text" id="pn" value="${esc(S.me?.name || "")}" maxlength="30" autocomplete="name" aria-label="Numele tău">
+      <button class="btn" type="submit">Salvează</button></form></article>
+    <article class="card"><h3>Parola</h3><form class="row" id="passForm">
+      <input type="password" id="pp" placeholder="Parola nouă (minim 8 caractere)" minlength="8" autocomplete="new-password" aria-label="Parola nouă">
+      <button class="btn" type="submit">Schimbă parola</button></form></article>
+    <article class="card"><h3>Ieșire</h3><p class="status" style="margin:0">Ești intrat cu <b>${esc(S.email || "")}</b>.</p>
+      <div class="row"><button class="btn ghost" id="logoutBtn">Ieși din cont</button></div></article>`;
+}
+function pageAdmin(){
+  const req = reqItems();
+  const pend = pending().map(p => `<div class="prow" data-pid="${esc(p.id)}"><span class="name">${esc(p.name)}</span>
+      <span class="count">${new Date(p.created_at).toLocaleDateString("ro-RO")}</span>
+      <button class="btn sm" data-act="approve">Aprobă</button><button class="btn sm warn" data-act="reject">Respinge</button></div>`).join("");
+  const rejected = S.profiles.filter(p => p.status === "rejected");
+  const ppl = people().map(p => `<div class="prow" data-pid="${esc(p.id)}"><span class="name">${esc(p.name)}${p.id === S.uid ? " (tu)" : ""}${p.role === "admin" ? ' <span class="tag">admin</span>' : ""}</span>
+      <span class="count">${req.filter(i => p.items?.[i.id]?.ok).length}/${req.length}</span>
+      <select data-team="${esc(p.id)}" aria-label="Echipa lui ${esc(p.name)}" style="flex:0 1 170px"><option value="">Fără echipă</option>
+        ${S.teams.map(x => `<option value="${esc(x.id)}" ${teamOf(p.id)===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select>
+      ${p.id === S.uid ? "" : `<button class="btn sm ghost" data-act="${p.role === "admin" ? "unadmin" : "mkadmin"}">${p.role === "admin" ? "Scoate admin" : "Fă admin"}</button>
+      <button class="btn sm warn" data-act="reset">Golește bifele</button><button class="btn sm warn" data-act="reject">Scoate</button>`}</div>`).join("");
+  const items = S.items.map(it => `<div class="irow" data-iid="${esc(it.id)}">
+      <input type="text" id="an-${esc(it.id)}" value="${esc(it.name)}" maxlength="60" aria-label="Nume">
+      <input type="text" class="cat" id="ac-${esc(it.id)}" value="${esc(it.cat)}" maxlength="30" aria-label="Categorie">
+      <button class="btn sm" data-act="saveItem">Salvează</button><button class="btn sm warn" data-act="delItem">Șterge</button></div>`).join("");
+  return `<div class="eyebrow">Organizator</div><h1 class="pg">Ad<span>min</span></h1><div class="status" id="status" hidden></div>
+    <article class="card adm"><h3>Link de înregistrare</h3>
+      <div class="linkbox" id="linkBox">${esc(SITE)}</div>
+      <div class="row"><button class="btn sm" data-act="copy">Copiază linkul</button></div>
+      <p class="status" style="margin:0">Trimite linkul oricui. Își fac cont cu nume, email și parolă, apoi apar mai jos la „De aprobat”. Până nu îi aprobi, nu văd nimic din aplicație.</p></article>
+    <article class="card adm"><h3>De aprobat <span class="count">${pending().length}</span></h3>${pend || '<p class="status" style="margin:0">Nicio cerere nouă.</p>'}</article>
+    <article class="card adm"><h3>Echipe <span class="count">${S.teams.length}</span></h3>
+      <p class="status" style="margin:0">Toți intră fără echipă. După ce primiți listele pe email de la 4M, creați echipele aici și alegeți echipa fiecăruia la Oameni.</p>
+      ${S.teams.map(x => `<div class="irow" data-tid="${esc(x.id)}"><input type="text" id="tn-${esc(x.id)}" value="${esc(x.name)}" maxlength="40" aria-label="Numele echipei">
+        <span class="count">${people().filter(p => teamOf(p.id) === x.id).length} oameni</span>
+        <button class="btn sm" data-act="saveTeam">Salvează</button><button class="btn sm warn" data-act="delTeam">Șterge</button></div>`).join("")}
+      <form class="row" id="addTeam"><input type="text" id="teamNameNew" placeholder="Echipă nouă (ex. Echipa 3)" maxlength="40" autocomplete="off"><button class="btn sm" type="submit">Creează echipa</button></form></article>
+    <article class="card adm"><h3>Oameni <span class="count">${people().length}</span></h3>${ppl}
+      ${rejected.length ? `<div class="lbl" style="margin-top:8px">Respinși / scoși</div>${rejected.map(p => `<div class="prow" data-pid="${esc(p.id)}"><span class="name">${esc(p.name)}</span><button class="btn sm ghost" data-act="approve">Reprimește</button></div>`).join("")}` : ""}</article>
+    <article class="card adm"><h3>Pagina Acasă</h3>
+      ${S.cfg.hero_url ? `<img class="thumb" src="${esc(S.cfg.hero_url)}" alt="Poza de pe pagina Acasă">` : '<p class="status" style="margin:0">Acum e ilustrația implicită. Pune o poză de-a voastră din aventură.</p>'}
+      <div class="row"><label class="btn sm" for="heroFile">Încarcă poză</label><input type="file" id="heroFile" accept="image/*" hidden>
+        ${S.cfg.hero_url ? '<button class="btn sm warn" data-act="heroClear">Revino la ilustrație</button>' : ""}</div>
+      <div class="row"><span class="lbl" style="margin:0">Data plecării</span>
+        <input type="date" id="startDate" value="${esc(S.cfg.start_date || "")}" style="flex:0 1 200px"><button class="btn sm" data-act="saveDate">Salvează data</button></div></article>
+    <article class="card adm"><h3>Lista de echipament <span class="count">${S.items.length}</span></h3>
+      <p class="status" style="margin:0">Categoria decide unde apare: „Opțional” → la opționale, „Echipă …” → la echipă, restul → individual obligatoriu.</p>${items}
+      <form class="row" id="addItem"><input type="text" id="itemName" placeholder="Echipament nou" maxlength="60" autocomplete="off">
+        <input type="text" id="itemCat" placeholder="Categorie" maxlength="30" autocomplete="off" style="flex:0 1 170px"><button class="btn sm" type="submit">Adaugă</button></form></article>
+    <article class="card adm"><h3>Reset general</h3><p class="status" style="margin:0">Golește bifele și notele tuturor. Oamenii, mașinile și lista rămân.</p>
+      <div class="row"><button class="btn sm warn" data-act="resetAll">Golește tot</button></div></article>`;
+}
+
+/* ---------- render ---------- */
+function render(force){
+  const inApp = S.uid && approved();
+  document.body.classList.toggle("noside", !inApp);
+  $("side").hidden = !inApp; $("burger").hidden = !inApp;
+  $("whoMini").innerHTML = S.me ? `<b>${esc(S.me.name)}</b>` : "";
+  if (inApp){
+    $("sideWho").innerHTML = `Ești intrat ca <b>${esc(S.me.name)}</b><br><a href="#" data-go="profile">Profil</a> · <a href="#" id="logout">Ieși</a>`;
+    $("nav-admin").hidden = !isAdmin();
+    $("b-adm").textContent = pending().length ? pending().length + " noi" : "";
+    document.querySelectorAll("#side .nav[data-go]").forEach(b => b.dataset.go === S.page ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+    const req = reqItems(), tm = teamItems();
+    $("b-ind").textContent = `${req.filter(i => S.me.items?.[i.id]?.ok).length}/${req.length}`;
+    $("b-team").textContent = teamOf(S.uid) ? `${tm.filter(i => mates().some(x => x.items?.[i.id]?.ok)).length}/${tm.length}` : "";
+    $("b-tr").textContent = S.cars.length ? `${freeSeats()} libere` : "";
+    $("b-grp").textContent = people().length || "";
+  }
+  const a = document.activeElement;
+  if (!force && a && $("page").contains(a) && /INPUT|SELECT|TEXTAREA/.test(a.tagName) && a.type !== "checkbox") return;
+  let html;
+  if (!S.loaded) html = '<div class="empty">Se încarcă…</div>';
+  else if (!S.uid || S.recovering) html = pageAuth();
+  else if (!S.me) html = '<div class="empty">Se pregătește contul…</div>';
+  else if (!approved()) html = pagePending();
+  else {
+    if (S.page === "admin" && !isAdmin()) S.page = "home";
+    html = S.page === "ind" ? checklist("ind") : S.page === "team" ? checklist("team") : S.page === "transport" ? pageTransport()
+      : S.page === "group" ? pageGroup() : S.page === "admin" ? pageAdmin() : S.page === "profile" ? pageProfile() : pageHome();
+  }
+  const prev = $("status"), keep = prev && !prev.hidden ? [prev.textContent, prev.className] : null;
+  $("page").innerHTML = html;
+  if (keep && $("status")){ $("status").hidden = false; $("status").textContent = keep[0]; $("status").className = keep[1]; }
+}
+
+/* ---------- writes ---------- */
+function setItem(itemId, patch){
+  if (!S.me) return;
+  const cur = { ok: false, flag: "", note: "", ...(S.me.items?.[itemId] || {}), ...patch };
+  S.me.items = { ...(S.me.items || {}), [itemId]: cur };
+  return write(() => sb.rpc("set_item", { item_id: itemId, val: cur }));
+}
+const timers = {}, pendingNotes = {};
+async function flushNotes(){
+  for (const [id, note] of Object.entries(pendingNotes)){ clearTimeout(timers[id]); delete pendingNotes[id]; await setItem(id, { note }); }
+}
+const setRide = (uid, carId) => write(() => sb.from("profiles").update({ ride: carId || null }).eq("id", uid));
+
+/* ---------- events ---------- */
+const pg = $("page");
+pg.addEventListener("click", async e => {
+  const t = e.target;
+  const goBtn = t.closest("[data-go]"); if (goBtn){ e.preventDefault(); go(goBtn.dataset.go); return; }
+  const au = t.closest("[data-auth]"); if (au){ e.preventDefault(); S.authMode = au.dataset.auth; render(true); return; }
+  if (t.id === "logoutBtn"){ sb.auth.signOut(); return; }
+  const gt = t.closest("[data-gt]"); if (gt){ S.groupTab = gt.dataset.gt; render(true); return; }
+  if (t.id === "saveAll"){ await flushNotes(); flashSaved(); return; }
+  const row = t.closest("[data-i]"), f = t.closest("[data-flag]");
+  if (row && f){
+    const st = S.me?.items?.[row.dataset.i] || {};
+    const flag = st.flag === f.dataset.flag ? "" : f.dataset.flag;
+    setItem(row.dataset.i, flag === "skip" ? { flag, ok: false } : { flag }); render(true); return;
+  }
+  if (t.id === "addCar"){ S.carForm = { seats: 3 }; render(true); return; }
+  if (t.id === "cf-cancel"){ S.carForm = null; render(true); return; }
+  const cb = t.closest("[data-car]");
+  if (cb){
+    const cid = cb.closest("[data-cid]").dataset.cid, car = S.cars.find(c => c.id === cid), act = cb.dataset.car;
+    if (act === "join") await setRide(S.uid, cid);
+    if (act === "leave") await setRide(S.uid, "");
+    if (act === "edit"){ S.carForm = { ...car }; render(true); }
+    if (act === "del"){ if (!arm(cb)) return; await write(() => sb.from("cars").delete().eq("id", cid)); }
+    return;
+  }
+  const ab = t.closest("[data-act]"); if (!ab) return;
+  const act = ab.dataset.act, pid = ab.closest("[data-pid]")?.dataset.pid, iid = ab.closest("[data-iid]")?.dataset.iid, tid = ab.closest("[data-tid]")?.dataset.tid;
+  const upd = (id, v) => write(() => sb.from("profiles").update(v).eq("id", id));
+  if (act === "copy"){
+    try { await navigator.clipboard.writeText(SITE); ab.textContent = "Copiat ✓"; }
+    catch { const r = document.createRange(); r.selectNodeContents($("linkBox")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+  }
+  if (act === "approve") await upd(pid, { status: "approved" });
+  if (act === "reject"){ if (!arm(ab)) return; await upd(pid, { status: "rejected", ride: null }); }
+  if (act === "mkadmin"){ if (!arm(ab)) return; await upd(pid, { role: "admin" }); }
+  if (act === "unadmin") await upd(pid, { role: "member" });
+  if (act === "reset"){ if (!arm(ab)) return; await upd(pid, { items: {} }); }
+  if (act === "resetAll"){ if (!arm(ab, "Sigur? Se golesc bifele tuturor")) return; for (const p of people()) await upd(p.id, { items: {} }); }
+  if (act === "saveItem"){ const name = $("an-"+iid).value.trim(), cat = $("ac-"+iid).value.trim() || "Altele"; if (name) await write(() => sb.from("items").update({ name, cat }).eq("id", iid)); ab.blur(); }
+  if (act === "delItem"){ if (!arm(ab)) return; await write(() => sb.from("items").delete().eq("id", iid)); }
+  if (act === "saveTeam"){ const name = $("tn-"+tid).value.trim(); if (name) await write(() => sb.from("teams").update({ name }).eq("id", tid)); ab.blur(); }
+  if (act === "delTeam"){ if (!arm(ab, "Sigur? Membrii rămân fără echipă")) return; await write(() => sb.from("teams").delete().eq("id", tid)); }
+  if (act === "saveDate"){ await write(() => sb.from("config").update({ start_date: $("startDate").value || null }).eq("id", 1)); ab.blur(); }
+  if (act === "heroClear"){ if (!arm(ab)) return; await write(() => sb.from("config").update({ hero_url: "" }).eq("id", 1)); }
+});
+pg.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.type === "checkbox"){
+    const row = t.closest("[data-i]"); if (!row) return;
+    const st = S.me?.items?.[row.dataset.i] || {};
+    setItem(row.dataset.i, t.checked && st.flag === "skip" ? { ok: true, flag: "" } : { ok: t.checked }); render(true); return;
+  }
+  if (t.id === "teamFilter"){ S.groupTeam = t.value; t.blur(); render(true); return; }
+  if (t.dataset.team !== undefined){ await write(() => sb.from("profiles").update({ team: t.value || null }).eq("id", t.dataset.team)); t.blur(); return; }
+  if (t.dataset.assign !== undefined){ await setRide(t.dataset.assign, t.value); t.blur(); return; }
+  if (t.id === "heroFile" && t.files?.[0]){
+    const file = t.files[0];
+    if (file.size > 8e6){ status("Poza e prea mare (maxim 8 MB).", true); return; }
+    status("Se încarcă poza…");
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const path = `hero-${Date.now()}.${ext}`;
+    const up = await sb.storage.from("media").upload(path, file, { contentType: file.type, upsert: false });
+    if (up.error){ status("Poza nu s-a putut încărca. Încearcă un JPG sau PNG.", true); return; }
+    const url = sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+    await write(() => sb.from("config").update({ hero_url: url }).eq("id", 1));
+  }
+});
+pg.addEventListener("input", e => {
+  const t = e.target, row = t.closest("[data-i]");
+  if (!row || t.type !== "text") return;
+  const id = row.dataset.i, val = t.value.trim();
+  clearTimeout(timers[id]); pendingNotes[id] = val;
+  timers[id] = setTimeout(() => { delete pendingNotes[id]; setItem(id, { note: val }); }, 700);
+});
+pg.addEventListener("focusout", e => { if (e.target.closest?.("[data-i]") && e.target.type === "text") setTimeout(() => render(), 800); });
+pg.addEventListener("submit", async e => {
+  e.preventDefault();
+  const id = e.target.id;
+  if (id === "loginForm"){
+    status("Se verifică…");
+    const r = await sb.auth.signInWithPassword({ email: $("le").value.trim(), password: $("lp").value });
+    if (r.error) status(/confirm/i.test(r.error.message) ? "Confirmă întâi emailul din mesajul primit." : "Email sau parolă greșită.", true);
+  }
+  if (id === "signupForm"){
+    const name = $("sn").value.trim(), email = $("se").value.trim(), password = $("sp").value;
+    if (password.length < 8){ status("Parola trebuie să aibă minim 8 caractere.", true); return; }
+    status("Se creează contul…");
+    const r = await sb.auth.signUp({ email, password, options: { data: { name }, emailRedirectTo: SITE } });
+    if (r.error) status(/registered|exists/i.test(r.error.message) ? "Există deja un cont cu acest email. Intră în cont." : "Contul nu s-a putut crea: " + r.error.message, true);
+    else if (!r.data.session) status("Ți-am trimis un email de confirmare. Apasă pe link, apoi intră în cont.");
+  }
+  if (id === "forgotForm"){
+    const r = await sb.auth.resetPasswordForEmail($("fe").value.trim(), { redirectTo: SITE });
+    status(r.error ? "Nu s-a putut trimite emailul. Încearcă mai târziu." : "Dacă emailul are cont, ai primit un link de resetare.", !!r.error);
+  }
+  if (id === "newPassForm" || id === "passForm"){
+    const pw = $(id === "newPassForm" ? "np" : "pp").value;
+    if (pw.length < 8){ status("Parola trebuie să aibă minim 8 caractere.", true); return; }
+    const r = await sb.auth.updateUser({ password: pw });
+    if (r.error) status("Parola nu s-a schimbat: " + r.error.message, true);
+    else { S.recovering = false; render(true); flashSaved(); }
+  }
+  if (id === "nameForm"){ const name = $("pn").value.trim(); if (name) await write(() => sb.from("profiles").update({ name }).eq("id", S.uid)); $("pn").blur(); }
+  if (id === "carForm"){
+    const data = { label: $("cf-label").value.trim(), seats: Math.max(0, Math.min(8, parseInt($("cf-seats").value) || 0)),
+      from_city: $("cf-from").value.trim(), when_text: $("cf-when").value.trim(), note: $("cf-note").value.trim() };
+    if (S.carForm.id) await write(() => sb.from("cars").update(data).eq("id", S.carForm.id));
+    else {
+      const r = await write(() => sb.from("cars").insert({ ...data, owner: S.uid }).select().single());
+      if (r?.data) await setRide(S.uid, r.data.id);
+    }
+    S.carForm = null; render(true);
+  }
+  if (id === "addTeam"){ const name = $("teamNameNew").value.trim(); if (name) await write(() => sb.from("teams").insert({ name })); }
+  if (id === "addItem"){
+    const name = $("itemName").value.trim(); if (!name) return;
+    const cat = $("itemCat").value.trim() || "Altele";
+    const ord = Math.max(0, ...S.items.map(i => Number(i.ord) || 0)) + 1;
+    await write(() => sb.from("items").insert({ id: "x" + Date.now().toString(36), name, cat, ord }));
+  }
+});
+
+/* ---------- boot ---------- */
+(function initPage(){ const h = (location.hash || "").slice(1); S.page = PAGES.includes(h) ? h : "home"; })();
+render(true);
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") S.recovering = true;
+  const uid = session?.user?.id || null;
+  S.email = session?.user?.email || "";
+  if (uid !== S.uid){ S.uid = uid; S.me = null; S.profiles = []; if (uid) subscribe(); }
+  setTimeout(loadAll, 0);
+});
+
+</script>
+</body>
+</html>
