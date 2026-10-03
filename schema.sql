@@ -30,6 +30,7 @@ create table if not exists public.profiles (
   team uuid references public.teams(id) on delete set null,
   ride uuid references public.cars(id) on delete set null,
   items jsonb not null default '{}'::jsonb,
+  own_transport boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -220,3 +221,6 @@ insert into public.items (id, name, cat, ord) values
   ('o09', 'Coardă 10 m, Ø8 mm (1/echipă)', 'Opțional', 58)
 
 on conflict (id) do nothing;
+
+-- migration (v3): travelling on their own
+alter table public.profiles add column if not exists own_transport boolean not null default false;

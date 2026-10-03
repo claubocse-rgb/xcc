@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>XCC</title>
 <meta name="description" content="Echipament, transport și echipe pentru Xtreme Character Challenge.">
 <meta name="theme-color" content="#000000">
@@ -13,92 +13,102 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* XCC v2 — "trail marker" field app.
-   4M colours: black chrome, grey/white ground, red for markers and the one primary action per screen.
-   Phone: pine top bar + bottom tab bar. Desktop (>=960px): pine left rail, content column. */
+/* XCC — trail-marker field app in 4M colours.
+   Black chrome, neutral white/grey ground. Red = brand (markers, active nav, primary button) and alarm
+   (missing / need). Ink = done & progress. Blue = extra to give. Green only for "fully ready".
+   Phone: black top bar + bottom tab bar. Desktop (>=960px): black left rail + content column. */
 :root{
-  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#F7F8FA; --line:#E4E7EC; --line-2:#D0D5DD;
-  --text:#101828; --muted:#475467; --faint:#98A2B3;
-  --brand:#000000; --brand-2:#1C1C1E; --on-brand:#FFFFFF; --on-brand-muted:#98A2B3;
+  --bg:#F3F3F3; --surface:#FFFFFF; --surface-2:#F6F6F6; --line:#DCDCDC; --line-2:#C4C4C4; --ctrl:#8A8A8A;
+  --text:#111111; --muted:#555555; --faint:#6B6B6B;
+  --brand:#000000; --brand-2:#1C1C1C; --on-brand:#FFFFFF; --on-brand-muted:#A3A3A3;
   --accent:#CF171F; --accent-press:#A8121A; --on-accent:#FFFFFF;
-  --ok:#101828; --ok-soft:#EAECF0; --need:#CF171F; --need-soft:#FDE7E8; --lend:#1D4E89; --lend-soft:#E6EEF8;
-  --skip:#667085; --skip-soft:#F2F4F7; --warn:#8A5300; --warn-soft:#FBEBCD;
-  --marker-bg:#FFFFFF; --marker-edge:#D0D5DD; --marker-red:#CF171F;
+  --ok:#111111; --ok-soft:#ECECEC; --ready:#1F6F43; --ready-soft:#E3F1E8;
+  --need:#B4141B; --need-strong:#B4141B; --need-soft:#FDE7E8; --lend:#1D4E89; --lend-soft:#E6EEF8;
+  --skip:#666666; --skip-soft:#F0F0F0; --warn:#8A5300; --warn-soft:#FBEBCD;
+  --seg-on:#FFFFFF;
+  --marker-bg:#FFFFFF; --marker-edge:#C4C4C4; --marker-red:#CF171F;
   --shadow-sheet:0 -12px 40px rgba(0,0,0,.22);
   --font-d:"Big Shoulders Display","Big Shoulders","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --font-b:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r-s:8px; --r-m:14px; --r-l:20px;
-  --tabbar-h:64px;
+  --r-s:6px; --r-m:10px; --r-l:12px;
+  --tabbar-h:64px; --topbar-h:56px;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#0C0C0D; --surface:#17171A; --surface-2:#1F1F23; --line:#2A2A2E; --line-2:#3F3F46;
-  --text:#F4F4F5; --muted:#A1A1AA; --faint:#71717A;
+  --bg:#0C0C0D; --surface:#17171A; --surface-2:#1F1F23; --line:#33333A; --line-2:#5A5A63; --ctrl:#7A7A84;
+  --text:#F4F4F5; --muted:#A1A1AA; --faint:#8B8B94;
   --brand:#000000; --brand-2:#1C1C1E; --on-brand:#FFFFFF; --on-brand-muted:#A1A1AA;
   --accent:#E5252C; --accent-press:#CF171F; --on-accent:#FFFFFF;
-  --ok:#F4F4F5; --ok-soft:#27272A; --need:#FF6B70; --need-soft:#3A1415; --lend:#8AB4F0; --lend-soft:#15233A;
+  --ok:#F4F4F5; --ok-soft:#27272A; --ready:#5CC48A; --ready-soft:#16301F;
+  --need:#FF6B70; --need-strong:#C81A21; --need-soft:#3A1415; --lend:#8AB4F0; --lend-soft:#15233A;
   --skip:#A1A1AA; --skip-soft:#232326; --warn:#F2B65C; --warn-soft:#3A2B12;
-  --marker-bg:#FFFFFF; --marker-edge:transparent; --marker-red:#CF171F;
-  --shadow-sheet:0 -12px 40px rgba(0,0,0,.6);
+  --seg-on:#34343A;
+  --marker-bg:#E8E8EA; --marker-edge:transparent; --marker-red:#CF171F;
+  --shadow-sheet:0 -12px 40px rgba(0,0,0,.6),0 -1px 0 #3A3A42;
   color-scheme:dark;
 }}
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;height:100%}
-body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:16px/1.5 var(--font-b);font-feature-settings:"tnum" 1;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:16px/1.5 var(--font-b);-webkit-tap-highlight-color:transparent}
 img{max-width:100%;display:block}
 [hidden]{display:none!important}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 a{color:var(--lend)}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num,.prog .big,.person .r,.count-pill b,.dot,.seg .n,.count{font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- trail markers ---------- */
 .mk{width:24px;height:24px;flex:none;display:block}
 .mk rect.bg{fill:var(--marker-bg);stroke:var(--marker-edge)}
 .mk .red{fill:var(--marker-red)}
+.mk .ink{fill:#111}
 
 /* ---------- shell ---------- */
 .topbar{position:sticky;top:0;z-index:40;background:var(--brand);color:var(--on-brand);padding:env(safe-area-inset-top,0px) 16px 0}
-.topbar .in{height:56px;display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
-.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font:800 1.45rem/1 var(--font-d);letter-spacing:.02em}
-.brand small{font:500 .8rem var(--font-b);color:var(--on-brand-muted);letter-spacing:0}
-.avatar-btn{margin-left:auto;background:none;border:0;padding:4px;border-radius:999px}
-.av{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;font:700 .85rem var(--font-b);color:#fff;flex:none}
-.av.lg{width:52px;height:52px;font-size:1.1rem}
+@media (prefers-color-scheme:dark){.topbar{box-shadow:0 1px 0 var(--line)}}
+.topbar .in{height:var(--topbar-h);display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font:800 1.5rem/1 var(--font-d);letter-spacing:.03em}
+.avatar-btn{margin-left:auto;background:none;border:0;padding:5px;border-radius:999px;min-width:44px;min-height:44px}
+.av{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;font:700 .82rem var(--font-b);color:#fff;flex:none}
+.av.lg{width:52px;height:52px;font-size:1.05rem}
 .shell{max-width:760px;margin:0 auto;padding:18px 16px calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom,0px))}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);
-  padding:0 6px env(safe-area-inset-bottom,0px);display:flex;justify-content:space-around}
+  padding:0 4px env(safe-area-inset-bottom,0px);display:flex;justify-content:space-around}
 .tab{flex:1;max-width:120px;height:var(--tabbar-h);background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   color:var(--muted);font:600 .74rem var(--font-b);position:relative}
+.tab .ic{position:relative;display:block}
+.tab:not([aria-current="page"]) .mk{opacity:.8}
 .tab[aria-current="page"]{color:var(--text)}
 .tab[aria-current="page"]::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
-.tab .dot{position:absolute;top:8px;right:calc(50% - 20px);min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font:700 .68rem/18px var(--font-b)}
+.tab .dot{position:absolute;top:-7px;left:15px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font:700 .66rem/18px var(--font-b);box-shadow:0 0 0 2px var(--surface);text-align:center}
 .rail{display:none}
 body.noapp .tabbar,body.noapp .avatar-btn{display:none}
 
 @media (min-width:960px){
   .topbar{display:none}
-  body:not(.noapp) .rail{display:flex;position:fixed;inset:0 auto 0 0;width:248px;flex-direction:column;background:var(--brand);color:var(--on-brand);padding:22px 14px;gap:4px;z-index:40}
+  body:not(.noapp) .rail{display:flex;position:fixed;inset:0 auto 0 0;width:248px;flex-direction:column;background:var(--brand);color:var(--on-brand);padding:22px 14px;gap:4px;z-index:40;border-right:1px solid var(--brand-2)}
   .rail .brand{padding:0 8px 18px}
-  .rail .nav{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:var(--on-brand-muted);font:600 .98rem var(--font-b);padding:11px 10px;border-radius:10px;text-align:left}
+  .rail .nav{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:var(--on-brand-muted);font:600 .98rem var(--font-b);padding:11px 10px;border-radius:8px;text-align:left}
   .rail .nav:hover{background:var(--brand-2);color:var(--on-brand)}
   .rail .nav[aria-current="page"]{background:var(--brand-2);color:var(--on-brand);box-shadow:inset 3px 0 0 var(--accent)}
   .rail .nav .dot{margin-left:auto;background:var(--accent);color:#fff;border-radius:999px;font:700 .72rem/20px var(--font-b);min-width:20px;padding:0 6px;text-align:center}
-  .rail .me{margin-top:auto;display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--on-brand);padding:10px;border-radius:10px;text-align:left}
+  .rail .me{margin-top:auto;display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--on-brand);padding:10px;border-radius:8px;text-align:left}
   .rail .me:hover{background:var(--brand-2)}
   .rail .me span small{display:block;color:var(--on-brand-muted);font-size:.8rem}
   .tabbar{display:none}
   body:not(.noapp) .shell{margin-left:248px;max-width:none;padding:34px 48px 60px}
-  body:not(.noapp) .page{max-width:720px;margin:0 auto}
+  body:not(.noapp) .page{max-width:760px;margin:0 auto}
   body.noapp .topbar{display:block}
   body.noapp .shell{margin:0 auto}
+  :root{--topbar-h:0px}
 }
 .page{display:flex;flex-direction:column;gap:20px}
 
 /* ---------- type ---------- */
 h1,h2,h3{margin:0;text-wrap:balance}
-.h1{font:800 clamp(2.2rem,8vw,3rem)/.95 var(--font-d);letter-spacing:.005em}
-.h2{font:800 1.55rem/1.05 var(--font-d);letter-spacing:.01em}
+.h1{font:800 clamp(2.5rem,10vw,3.3rem)/.95 var(--font-d);letter-spacing:.005em}
+.h2{font:800 1.8rem/1.05 var(--font-d);letter-spacing:.01em}
 .h3{font:700 1.05rem/1.3 var(--font-b)}
 .lead{margin:0;color:var(--muted);max-width:60ch}
 .muted{color:var(--muted)}
@@ -109,55 +119,71 @@ p{margin:0}
 .hero{position:relative;border-radius:var(--r-l);overflow:hidden;min-height:clamp(210px,44vw,320px);background:#111;color:#fff;display:flex;align-items:flex-end;isolation:isolate}
 .hero > img,.hero > svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;z-index:-2}
 .hero > img{object-position:right top}
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,.8) 100%)}
-.hero h1,.hero p{text-shadow:0 2px 14px rgba(0,0,0,.35)}
-.hero .txt{padding:20px 22px;display:flex;flex-direction:column;gap:6px}
-.hero h1{font:900 clamp(2.4rem,10vw,4rem)/.86 var(--font-d);letter-spacing:.005em}
-.hero p{color:#E4E7EC;font-weight:500}
-.count-pill{align-self:flex-start;display:inline-flex;align-items:baseline;gap:6px;background:var(--marker-bg);color:#16231B;border-radius:999px;padding:4px 12px 4px 6px;font-weight:600;font-size:.9rem}
-.count-pill b{background:var(--marker-red);color:#fff;border-radius:999px;padding:1px 9px;font:800 1.05rem/1.4 var(--font-d)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.28) 38%,rgba(0,0,0,.86) 100%)}
+.hero h1,.hero p{text-shadow:0 2px 14px rgba(0,0,0,.4)}
+.hero .txt{padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.hero h1{font:900 clamp(2.5rem,11vw,4.2rem)/.86 var(--font-d);letter-spacing:.01em;text-transform:uppercase}
+.hero p{color:#ECECEC;font-weight:600}
+.count-pill{align-self:flex-start;display:inline-flex;align-items:baseline;gap:6px;background:#FFFFFF;color:#111;border-radius:var(--r-s);padding:4px 12px 4px 4px;font-weight:600;font-size:.9rem}
+.count-pill b{background:var(--marker-red);color:#fff;border-radius:4px;padding:1px 9px;font:800 1.1rem/1.4 var(--font-d)}
 
 /* ---------- blocks ---------- */
 .block{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:16px}
 .block.flush{padding:0;overflow:hidden}
-.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.block-head > :first-child{min-width:0}
+.block-head > :last-child{flex:none}
 .stack{display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .spacer{flex:1}
+.section{display:flex;flex-direction:column;gap:10px}
+.warnline{display:flex;gap:10px;align-items:flex-start;color:var(--need);font-weight:600;font-size:.92rem}
+.warnline svg{flex:none;margin-top:2px}
 
 /* next steps */
 .steps{list-style:none;margin:0;padding:0}
-.step{display:flex;align-items:center;gap:14px;padding:14px 16px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+.step{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
 .steps li:first-child .step{border-top:0}
-.step:hover{background:var(--surface-2)}
-.step .st{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;flex:none;font-weight:800}
+.step .st{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;flex:none;font-weight:800;font-size:.9rem;margin-top:1px}
 .st.todo{background:var(--need-soft);color:var(--need)}
 .st.done{background:var(--ok-soft);color:var(--ok)}
-.st.wait{background:var(--skip-soft);color:var(--skip)}
+.st.ready{background:var(--ready-soft);color:var(--ready)}
+.st.wait{background:transparent;color:var(--skip);border:2px dashed var(--line-2)}
+.st.help{background:var(--lend-soft);color:var(--lend)}
 .step .t{flex:1;min-width:0}
-.step .t b{display:block;font-weight:650}
-.step .t span{display:block;color:var(--muted);font-size:.9rem}
-.step .chev{color:var(--faint);font-size:1.3rem}
+.step .t b{display:block;font-weight:700}
+.step .t span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:.9rem}
+.step .chev{color:var(--faint);font-size:1.3rem;align-self:center}
+.welcome{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.welcome ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.welcome .muted{color:var(--on-brand-muted)}
 
 /* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid transparent;font-weight:650;font-size:1rem;background:var(--accent);color:var(--on-accent);text-decoration:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:var(--r-s);border:1px solid transparent;font-weight:700;font-size:1rem;background:var(--accent);color:var(--on-accent);text-decoration:none;white-space:nowrap}
 .btn:active{background:var(--accent-press)}
 .btn.sec{background:var(--surface);border-color:var(--line-2);color:var(--text)}
 .btn.sec:active{background:var(--surface-2)}
-.btn.ghost{background:transparent;color:var(--text);border-color:transparent}
+.btn.ink{background:var(--text);color:var(--surface)}
+.btn.ink:active{opacity:.85}
+.btn.ghost{background:transparent;color:var(--text);border-color:transparent;text-decoration:underline;text-underline-offset:3px}
+.btn.ghost:active{background:var(--surface-2)}
 .btn.danger{background:transparent;border-color:var(--need);color:var(--need)}
-.btn.ok{background:var(--text);color:var(--surface)}
-.btn.sm{min-height:36px;padding:0 12px;font-size:.9rem;border-radius:10px}
+.btn.danger:active{background:var(--need-soft)}
+.btn.sm{min-height:42px;padding:0 14px;font-size:.92rem}
 .btn.block-w{width:100%}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.btn.armed{background:var(--need);color:#fff;border-color:var(--need)}
+.btn:disabled,.btn[aria-busy="true"]{opacity:1;background:var(--line);color:var(--muted);border-color:transparent;cursor:not-allowed}
+.btn.armed{background:var(--need-strong);color:#fff;border-color:var(--need-strong)}
+@media (hover:hover){.btn:not(:disabled):hover{filter:brightness(.94)}.it-main:hover,.person:hover,.step:hover,.check-row:hover{background:var(--surface-2)}}
+.pair-btns{display:flex;gap:10px;flex-wrap:wrap}
+.pair-btns > .btn{flex:1 1 140px}
 
 /* segmented */
-.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;overflow-x:auto;scrollbar-width:none}
-.seg button{flex:1;min-height:40px;border:0;background:none;border-radius:9px;font-weight:650;color:var(--muted);padding:0 12px;white-space:nowrap}
-.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--line)}
-.seg.tight button{padding:0 8px;font-size:.88rem;flex:1 0 auto}
-.seg .n{display:inline-block;margin-left:6px;background:var(--accent);color:#fff;border-radius:999px;font-size:.72rem;padding:0 6px;line-height:18px}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-m);padding:3px;gap:3px}
+.seg button{flex:1 1 0;min-width:0;min-height:44px;border:0;background:none;border-radius:7px;font-weight:700;color:var(--muted);padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg button[aria-selected="true"]{background:var(--seg-on);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--line-2)}
+.seg.tight button{font-size:.84rem;padding:0 4px}
+.seg .n{display:inline-block;margin-left:5px;background:var(--accent);color:#fff;border-radius:999px;font-size:.72rem;padding:0 6px;line-height:18px}
+.sticky-seg{position:sticky;top:calc(var(--topbar-h) + env(safe-area-inset-top,0px));z-index:30;padding:6px 0;margin:-6px 0;background:var(--bg)}
 
 /* chips */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -165,53 +191,70 @@ p{margin:0}
 .chip.need{background:var(--need-soft);color:var(--need);border-color:transparent}
 .chip.lend{background:var(--lend-soft);color:var(--lend);border-color:transparent}
 .chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.ready{background:var(--ready-soft);color:var(--ready);border-color:transparent}
 .chip.skip{background:var(--skip-soft);color:var(--skip);border-color:transparent}
 .chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-button.chip{cursor:pointer}
+.chip.ghostchip{background:transparent;border-style:dashed;color:var(--faint)}
+button.chip{cursor:pointer;min-height:36px;padding:0 14px}
 button.chip[aria-pressed="true"]{background:var(--text);color:var(--surface);border-color:var(--text)}
+a.chip,button.chip.link{text-decoration:none;cursor:pointer}
+.chip.link{min-height:auto;padding:3px 10px}
 
 /* progress */
-.prog{display:flex;flex-direction:column;gap:8px}
+.prog{display:flex;flex-direction:column;gap:10px}
 .prog .big{font:800 2.6rem/1 var(--font-d)}
 .prog .big small{font:600 1rem var(--font-b);color:var(--muted);margin-left:6px}
+.prog .big.alarm{color:var(--need)}
 .bar{height:10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .35s ease}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:999px;transition:width .35s ease}
+.bar.full i{background:var(--ready)}
 .bar.thin{height:6px;border:0;background:var(--line)}
-.done-badge{display:inline-flex;align-items:center;gap:8px;background:var(--text);color:var(--surface);font-weight:700;border-radius:999px;padding:6px 14px}
+.done-badge{display:inline-flex;align-items:center;gap:8px;background:var(--ready);color:#fff;font-weight:700;border-radius:999px;padding:6px 14px;align-self:flex-start}
+@media (prefers-color-scheme:dark){.done-badge{color:#0C0C0D}}
 
 /* checklist rows */
-.group-title{display:flex;align-items:baseline;gap:10px;margin:6px 2px 8px}
-.group-title .h2{font-size:1.35rem}
+.group-title{display:flex;align-items:baseline;gap:10px;margin:8px 2px 0}
 .list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden}
-.it{display:flex;align-items:stretch;border-top:1px solid var(--line)}
+.it{display:flex;align-items:flex-start;border-top:1px solid var(--line);transition:opacity .4s}
 .it:first-child{border-top:0}
-.it-main{flex:1;min-width:0;display:flex;align-items:flex-start;gap:14px;padding:13px 6px 13px 14px;background:none;border:0;text-align:left;min-height:56px}
+.it.leaving{opacity:.35}
+.it-main{flex:1;min-width:0;display:flex;align-items:flex-start;gap:14px;padding:14px 6px 14px 14px;background:none;border:0;text-align:left;min-height:56px}
 .it-main:active{background:var(--surface-2)}
-.box{width:26px;height:26px;border-radius:8px;border:2px solid var(--line-2);flex:none;display:grid;place-items:center;margin-top:1px;transition:background .15s,border-color .15s}
-.box{color:var(--surface)}
+.it-main:focus-visible,.it-more:focus-visible,.person:focus-visible,.step:focus-visible,.check-row:focus-visible{outline-offset:-3px}
+.box{width:26px;height:26px;border-radius:6px;border:2px solid var(--ctrl);flex:none;display:grid;place-items:center;margin-top:-1px;color:var(--surface);transition:background .15s,border-color .15s,transform .15s}
 .box svg{width:16px;height:16px;opacity:0}
 .it.on .box{background:var(--ok);border-color:var(--ok)}
 .it.on .box svg{opacity:1}
+.it.lendrow.on .box{background:var(--lend);border-color:var(--lend);color:#fff}
+.it.pop .box{transform:scale(1.15)}
 .it.skip .box{background:var(--skip-soft);border-color:var(--line-2);border-style:dashed}
 .it-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .it-name{font-weight:600;line-height:1.35}
 .it.on .it-name,.it.skip .it-name{color:var(--muted)}
 .it.skip .it-name{text-decoration:line-through}
-.it-more{width:52px;flex:none;background:none;border:0;color:var(--muted);font-size:1.3rem;letter-spacing:1px;border-left:1px solid transparent}
+.it-more{width:52px;height:56px;flex:none;background:none;border:0;color:var(--muted);font-size:1.25rem;letter-spacing:1px}
 .it-more:active{background:var(--surface-2)}
+.it-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px 54px;margin-top:-6px}
 .empty{padding:22px 18px;text-align:center;color:var(--muted)}
 .empty b{display:block;color:var(--text);font-size:1.05rem;margin-bottom:4px}
 .note-inline{color:var(--muted);font-size:.88rem;font-style:italic}
 
 /* people */
-.person{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+.person{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;text-decoration:none}
 .list .person:first-child{border-top:0}
 .person:active{background:var(--surface-2)}
 .person .t{flex:1;min-width:0}
-.person .t b{display:block;font-weight:650}
+.person .t b{display:block;font-weight:700}
 .person .t span{color:var(--muted);font-size:.86rem}
 .person .r{width:92px;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:.82rem;color:var(--muted);font-weight:600}
 .person .r .bar{width:100%}
+.person .chev{color:var(--faint);font-size:1.3rem}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:64px}
+.tile b{font:800 1.8rem/1 var(--font-d)}
+.tile span{font-size:.8rem;color:var(--muted);font-weight:600}
+.tile[aria-pressed="true"]{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
+.tile.alarm b{color:var(--need)}
 
 /* needs */
 .need-card{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
@@ -221,67 +264,82 @@ button.chip[aria-pressed="true"]{background:var(--text);color:var(--surface);bor
 
 /* cars */
 .car{display:flex;flex-direction:column;gap:12px}
-.car-route{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.car-route{color:var(--muted);font-size:.92rem}
 .seats{display:flex;flex-wrap:wrap;gap:8px}
-.seat{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:.88rem;font-weight:600}
-.seat .av{width:26px;height:26px;font-size:.72rem}
-.seat.free{border-style:dashed;color:var(--faint);background:transparent;padding-left:12px}
-.seat.me{border-color:var(--accent)}
+.seat{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:.88rem;font-weight:600;color:var(--text)}
+button.seat{cursor:pointer}
+.seat .av{width:26px;height:26px;font-size:.7rem;box-shadow:0 0 0 1.5px var(--line-2)}
+.seat.free{border-style:dashed;border-color:var(--line-2);color:var(--faint);background:transparent;padding-left:12px}
+.seat.me{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .seat .role{color:var(--muted);font-weight:500}
 .mycar{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
-.mycar .muted{color:var(--on-brand-muted)}
-.mycar .btn.sec{background:transparent;color:var(--on-brand);border-color:var(--on-brand-muted)}
+@media (prefers-color-scheme:dark){.mycar{border-color:var(--line-2)}}
+.mycar .muted,.mycar .car-route{color:var(--on-brand-muted)}
+.mycar .car-route b{color:#fff}
+.mycar .seat{background:var(--brand-2);border-color:#3F3F46;color:#fff}
+.mycar .seat .role{color:var(--on-brand-muted)}
+.mycar .seat.free{background:transparent;color:var(--on-brand-muted);border-color:#555}
+.mycar .btn.sec{background:transparent;color:var(--on-brand);border-color:#666}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:48px;height:48px;border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--surface);font-size:1.4rem;font-weight:700}
+.stepper output{min-width:48px;text-align:center;font:800 1.8rem/1 var(--font-d)}
 
 /* forms */
 .field{display:flex;flex-direction:column;gap:6px}
 .field > span{font-weight:600;font-size:.92rem}
 .field small{color:var(--muted)}
-.input,select.input,textarea.input{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);padding:10px 14px;font-size:1rem}
+.input,select.input,textarea.input{width:100%;min-height:48px;border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--surface);padding:10px 14px;font-size:1rem}
 textarea.input{min-height:84px;resize:vertical}
 .input:focus{outline:none;border-color:var(--text);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 15%,transparent)}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .pw{position:relative}
-.pw .input{padding-right:84px}
-.pw button{position:absolute;right:6px;top:6px;bottom:6px;border:0;background:var(--surface-2);border-radius:9px;padding:0 12px;font-weight:600;font-size:.85rem;color:var(--muted)}
-.linkbox{font-size:.9rem;background:var(--surface-2);border:1px dashed var(--line-2);border-radius:10px;padding:10px 12px;word-break:break-all;user-select:all}
-.check-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.pw .input{padding-right:90px}
+.pw button{position:absolute;right:5px;top:5px;bottom:5px;border:0;background:var(--surface-2);border-radius:5px;padding:0 12px;font-weight:600;font-size:.85rem;color:var(--muted);min-width:72px}
+.linkbox{font-size:.9rem;background:var(--surface-2);border:1px dashed var(--line-2);border-radius:var(--r-s);padding:10px 12px;word-break:break-all;user-select:all}
+.check-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;min-height:60px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left}
 .check-row:first-child{border-top:0}
-.toggle{width:52px;height:32px;border-radius:999px;border:0;background:var(--line-2);position:relative;flex:none;transition:background .15s}
+.check-row .lbl b{display:block}
+.check-row .lbl span{color:var(--muted);font-size:.86rem}
+.toggle{width:52px;height:32px;border-radius:999px;background:var(--ctrl);position:relative;flex:none;transition:background .15s}
 .toggle::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
-.toggle[aria-checked="true"]{background:var(--accent)}
-.toggle[aria-checked="true"]::after{transform:translateX(20px)}
-.toggle.red[aria-checked="true"]{background:var(--need)}
-.toggle.blue[aria-checked="true"]{background:var(--lend)}
+[aria-checked="true"] > .toggle{background:var(--ok)}
+[aria-checked="true"] > .toggle::after{transform:translateX(20px);background:var(--surface)}
+[aria-checked="true"] > .toggle.red{background:var(--need)}
+[aria-checked="true"] > .toggle.blue{background:var(--lend)}
+@media (prefers-color-scheme:dark){[aria-checked="true"] > .toggle.red::after,[aria-checked="true"] > .toggle.blue::after{background:#0C0C0D}}
+.teamchips{display:flex;gap:6px;flex-wrap:wrap}
+.teamchips button{min-width:44px;min-height:40px;border-radius:var(--r-s);border:1px solid var(--line-2);background:var(--surface);font-weight:700;padding:0 10px}
+.teamchips button[aria-pressed="true"]{background:var(--text);color:var(--surface);border-color:var(--text)}
 
 /* sheet */
 .sheet-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
 .sheet-scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);border:0;animation:fade .18s ease}
-.sheet{position:relative;width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:var(--shadow-sheet);
+.sheet{position:relative;width:100%;max-width:560px;max-height:88dvh;overflow:auto;overscroll-behavior:contain;background:var(--surface);border-radius:16px 16px 0 0;box-shadow:var(--shadow-sheet);
   padding:10px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .22s cubic-bezier(.2,.8,.2,1)}
 .grab{width:42px;height:5px;border-radius:999px;background:var(--line-2);margin:0 auto 12px}
-.sheet-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.sheet-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
 .sheet-head .h2{flex:1}
-.x{width:38px;height:38px;border-radius:999px;border:0;background:var(--surface-2);font-size:1.2rem;color:var(--muted);flex:none}
-@media (min-width:960px){.sheet-wrap{align-items:center}.sheet{border-radius:22px}}
+.x{width:44px;height:44px;border-radius:999px;border:0;background:var(--surface-2);font-size:1.2rem;color:var(--muted);flex:none}
+@media (min-width:960px){.sheet-wrap{align-items:center}.sheet{border-radius:16px}}
 @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
 /* toast */
-.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom,0px));z-index:90;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+body.sheet-open .toasts{bottom:calc(16px + env(safe-area-inset-bottom,0px));top:auto}
 @media (min-width:960px){.toasts{bottom:28px;left:calc(50% + 124px)}}
-.toast{pointer-events:auto;background:var(--text);color:var(--surface);padding:11px 18px;border-radius:999px;font-weight:600;font-size:.94rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:up .2s ease}
-.toast.err{background:var(--need);color:#fff}
+.toast{pointer-events:none;background:var(--text);color:var(--surface);padding:11px 18px;border-radius:999px;font-weight:600;font-size:.94rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:up .2s ease;text-align:center}
+.toast.err{background:var(--need-strong);color:#fff}
 
 /* auth */
 .auth{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.auth .hero{min-height:200px}
-.legend{display:flex;flex-wrap:wrap;gap:12px 18px;color:var(--muted);font-size:.85rem}
-.legend span{display:inline-flex;align-items:center;gap:8px}
-.legend .mk{width:18px;height:18px}
-.thumb{width:100%;max-width:340px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
-.kv{display:flex;flex-direction:column;gap:4px}
+.auth .hero{min-height:150px}
+.auth .hero h1{font-size:clamp(2rem,9vw,2.8rem)}
+.thumb{width:100%;max-width:340px;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r-s);border:1px solid var(--line)}
+.kv{display:flex;flex-direction:column;gap:6px}
 .kv > span:first-child{color:var(--muted);font-size:.85rem;font-weight:600}
 .divider{height:1px;background:var(--line);margin:4px 0}
+.summary{white-space:pre-wrap;font:500 .86rem/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:12px;max-height:280px;overflow:auto}
 
 </style>
 </head>
@@ -297,51 +355,75 @@ textarea.input{min-height:84px;resize:vertical}
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-/* ===== XCC v2 — Supabase backend (same schema as v1) ===== */
+/* ===== XCC — Supabase backend ===== */
 const SUPABASE_URL = "https://fmdkcbvkohbgxrceegja.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZGtjYnZrb2hiZ3hyY2VlZ2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NTA4NjUsImV4cCI6MjEwNjUyNjg2NX0.Stx7byO_C52xGXl4bKkoHrofXroZfd6_UeqlV9mTHU8";
 const sb = window.XCC_MOCK || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const S = {
-  loaded: false, uid: null, email: "", me: null,
+  loaded: false, loadFailed: false, uid: null, email: "", me: null, meMissing: 0,
   profiles: [], items: [], teams: [], cars: [], cfg: {},
-  page: "home", gearTab: "mine", onlyMissing: false, groupTab: "people", groupTeam: "all", q: "", adminTab: "requests",
-  authMode: "login", recovering: false, sheet: null,
+  page: "home", gearTab: "mine", onlyMissing: false, groupTab: "people", groupTeam: "all", q: "",
+  adminTab: "requests", adminFilter: "all", listQ: "",
+  authMode: new URLSearchParams(location.search).has("nou") ? "signup" : "login", checkEmail: "",
+  recovering: false, sheet: null, leaving: {},
 };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const SITE = location.origin + location.pathname;
+const INVITE = SITE + "?nou";
 const PAGES = ["home", "gear", "transport", "group", "admin"];
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 
 /* ---------- domain helpers ---------- */
 const isOpt = it => /op[tț]ional/i.test(it.cat || "");
 const isTeam = it => /^echip/i.test(it.cat || "") || /\/\s*echip/i.test(it.name || "");
 const groupOf = it => isOpt(it) ? "Opțional" : (it.cat || "Altele").replace(/\s*obligatoriu\s*/i, "").trim() || "Altele";
+const itemById = id => S.items.find(i => i.id === id);
 const reqItems = () => S.items.filter(i => !isOpt(i) && !isTeam(i));
 const optItems = () => S.items.filter(i => isOpt(i) && !isTeam(i));
 const teamItems = () => S.items.filter(isTeam);
+const teamReq = () => teamItems().filter(i => !isOpt(i));
 const people = () => S.profiles.filter(p => p.status === "approved");
 const pending = () => S.profiles.filter(p => p.status === "pending");
 const isAdmin = () => S.me?.role === "admin" && S.me?.status === "approved";
 const approved = () => S.me?.status === "approved";
 const byId = id => S.profiles.find(p => p.id === id);
-const pname = id => byId(id)?.name || "Cineva";
-const st = (p, id) => p?.items?.[id] || {};
-const has = (p, id) => !!st(p, id).ok;
+/* item state: {ok, need, lend, skip, note}; older rows used a single `flag` field */
+function st(p, id){
+  const s = p?.items?.[id] || {};
+  return { ok: !!s.ok, need: s.need ?? s.flag === "need", lend: s.lend ?? s.flag === "lend", skip: s.skip ?? s.flag === "skip", note: s.note || "" };
+}
+const has = (p, id) => st(p, id).ok;
 const carOf = id => { const r = byId(id)?.ride; return S.cars.find(c => c.id === r) || null; };
 const teamOf = id => { const t = byId(id)?.team; return S.teams.find(x => x.id === t) || null; };
-const mates = () => { const t = teamOf(S.uid); return t ? people().filter(p => p.team === t.id) : []; };
+const membersOf = tid => people().filter(p => p.team === tid);
+const mates = () => { const t = teamOf(S.uid); return t ? membersOf(t.id) : []; };
 const ridersOf = car => people().filter(p => p.ride === car.id && p.id !== car.owner);
 const freeOf = car => Math.max(0, (car.seats || 0) - ridersOf(car).length);
-const noRide = () => people().filter(p => !carOf(p.id));
+const isDriver = id => S.cars.some(c => c.owner === id);
+const ownWay = p => !!p?.own_transport;
+const noRide = () => people().filter(p => !carOf(p.id) && !ownWay(p));
 const missingOf = p => reqItems().filter(i => !has(p, i.id));
+const lendersOf = (id, except) => people().filter(x => x.id !== except && st(x, id).lend);
+const seekersOf = (id, except) => people().filter(x => x.id !== except && st(x, id).need);
 const firstName = n => String(n || "").trim().split(/\s+/)[0] || "";
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+/* first name, plus surname initial when two people share a first name */
+function shortName(p){
+  if (!p) return "Cineva";
+  const f = firstName(p.name), parts = String(p.name || "").trim().split(/\s+/);
+  const dup = people().filter(x => firstName(x.name).toLowerCase() === f.toLowerCase()).length > 1;
+  return dup && parts.length > 1 ? `${f} ${parts[parts.length - 1][0]}.` : f;
+}
+const nameOf = id => shortName(byId(id));
+function teamGaps(tid){ const m = membersOf(tid); return teamReq().filter(i => !m.some(p => has(p, i.id))); }
 
 function avatar(p, cls = ""){
   const name = p?.name || "?";
   const ini = name.trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toUpperCase() || "?";
-  const hues = ["#344054", "#7A1F24", "#1D4E89", "#5B4636", "#3F3F46", "#4B3F72"];
+  const hues = ["#1F1F1F", "#3A3A3A", "#4A4F57", "#5B544C", "#2F3B45", "#45403A"];
   let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return `<span class="av ${cls}" style="background:${hues[h % hues.length]}" aria-hidden="true">${esc(ini)}</span>`;
 }
@@ -352,18 +434,29 @@ function marker(type){
     dot: '<circle class="red" cx="12" cy="12" r="5.2"/>',
     cross: '<path class="red" d="M9.4 4.5h5.2v4.9h4.9v5.2h-4.9v4.9H9.4v-4.9H4.5V9.4h4.9z"/>',
     tri: '<path class="red" d="M12 5.2l6.6 12.6H5.4z"/>',
-    gear: '<path class="red" d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6zm0 2.6a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4z"/>',
+    key: '<path class="ink" d="M9.5 6.5a3.6 3.6 0 0 1 3.4 4.8l5.6 5.6v2.4h-2.4v-1.6h-1.6v-1.6h-1.6l-1.5-1.5a3.6 3.6 0 1 1-1.9-8.1zm-.9 2.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/>',
   };
-  return `<svg class="mk" viewBox="0 0 24 24" aria-hidden="true"><rect class="bg" x="1" y="1" width="22" height="22" rx="4"/>${shapes[type] || shapes.band}</svg>`;
+  return `<svg class="mk" viewBox="0 0 24 24" aria-hidden="true"><rect class="bg" x="1" y="1" width="22" height="22" rx="3"/>${shapes[type] || shapes.band}</svg>`;
 }
 const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const WARN = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2z" fill="currentColor"/><path d="M12 10v5M12 17.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>';
 
 /* ---------- feedback ---------- */
 function toast(msg, err){
+  const box = $("toasts"); box.innerHTML = "";
   const el = document.createElement("div");
   el.className = "toast" + (err ? " err" : ""); el.textContent = msg; el.setAttribute("role", err ? "alert" : "status");
-  $("toasts").appendChild(el);
-  setTimeout(() => el.remove(), err ? 4200 : 2200);
+  box.appendChild(el);
+  setTimeout(() => el.remove(), err ? 4500 : 2800);
+}
+function authErr(m = ""){
+  if (/rate limit|too many|seconds/i.test(m)) return "Prea multe încercări. Mai încearcă peste câteva minute.";
+  if (/fetch|network|Failed/i.test(m)) return "Nu ai internet. Verifică semnalul și încearcă din nou.";
+  if (/same|different/i.test(m)) return "Alege altă parolă decât cea veche.";
+  if (/at least|weak|short/i.test(m)) return "Parola trebuie să aibă minim 8 caractere.";
+  if (/invalid.*email|email.*invalid/i.test(m)) return "Emailul nu pare corect.";
+  if (/expired|invalid.*token|otp/i.test(m)) return "Linkul a expirat. Cere unul nou cu „Am uitat parola”.";
+  return "Ceva n-a mers. Încearcă din nou.";
 }
 async function write(fn, okMsg){
   try {
@@ -375,31 +468,53 @@ async function write(fn, okMsg){
   } catch(e){
     console.error(e);
     const m = e?.message || "";
-    toast(/plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator/i.test(m) ? m : "Nu s-a salvat. Verifică internetul și încearcă din nou.", true);
-    scheduleReload(50);
+    toast(/plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator/i.test(m) ? m
+      : /fetch|network|Failed/i.test(m) ? "Nu s-a salvat: nu ai internet." : "Nu s-a salvat. Încearcă din nou.", true);
+    scheduleReload(400);
     return false;
   }
 }
+/* two-tap confirm; a second tap within 500 ms (double-tap) doesn't count */
 function arm(b, label){
-  if (b.dataset.armed) return true;
-  b.dataset.armed = "1"; const old = b.innerHTML; b.textContent = label || "Apasă din nou ca să confirmi"; b.classList.add("armed");
+  const now = Date.now();
+  if (b.dataset.armed && now - Number(b.dataset.armedAt) > 500) return true;
+  if (b.dataset.armed) return false;
+  b.dataset.armed = "1"; b.dataset.armedAt = now;
+  const old = b.innerHTML; b.textContent = label || "Apasă încă o dată ca să confirmi"; b.classList.add("armed");
   setTimeout(() => { if (b.isConnected){ delete b.dataset.armed; b.innerHTML = old; b.classList.remove("armed"); } }, 4000);
   return false;
+}
+async function busy(btn, fn){
+  if (!btn) return fn();
+  if (btn.getAttribute("aria-busy") === "true") return;
+  btn.setAttribute("aria-busy", "true"); btn.disabled = true;
+  try { return await fn(); } finally { if (btn.isConnected){ btn.removeAttribute("aria-busy"); btn.disabled = false; } }
 }
 
 /* ---------- data ---------- */
 async function loadAll(){
-  const cfg = await sb.from("config").select("*").eq("id", 1).maybeSingle();
-  S.cfg = cfg.data || {};
-  if (S.uid){
-    const [pr, it, tm, cr] = await Promise.all([
-      sb.from("profiles").select("*").order("created_at"),
-      sb.from("items").select("*").order("ord"),
-      sb.from("teams").select("*").order("created_at"),
-      sb.from("cars").select("*").order("created_at"),
-    ]);
-    S.profiles = pr.data || []; S.items = it.data || []; S.teams = tm.data || []; S.cars = cr.data || [];
-    S.me = S.profiles.find(p => p.id === S.uid) || null;
+  try {
+    const cfg = await sb.from("config").select("*").eq("id", 1).maybeSingle();
+    if (!cfg.error) S.cfg = cfg.data || {};
+    if (S.uid){
+      const [pr, it, tm, cr] = await Promise.all([
+        sb.from("profiles").select("*").order("created_at"),
+        sb.from("items").select("*").order("ord"),
+        sb.from("teams").select("*").order("created_at"),
+        sb.from("cars").select("*").order("created_at"),
+      ]);
+      const err = pr.error || it.error || tm.error || cr.error;
+      if (err) throw err;
+      S.profiles = pr.data || []; S.items = it.data || []; S.teams = tm.data || []; S.cars = cr.data || [];
+      S.me = S.profiles.find(p => p.id === S.uid) || null;
+      S.meMissing = S.me ? 0 : S.meMissing + 1;
+      if (!S.me && S.meMissing < 3) scheduleReload(1500);
+    }
+    S.loadFailed = false;
+  } catch(e){
+    console.error(e);
+    if (S.loaded && !S.loadFailed) toast("Fără conexiune. Vezi ultimele date salvate.", true);
+    else S.loadFailed = true;
   }
   S.loaded = true;
   render();
@@ -412,27 +527,44 @@ function subscribe(){
   if (channel) sb.removeChannel(channel);
   channel = sb.channel("xcc-live").on("postgres_changes", { event: "*", schema: "public" }, () => scheduleReload()).subscribe();
 }
+document.addEventListener("visibilitychange", () => { if (!document.hidden && S.uid) scheduleReload(100); });
 
-/* ---------- navigation ---------- */
-function go(page, opts = {}){
+/* ---------- navigation (real history, so the phone's Back button works) ---------- */
+function routeHash(page, tab){ return page === "home" ? location.pathname + location.search : `#${page}${tab ? "/" + tab : ""}`; }
+function go(page, opts = {}, push = true){
   if (!PAGES.includes(page) || (page === "admin" && !isAdmin())) page = "home";
+  const changed = page !== S.page || opts.gearTab || opts.adminTab;
   Object.assign(S, opts);
-  S.page = page; closeSheet();
-  try { history.replaceState(null, "", page === "home" ? location.pathname : "#" + page); } catch {}
+  if (S.sheet) closeSheet(true);
+  S.page = page;
+  const tab = page === "gear" ? S.gearTab : page === "admin" ? S.adminTab : page === "group" ? S.groupTab : "";
+  try { if (push && changed) history.pushState({ page }, "", routeHash(page, ["mine", "requests", "people"].includes(tab) ? "" : tab)); } catch {}
   render(); window.scrollTo({ top: 0 });
 }
+function readHash(){
+  const [p, t] = (location.hash || "").slice(1).split("/");
+  S.page = PAGES.includes(p) ? p : "home";
+  if (p === "gear") S.gearTab = ["mine", "team", "extra"].includes(t) ? t : "mine";
+  if (p === "admin") S.adminTab = ["requests", "people", "teams", "list", "settings"].includes(t) ? t : "requests";
+  if (p === "group") S.groupTab = ["people", "needs", "items"].includes(t) ? t : "people";
+}
+window.addEventListener("popstate", () => {
+  if (S.sheet){ closeSheet(true); return; }
+  readHash(); render();
+});
 
 /* ---------- shared bits ---------- */
 function heroArt(){
   if (S.cfg.hero_url) return `<img src="${esc(S.cfg.hero_url)}" alt="">`;
   return `<svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FB5A6"/><stop offset=".6" stop-color="#5E7C69"/><stop offset="1" stop-color="#2B4637"/></linearGradient></defs>
+    <defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9B9B9"/><stop offset=".6" stop-color="#7A7A7A"/><stop offset="1" stop-color="#3A3A3A"/></linearGradient></defs>
     <rect width="800" height="420" fill="url(#sk)"/>
-    <path d="M0 210 L110 150 L180 185 L290 110 L380 170 L470 125 L560 190 L650 140 L740 175 L800 150 V420 H0Z" fill="#46664F" opacity=".75"/>
-    <path d="M0 265 L130 205 L220 245 L330 190 L420 240 L520 200 L610 255 L700 215 L800 245 V420 H0Z" fill="#2F4C3B"/>
-    <g fill="#1B3226">${Array.from({length: 26}, (_, i) => { const x = i * 32 - 6, h = 46 + (i * 37 % 34), y = 330 - (i * 23 % 26); return `<path d="M${x} ${y} l14 -${h} l14 ${h}z"/>`; }).join("")}</g>
-    <path d="M0 340 H800 V420 H0Z" fill="#14271D"/>
-    <g transform="translate(640 92)"><rect x="-26" y="-26" width="52" height="52" rx="7" fill="#F4F6F3"/><rect x="-24" y="-8" width="48" height="16" fill="#D0161E"/></g>
+    <path d="M0 210 L110 150 L180 185 L290 110 L380 170 L470 125 L560 190 L650 140 L740 175 L800 150 V420 H0Z" fill="#5A5A5A" opacity=".8"/>
+    <path d="M0 265 L130 205 L220 245 L330 190 L420 240 L520 200 L610 255 L700 215 L800 245 V420 H0Z" fill="#3A3A3A"/>
+    <g fill="#1E1E1E">${Array.from({length: 26}, (_, i) => { const x = i * 32 - 6, h = 46 + (i * 37 % 34), y = 330 - (i * 23 % 26); return `<path d="M${x} ${y} l14 -${h} l14 ${h}z"/>`; }).join("")}</g>
+    <path d="M0 340 H800 V420 H0Z" fill="#111"/>
+    <rect x="652" y="250" width="22" height="120" fill="#2A2A2A"/>
+    <g transform="translate(663 292)"><rect x="-11" y="-11" width="22" height="22" rx="2" fill="#F4F4F4"/><rect x="-11" y="-4" width="22" height="8" fill="#CF171F"/></g>
   </svg>`;
 }
 function daysLeft(){
@@ -440,7 +572,6 @@ function daysLeft(){
   const d = new Date(S.cfg.start_date + "T00:00:00"), n = new Date();
   return Math.ceil((d - new Date(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5);
 }
-function fmtDate(iso){ try { return new Date(iso + "T00:00:00").toLocaleDateString("ro-RO", { day: "numeric", month: "long" }); } catch { return iso; } }
 /* "5–8 noiembrie 2026" (or "30 octombrie – 2 noiembrie 2026" across months) */
 function dateRange(iso, days){
   try {
@@ -457,227 +588,283 @@ function hero(compact){
     <h1>Xtreme Character Challenge</h1>
     ${compact ? "" : `<p>${esc(when)}</p>`}</div></section>`;
 }
+const personBtn = (p, cls = "") => p ? `<button class="chip link ${cls}" data-person="${esc(p.id)}">${esc(shortName(p))}</button>` : "";
 function itemRow(it, kind){
-  const s = st(S.me, it.id), on = !!s.ok, skip = s.flag === "skip";
+  const s = st(S.me, it.id), on = s.ok, leaving = S.leaving[it.id];
   const chips = [];
   if (kind === "team"){
-    const others = mates().filter(p => p.id !== S.uid && has(p, it.id)).map(p => firstName(p.name));
-    if (others.length) chips.push(`<span class="chip ok">Aduce ${esc(others.join(", "))}</span>`);
+    const others = (teamOf(S.uid) ? mates() : []).filter(p => p.id !== S.uid && has(p, it.id));
+    if (others.length) chips.push(`<span class="chip ok">Aduce ${esc(others.map(shortName).join(", "))}</span>`);
   }
-  if (s.flag === "need") chips.push('<span class="chip need">Am nevoie</span>');
-  if (s.flag === "lend") chips.push('<span class="chip lend">Am în plus</span>');
-  if (skip) chips.push('<span class="chip skip">Nu iau</span>');
-  return `<div class="it ${on ? "on" : ""} ${skip ? "skip" : ""}">
+  if (s.need){
+    chips.push('<span class="chip need">Am nevoie</span>');
+    const l = lendersOf(it.id, S.uid);
+    if (l.length) chips.push(`<span class="chip lend">Are în plus:</span>${l.map(p => personBtn(p, "lend")).join("")}`);
+  }
+  if (s.lend && kind !== "team") chips.push('<span class="chip lend">Am de dat</span>');
+  if (s.skip) chips.push('<span class="chip skip">Nu iau</span>');
+  return `<div class="it ${on ? "on" : ""} ${s.skip ? "skip" : ""} ${leaving ? "leaving" : ""}" data-row="${esc(it.id)}">
     <button class="it-main" data-toggle="${esc(it.id)}" aria-pressed="${on}">
       <span class="box">${CHECK}</span>
       <span class="it-body"><span class="it-name">${esc(it.name)}</span>
-        ${chips.length ? `<span class="chips">${chips.join("")}</span>` : ""}
         ${s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span>
     </button>
-    <button class="it-more" data-more="${esc(it.id)}" aria-label="Mai multe pentru ${esc(it.name)}">•••</button>
-  </div>`;
+    <button class="it-more" data-more="${esc(it.id)}" aria-label="Opțiuni pentru ${esc(it.name)}">•••</button>
+  </div>${chips.length ? `<div class="it-chips">${chips.join("")}</div>` : ""}`;
 }
 
 /* ---------- auth screens ---------- */
 function pageAuth(){
   if (S.recovering) return `<div class="auth">${hero(true)}<form class="block stack" id="newPassForm">
       <h2 class="h2">Alege o parolă nouă</h2>
+      <p class="muted">Ai deschis linkul de resetare. Scrie parola nouă și intri direct.</p>
       <label class="field"><span>Parola nouă</span><div class="pw"><input class="input" type="password" id="np" minlength="8" autocomplete="new-password" required><button type="button" data-pw>Arată</button></div><small>Minim 8 caractere.</small></label>
-      <button class="btn" type="submit">Salvează parola</button></form></div>`;
+      <button class="btn" type="submit">Salvează parola și intră</button></form></div>`;
   const m = S.authMode;
+  if (m === "check" || m === "sent") return `<div class="auth">${hero(true)}<div class="block stack">
+      <h2 class="h2">Verifică emailul</h2>
+      <p>${m === "sent" ? "Dacă ai cont, am trimis un link de resetare la" : "Am trimis un link de confirmare la"} <b>${esc(S.checkEmail)}</b>. ${m === "sent" ? "Apasă pe el și îți alegi o parolă nouă." : "Apasă pe el, apoi revino aici și intră."}</p>
+      <p class="muted small">Nu-l găsești? Uită-te și în Spam sau Promoții. Linkul e valabil o oră.</p>
+      <div class="pair-btns"><button class="btn sec" data-resend>Retrimite emailul</button><button class="btn ghost" data-auth="${m === "sent" ? "forgot" : "signup"}">Am greșit emailul</button></div>
+      <button class="btn ${m === "sent" ? "sec" : ""}" data-auth="login">${m === "sent" ? "Înapoi la intrare" : "Am confirmat, vreau să intru"}</button></div></div>`;
   const body = m === "forgot" ? `
-      <h2 class="h2">Resetează parola</h2>
-      <p class="muted">Îți trimitem pe email un link cu care îți alegi o parolă nouă.</p>
+      <h2 class="h2">Ai uitat parola?</h2>
+      <p class="muted">Scrie emailul cu care ți-ai făcut cont. Îți trimitem un link cu care îți alegi o parolă nouă.</p>
       <form class="stack" id="forgotForm">
-        <label class="field"><span>Email</span><input class="input" type="email" id="fe" autocomplete="email" required></label>
-        <button class="btn" type="submit">Trimite linkul</button>
+        <label class="field"><span>Email</span><input class="input" type="email" id="fe" autocomplete="email" value="${esc(S.checkEmail)}" required></label>
+        <button class="btn" type="submit">Trimite linkul de resetare</button>
         <button class="btn ghost" type="button" data-auth="login">Înapoi</button></form>`
     : m === "signup" ? `
       <form class="stack" id="signupForm">
-        <label class="field"><span>Cum te știe echipa</span><input class="input" type="text" id="sn" maxlength="30" autocomplete="name" placeholder="ex. Andrei Pop" required></label>
+        <label class="field"><span>Cum îți spun ceilalți</span><input class="input" type="text" id="sn" maxlength="30" autocomplete="name" placeholder="ex. Andrei Pop" required></label>
         <label class="field"><span>Email</span><input class="input" type="email" id="se" autocomplete="email" required></label>
-        <label class="field"><span>Parolă</span><div class="pw"><input class="input" type="password" id="sp" minlength="8" autocomplete="new-password" required><button type="button" data-pw>Arată</button></div><small>Minim 8 caractere. O folosești de pe orice telefon.</small></label>
+        <label class="field"><span>Parolă</span><div class="pw"><input class="input" type="password" id="sp" minlength="8" autocomplete="new-password" required><button type="button" data-pw>Arată</button></div><small>Minim 8 caractere. Cu ea intri de pe orice telefon.</small></label>
         <button class="btn" type="submit">Creează contul</button>
-        <p class="small muted">După ce îți faci contul, Clau îl aprobă și intri.</p></form>`
+        <p class="small muted">După ce îți faci contul, Clau îl aprobă și intri în grup.</p></form>`
     : `
       <form class="stack" id="loginForm">
         <label class="field"><span>Email</span><input class="input" type="email" id="le" autocomplete="email" required></label>
         <label class="field"><span>Parolă</span><div class="pw"><input class="input" type="password" id="lp" autocomplete="current-password" required><button type="button" data-pw>Arată</button></div></label>
         <button class="btn" type="submit">Intră</button>
-        <button class="btn ghost" type="button" data-auth="forgot">Am uitat parola</button></form>`;
+        <button class="btn sec" type="button" data-auth="forgot">Am uitat parola</button></form>`;
   return `<div class="auth">${hero()}
     <div class="block stack">
       ${m !== "forgot" ? `<div class="seg" role="tablist"><button role="tab" data-auth="login" aria-selected="${m === "login"}">Am cont</button><button role="tab" data-auth="signup" aria-selected="${m === "signup"}">Sunt nou</button></div>` : ""}
       ${body}
     </div>
-    <div class="legend" aria-label="Ce găsești în aplicație">
-      <span>${marker("dot")}Echipament</span><span>${marker("cross")}Transport</span><span>${marker("tri")}Echipa</span>
-    </div></div>`;
+    <p class="small muted" style="text-align:center">Aplicație făcută de participanți pentru grupul lor. Nu e un produs oficial 4M.</p></div>`;
 }
 function pagePending(){
   const rej = S.me?.status === "rejected";
   return `<div class="auth">${hero(true)}<div class="block stack">
     ${avatar(S.me, "lg")}
-    <h2 class="h2">${rej ? "Contul nu a fost aprobat" : `Salut, ${esc(firstName(S.me?.name))}! Aproape gata.`}</h2>
-    <p class="muted">${rej ? "Dacă e o greșeală, scrie-i lui Clau și îți reactivează contul." :
-      "Clau a primit cererea ta. Când te aprobă, pagina se deschide singură, nu trebuie să faci nimic."}</p>
+    <h2 class="h2">${rej ? "Nu mai ești în grupul XCC" : `Salut, ${esc(firstName(S.me?.name))}! Aproape gata.`}</h2>
+    <p class="muted">${rej ? "Dacă e o greșeală, scrie-i lui Clau pe grupul de WhatsApp." :
+      "Contul tău așteaptă aprobarea lui Clau. Spune-i pe grupul de WhatsApp că te-ai înscris. Când te aprobă, pagina se deschide singură."}</p>
+    <p class="small muted">Cont creat cu <b>${esc(S.email)}</b></p>
     <button class="btn sec" data-logout>Ieși din cont</button></div></div>`;
 }
 
 /* ---------- pages ---------- */
 function pageHome(){
-  const p = S.me, req = reqItems(), miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid);
+  const p = S.me, miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid);
   const steps = [];
-  if (isAdmin() && pending().length) steps.push({ go: "admin", tab: "requests", cls: "todo", ic: pending().length, t: `${plural(pending().length, "cerere nouă", "cereri noi")} de aprobat`, s: pending().map(x => firstName(x.name)).join(", ") });
+  if (isAdmin() && pending().length) steps.push({ go: "admin", tab: "requests", cls: "todo", ic: pending().length, t: `${plural(pending().length, "cerere nouă", "cereri noi")} de aprobat`, s: pending().map(x => x.name).join(", ") });
   steps.push(miss.length
-    ? { go: "gear", cls: "todo", ic: miss.length, t: `Îți ${miss.length === 1 ? "lipsește un lucru obligatoriu" : `lipsesc ${miss.length} lucruri obligatorii`}`, s: miss.slice(0, 3).map(i => i.name).join(", ") + (miss.length > 3 ? "…" : "") }
-    : { go: "gear", cls: "done", ic: "✓", t: "Ai tot echipamentul obligatoriu", s: "Verifică și opționalele." });
+    ? { go: "gear", cls: "todo", ic: miss.length, t: miss.length === reqItems().length ? "Începe cu lista de echipament" : `Îți ${miss.length === 1 ? "lipsește un lucru obligatoriu" : `lipsesc ${miss.length} lucruri obligatorii`}`, s: miss.slice(0, 3).map(i => i.name).join(", ") + (miss.length > 3 ? "…" : "") }
+    : { go: "gear", cls: "ready", ic: "✓", t: "Ai tot echipamentul obligatoriu", s: optItems().some(i => !has(p, i.id) && !st(p, i.id).skip) ? "Mai ai de hotărât câteva opționale." : "Ești gata de drum." });
+  const found = S.items.filter(i => st(p, i.id).need && lendersOf(i.id, S.uid).length);
+  if (found.length) steps.push({ go: "gear", cls: "help", ic: found.length, t: found.length === 1 ? `Cineva are în plus: ${found[0].name}` : `Cineva are în plus ${found.length} lucruri pe care le cauți`, s: found.map(i => `${i.name}: ${lendersOf(i.id, S.uid).map(shortName).join(", ")}`).join(" · ") });
   steps.push(car
-    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? `Conduci ${car.label || "mașina ta"}` : `Mergi cu ${firstName(pname(car.owner))}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
+    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? `Conduci ${car.label || "mașina ta"}` : `Mergi cu ${nameOf(car.owner)}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
+    : ownWay(p) ? { go: "transport", cls: "done", ic: "✓", t: "Vii pe cont propriu", s: "Dacă se schimbă ceva, alege un loc la Transport." }
     : { go: "transport", cls: "todo", ic: "!", t: "Încă n-ai loc într-o mașină", s: S.cars.length ? `${plural(S.cars.reduce((n, c) => n + freeOf(c), 0), "loc liber", "locuri libere")} acum` : "Ai mașină? Adaug-o." });
-  steps.push(team
-    ? { go: "gear", tab: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Vezi cine ce aduce pentru echipă" }
-    : { go: "group", cls: "wait", ic: "…", t: "Aștepți repartizarea pe echipe", s: "Le facem după listele de la 4M" });
-  const myExtra = S.items.filter(i => st(p, i.id).flag === "lend");
-  const canHelp = myExtra.filter(i => people().some(x => x.id !== S.uid && st(x, i.id).flag === "need"));
-  return `${hero()}
-    <div class="stack"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
+  if (!team) steps.push({ go: "gear", tab: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Le facem după ce primim listele de la 4M." });
+  else { const gaps = teamGaps(team.id);
+    steps.push(gaps.length ? { go: "gear", tab: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru" : `lipsesc ${gaps.length} lucruri`} de echipă`, s: gaps.map(i => i.name).join(", ") }
+      : { go: "gear", tab: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Echipa are tot echipamentul comun." }); }
+  const canHelp = S.items.filter(i => st(p, i.id).lend && seekersOf(i.id, S.uid).length);
+  const myExtra = S.items.filter(i => st(p, i.id).lend);
+  const welcome = !lsGet("xcc-welcome") ? `<div class="block welcome stack"><h2 class="h2">Bine ai venit în grup</h2>
+      <ol><li>Bifează ce ai din lista obligatorie.</li><li>Ia-ți loc într-o mașină sau adaugă-ți mașina.</li><li>Ce ai în plus trece la „De dat”.</li></ol>
+      <p class="muted small">Ce bifezi vede tot grupul, ca să ne ajutăm între noi.</p>
+      <button class="btn sec sm" data-welcome style="align-self:flex-start">Am înțeles</button></div>` : "";
+  return `${hero()}${welcome}
+    <div class="section"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
-    ${canHelp.length ? `<div class="stack"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 4).map(i => {
-      const who = people().filter(x => x.id !== S.uid && st(x, i.id).flag === "need").map(x => firstName(x.name));
-      return `<button class="person" data-go="gear" data-tab="extra"><span class="t"><b>${esc(i.name)}</b><span>${esc(who.join(", "))} caută. Tu ai în plus.</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("")}</div></div>`
-      : `<button class="block step" data-go="gear" data-tab="extra" style="border:1px solid var(--line);border-radius:var(--r-m)"><span class="st wait">+</span><span class="t"><b>${myExtra.length ? `Ai ${plural(myExtra.length, "lucru", "lucruri")} de dat` : "Ai echipament în plus?"}</b><span>${myExtra.length ? "Nimeni nu le caută acum. Te anunțăm aici." : "Trece-l la „De dat”, ca să-l găsească cine are nevoie."}</span></span><span class="chev" aria-hidden="true">›</span></button>`}
-    <p class="small muted">Lipsa echipamentului obligatoriu înseamnă descalificare, iar organizatorul nu asigură nimic din listă. <a href="https://www.4mro.ro/regulament-xcc" target="_blank" rel="noopener">Regulamentul XCC</a></p>`;
+    <div class="warnline">${WARN}<span>Fără echipamentul obligatoriu nu poți participa. Organizatorul nu asigură nimic din listă.</span></div>
+    ${canHelp.length ? `<div class="section"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 5).map(i => {
+      const who = seekersOf(i.id, S.uid);
+      return `<div class="need-card"><b>${esc(i.name)}</b><span class="chips"><span class="chip need">Caută:</span>${who.map(x => personBtn(x, "need")).join("")}</span></div>`; }).join("")}</div></div>`
+      : `<button class="block step" data-go="gear" data-tab="extra"><span class="st help">+</span><span class="t"><b>${myExtra.length ? `Ai ${plural(myExtra.length, "lucru", "lucruri")} de dat` : "Ai echipament în plus?"}</b><span>${myExtra.length ? "Nimeni nu le caută acum. Apar aici când cineva le cere." : "Trece-l la „De dat”, ca să-l găsească cine are nevoie."}</span></span><span class="chev" aria-hidden="true">›</span></button>`}
+    <p class="small muted"><a href="https://www.4mro.ro/regulament-xcc" target="_blank" rel="noopener">Regulamentul XCC pe 4mro.ro</a></p>`;
 }
 
 function pageGear(){
   const tab = S.gearTab, p = S.me;
-  const nExtra = S.items.filter(i => st(p, i.id).flag === "lend").length;
-  const seg = `<div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="team" aria-selected="${tab === "team"}">De echipă</button><button role="tab" data-gtab="extra" aria-selected="${tab === "extra"}">De dat${nExtra ? ` (${nExtra})` : ""}</button></div>`;
+  const nExtra = S.items.filter(i => st(p, i.id).lend).length;
+  const seg = `<div class="sticky-seg"><div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="team" aria-selected="${tab === "team"}">De echipă</button><button role="tab" data-gtab="extra" aria-selected="${tab === "extra"}">De dat${nExtra ? ` (${nExtra})` : ""}</button></div></div>`;
   if (tab === "extra"){
-    const list = S.items.filter(i => !isTeam(i));
+    const list = S.items.filter(i => !isTeam(i) && !st(p, i.id).need);
     const row = it => {
-      const s = st(p, it.id), on = s.flag === "lend";
-      const seekers = people().filter(x => x.id !== S.uid && st(x, it.id).flag === "need").map(x => firstName(x.name));
-      return `<div class="it ${on ? "on" : ""}">
-        <button class="it-main" data-extra="${esc(it.id)}" aria-pressed="${on}"><span class="box">${CHECK}</span>
+      const s = st(p, it.id), seekers = seekersOf(it.id, S.uid);
+      return `<div class="it lendrow ${s.lend ? "on" : ""}">
+        <button class="it-main" data-extra="${esc(it.id)}" aria-pressed="${s.lend}"><span class="box">${CHECK}</span>
           <span class="it-body"><span class="it-name">${esc(it.name)}</span>
-          ${seekers.length ? `<span class="chips"><span class="chip need">Caută: ${esc(seekers.join(", "))}</span></span>` : ""}
-          ${on && s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span></button>
-        <button class="it-more" data-more="${esc(it.id)}" aria-label="Mai multe pentru ${esc(it.name)}">•••</button></div>`;
+          ${s.lend && s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span></button>
+        <button class="it-more" data-more="${esc(it.id)}" aria-label="Opțiuni pentru ${esc(it.name)}">•••</button></div>
+        ${seekers.length ? `<div class="it-chips"><span class="chip need">Caută:</span>${seekers.map(x => personBtn(x, "need")).join("")}</div>` : ""}`;
     };
-    const sought = list.filter(i => people().some(x => x.id !== S.uid && st(x, i.id).flag === "need"));
-    const rest = list.filter(i => !sought.includes(i));
+    const sought = list.filter(i => seekersOf(i.id, S.uid).length);
+    const groups = {};
+    for (const it of list.filter(i => !sought.includes(i))) (groups[groupOf(it)] ??= []).push(it);
     return `<h1 class="h1">Echipament</h1>${seg}
       <div class="block stack"><p><b>Ce ai în plus și poți da altcuiva.</b></p>
-        <p class="muted small">Bifează doar lucrurile pe care le ai în plus, nu pe cele pe care le iei tu. Din ••• adaugi o notă, de exemplu mărimea.</p>
+        <p class="muted small">Bifează aici doar lucrurile pe care le ai în plus, nu pe cele pe care le iei tu. Din ••• adaugi o notă, de exemplu mărimea.</p>
         ${nExtra ? `<span class="chip lend" style="align-self:flex-start">Ai ${plural(nExtra, "lucru", "lucruri")} de dat</span>` : ""}</div>
-      ${sought.length ? `<section><div class="group-title"><h2 class="h2">Le caută cineva</h2></div><div class="list">${sought.map(row).join("")}</div></section>` : ""}
-      <section><div class="group-title"><h2 class="h2">${sought.length ? "Restul listei" : "Toată lista"}</h2></div><div class="list">${rest.map(row).join("")}</div></section>`;
+      ${sought.length ? `<section class="section"><div class="group-title"><h2 class="h2">Le caută cineva</h2></div><div class="list">${sought.map(row).join("")}</div></section>` : ""}
+      ${Object.entries(groups).map(([g, l]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div><div class="list">${l.map(row).join("")}</div></section>`).join("")}`;
   }
   if (tab === "team"){
-    const team = teamOf(S.uid), list = teamItems();
-    const covered = list.filter(i => !isOpt(i) && (team ? mates() : [p]).some(x => has(x, i.id))).length, needed = list.filter(i => !isOpt(i)).length;
+    const team = teamOf(S.uid), list = teamItems(), who = team ? mates() : [p];
+    const sorted = [...list].sort((a, b) => (who.some(x => has(x, a.id)) ? 1 : 0) - (who.some(x => has(x, b.id)) ? 1 : 0));
+    const covered = teamReq().filter(i => who.some(x => has(x, i.id))).length, needed = teamReq().length;
     return `<h1 class="h1">Echipament</h1>${seg}
       <div class="block stack">
-        ${team ? `<div class="block-head"><h2 class="h3">${esc(team.name)}</h2><span class="muted small">${plural(mates().length, "om", "oameni")}</span></div>
-          <div class="prog"><div class="big">${covered}<small>din ${needed} acoperite</small></div><div class="bar"><i style="width:${needed ? covered / needed * 100 : 0}%"></i></div></div>`
+        ${team ? `<div class="block-head"><h2 class="h3">${esc(team.name)}</h2><span class="muted small">${esc(mates().map(shortName).join(", "))}</span></div>
+          <div class="prog">${covered === needed ? '<span class="done-badge">✓ Echipa are tot ce e comun</span>' : `<div class="big alarm">${needed - covered}<small>lipsesc din ${needed} obligatorii</small></div>`}<div class="bar ${covered === needed ? "full" : ""}"><i style="width:${needed ? covered / needed * 100 : 0}%"></i></div></div>`
         : `<p><b>Încă nu ești într-o echipă.</b></p><p class="muted">Echipele le facem după ce primim listele de la 4M. Până atunci, bifează ce ai putea aduce tu.</p>`}
-        <p class="small muted">E nevoie de câte unul pe echipă. Bifează doar ce aduci tu pentru toți.</p>
+        <p class="small muted">Se aduc pentru toată echipa. Bifează doar ce aduci tu, ca să nu vină toți cu același lucru. Uită-te la cantitate (ex. 2–3 butelii).</p>
       </div>
-      <div class="list">${list.map(i => itemRow(i, "team")).join("") || '<div class="empty">Nimic pe listă.</div>'}</div>`;
+      <div class="list">${sorted.map(i => itemRow(i, "team")).join("") || '<div class="empty">Nimic pe listă.</div>'}</div>`;
   }
-  const req = reqItems(), opt = optItems(), haveReq = req.filter(i => has(p, i.id)).length;
+  const req = reqItems(), opt = optItems(), haveReq = req.filter(i => has(p, i.id)).length, missN = req.length - haveReq;
   const groups = {};
   for (const it of req) (groups[groupOf(it)] ??= []).push(it);
-  const filt = l => S.onlyMissing ? l.filter(i => !has(p, i.id) && st(p, i.id).flag !== "skip") : l;
+  const filt = l => S.onlyMissing ? l.filter(i => S.leaving[i.id] || (!has(p, i.id) && !st(p, i.id).skip)) : l;
   const sections = Object.entries(groups).map(([g, l]) => {
     const vis = filt(l); if (!vis.length) return "";
-    return `<section><div class="group-title"><h2 class="h2">${esc(g)}</h2><span class="muted small">${l.filter(i => has(p, i.id)).length}/${l.length}</span></div>
+    const done = l.filter(i => has(p, i.id)).length;
+    return `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2>${done === l.length ? `<span class="chip ok">✓ ${done}/${l.length}</span>` : `<span class="count muted small">${done}/${l.length}</span>`}</div>
       <div class="list">${vis.map(i => itemRow(i, "mine")).join("")}</div></section>`;
   }).join("");
   const optVis = filt(opt);
-  const optDone = opt.filter(i => has(p, i.id) || st(p, i.id).flag === "skip").length;
+  const optDone = opt.filter(i => has(p, i.id) || st(p, i.id).skip).length;
   return `<h1 class="h1">Echipament</h1>${seg}
     <div class="block prog">
-      ${haveReq === req.length && req.length ? `<span class="done-badge">✓ Ai tot ce e obligatoriu</span>` : `<div class="big">${haveReq}<small>din ${req.length} obligatorii</small></div>`}
-      <div class="bar"><i style="width:${req.length ? haveReq / req.length * 100 : 0}%"></i></div>
+      ${missN === 0 && req.length ? `<span class="done-badge">✓ Ai tot ce e obligatoriu</span>` : `<div class="big alarm">${missN}<small>${missN === 1 ? "lipsește" : "lipsesc"} · ${haveReq} din ${req.length} bifate</small></div>`}
+      <div class="bar ${missN === 0 ? "full" : ""}"><i style="width:${req.length ? haveReq / req.length * 100 : 0}%"></i></div>
       <div class="row"><span class="small muted">Apasă pe un rând ca să-l bifezi. Din ••• ceri ce-ți lipsește.</span><span class="spacer"></span>
         <button class="chip" data-missing aria-pressed="${S.onlyMissing}">Doar ce-mi lipsește</button></div>
     </div>
     ${sections}
-    ${optVis.length ? `<section><div class="group-title"><h2 class="h2">Opțional</h2><span class="muted small">${optDone}/${opt.length} hotărâte</span></div>
-      <div class="list">${optVis.map(i => itemRow(i, "mine")).join("")}</div></section>` : ""}
-    ${S.onlyMissing && !sections && !optVis.length ? '<div class="block empty"><b>Nimic nu-ți lipsește</b>Ești pregătit de drum.</div>' : ""}`;
+    ${S.onlyMissing && !sections ? `<div class="block empty"><b>Nu-ți lipsește nimic obligatoriu</b>${optVis.length ? `Mai ai ${plural(optVis.length, "opțional nehotărât", "opționale nehotărâte")} mai jos.` : "Ești pregătit de drum."}</div>` : ""}
+    ${optVis.length ? `<section class="section"><div class="group-title"><h2 class="h2">Opțional</h2><span class="count muted small">${optDone}/${opt.length} decise</span></div>
+      <div class="list">${optVis.map(i => itemRow(i, "mine")).join("")}</div></section>` : ""}`;
 }
 
 function pageTransport(){
-  const mine = carOf(S.uid), owned = S.cars.find(c => c.owner === S.uid);
-  const free = S.cars.reduce((n, c) => n + freeOf(c), 0), waiting = noRide();
+  const p = S.me, mine = carOf(S.uid), owned = S.cars.find(c => c.owner === S.uid);
+  const free = S.cars.reduce((n, c) => n + freeOf(c), 0), waiting = noRide(), own = people().filter(ownWay);
+  const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}</button>`;
   const seats = c => {
-    const out = [`<span class="seat ${c.owner === S.uid ? "me" : ""}">${avatar(byId(c.owner))}${esc(firstName(pname(c.owner)))} <span class="role">șofer</span></span>`];
-    for (const r of ridersOf(c)) out.push(`<span class="seat ${r.id === S.uid ? "me" : ""}">${avatar(r)}${esc(firstName(r.name))}</span>`);
+    const out = [byId(c.owner) ? seat(byId(c.owner), "șofer") : ""];
+    for (const r of ridersOf(c)) out.push(seat(r));
     for (let i = 0; i < freeOf(c); i++) out.push('<span class="seat free">loc liber</span>');
     return `<div class="seats">${out.join("")}</div>`;
   };
-  const route = c => { const parts = [c.from_city && `Din <b>${esc(c.from_city)}</b>`, c.when_text && esc(c.when_text)].filter(Boolean); return parts.length ? `<div class="car-route">${parts.join(", ")}</div>` : ""; };
-  const myBlock = mine ? `<div class="block mycar car">
-      <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(firstName(pname(mine.owner)))}`}</h2><span class="muted small">${esc(mine.label || "Mașină")}</span></div>
+  const route = c => { const parts = [c.from_city && `Din <b>${esc(c.from_city)}</b>`, c.when_text && esc(c.when_text)].filter(Boolean); return parts.length ? `<p class="car-route">${parts.join(", ")}</p>` : ""; };
+  let myBlock;
+  if (mine) myBlock = `<div class="block mycar car">
+      <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(mine.owner))}`}</h2><span class="muted small">${esc(mine.label || "Mașină")}</span></div>
       ${route(mine)}${seats(mine)}${mine.note ? `<p class="muted small">${esc(mine.note)}</p>` : ""}
-      <div class="row">${mine.owner === S.uid ? `<button class="btn sec sm" data-car-edit="${esc(mine.id)}">Editează mașina</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`
-    : `<div class="block stack"><h2 class="h2">Încă n-ai loc</h2>
-      <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")}. Alege o mașină de mai jos.` : "Nu sunt locuri libere acum."}</p>
-      <div class="row"><button class="btn" data-car-new>Am mașină</button></div></div>`;
+      <div class="row">${mine.owner === S.uid ? `<button class="btn sec sm" data-car-edit="${esc(mine.id)}">Editează mașina</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`;
+  else if (ownWay(p)) myBlock = `<div class="block stack"><h2 class="h2">Vii pe cont propriu</h2>
+      <p class="muted">Nu apari la „Fără loc”. Dacă ai totuși nevoie de loc, schimbă mai jos.</p>
+      <div class="row"><button class="btn sec sm" data-ownway="0">Am nevoie de loc</button></div></div>`;
+  else myBlock = `<div class="block stack"><h2 class="h2">Încă n-ai loc</h2>
+      <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")}. Alege o mașină de mai jos.` : "Nu sunt locuri libere acum. Ești pe lista „Fără loc” și Clau te ajută să găsești unul."}</p>
+      <div class="pair-btns"><button class="btn" data-car-new>Am mașină</button><button class="btn sec" data-ownway="1">Vin pe cont propriu</button></div></div>`;
   const others = S.cars.filter(c => c.id !== mine?.id);
   return `<h1 class="h1">Transport</h1>${myBlock}
-    ${others.length ? `<div class="stack"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
-      ${others.map(c => `<div class="block car">
-        <div class="block-head"><h3 class="h3">${esc(c.label || "Mașină")}</h3>${freeOf(c) ? `<span class="chip ok">${plural(freeOf(c), "loc", "locuri")}</span>` : '<span class="chip">Plină</span>'}</div>
+    ${others.length ? `<section class="section"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
+      ${others.map(c => { const f = freeOf(c), canJoin = !owned && f > 0, canEdit = isAdmin() && c.owner !== S.uid;
+        return `<div class="block car">
+        <div class="block-head"><h3 class="h3">${esc(c.label || "Mașină")}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plină</span>'}</div>
         ${route(c)}${seats(c)}${c.note ? `<p class="muted small">${esc(c.note)}</p>` : ""}
-        ${(!owned && freeOf(c)) || (isAdmin() && c.owner !== S.uid) ? `<div class="row">${!owned && freeOf(c) ? `<button class="btn ${mine ? "sec" : ""} sm" data-join="${esc(c.id)}">${mine ? "Mută-mă aici" : "Iau un loc"}</button>` : ""}${isAdmin() && c.owner !== S.uid ? `<button class="btn ghost sm" data-car-edit="${esc(c.id)}">Editează (admin)</button>` : ""}</div>` : ""}
-      </div>`).join("")}</div>` : (mine ? "" : '<div class="block empty"><b>Nicio mașină încă</b>Cine are mașină o adaugă cu „Am mașină”.</div>')}
-    ${!owned && mine ? `<button class="btn ghost" data-car-new>Am și eu mașină</button>` : ""}
-    <div class="stack"><div class="group-title"><h2 class="h2">Fără loc</h2><span class="muted small">${waiting.length}</span></div>
-      ${waiting.length ? `<div class="chips">${waiting.map(x => `<span class="chip ${x.id === S.uid ? "need" : ""}">${esc(x.name)}</span>`).join("")}</div>` : '<p class="muted">Toată lumea are loc.</p>'}
-      ${isAdmin() && people().length && S.cars.length ? `<button class="btn sec sm" data-assign style="align-self:flex-start">Repartizează oamenii</button>` : ""}</div>`;
+        ${canJoin || canEdit ? `<div class="row">${canJoin ? `<button class="btn ${mine ? "sec" : ""} sm" data-join="${esc(c.id)}">${mine ? "Mută-mă aici" : "Iau un loc"}</button>` : ""}${canEdit ? `<button class="btn sec sm" data-car-edit="${esc(c.id)}">Editează</button>` : ""}</div>` : ""}
+      </div>`; }).join("")}</section>` : (mine ? "" : '<div class="block empty"><b>Nicio mașină încă</b>Cine are mașină o adaugă cu „Am mașină”.</div>')}
+    ${!owned && mine ? `<button class="btn sec" data-car-new style="align-self:flex-start">Am și eu mașină</button>` : ""}
+    <section class="section"><div class="group-title"><h2 class="h2">Fără loc</h2><span class="count muted small">${waiting.length}</span></div>
+      ${waiting.length ? `<div class="chips">${waiting.slice(0, 14).map(x => personBtn(x, x.id === S.uid ? "need" : "")).join("")}${waiting.length > 14 ? `<span class="chip">+${waiting.length - 14}</span>` : ""}</div>` : '<p class="muted">Toată lumea are loc.</p>'}
+      ${own.length ? `<p class="small muted">Pe cont propriu: ${esc(own.map(shortName).join(", "))}</p>` : ""}
+      ${isAdmin() && people().length && S.cars.length ? `<button class="btn sec sm" data-assign style="align-self:flex-start">Repartizează oamenii</button>` : ""}</section>`;
 }
 
+function groupList(){ return people().filter(p => S.groupTeam === "all" || (S.groupTeam === "none" ? !teamOf(p.id) : p.team === S.groupTeam)); }
 function pageGroup(){
   const t = S.groupTab;
   const seg = `<div class="seg" role="tablist">
     <button role="tab" data-grtab="people" aria-selected="${t === "people"}">Oameni</button>
     <button role="tab" data-grtab="needs" aria-selected="${t === "needs"}">Nevoi</button>
     <button role="tab" data-grtab="items" aria-selected="${t === "items"}">Pe obiect</button></div>`;
-  const filter = S.teams.length ? `<div class="chips" role="group" aria-label="Filtrează după echipă">
+  const filter = S.teams.length ? `<div class="chips" role="group" aria-label="Arată doar o echipă">
     ${[["all", "Toți"], ...S.teams.map(x => [x.id, x.name]), ["none", "Fără echipă"]].map(([v, l]) => `<button class="chip" data-team-filter="${esc(v)}" aria-pressed="${S.groupTeam === v}">${esc(l)}</button>`).join("")}</div>` : "";
-  let list = people().filter(p => S.groupTeam === "all" || (S.groupTeam === "none" ? !teamOf(p.id) : p.team === S.groupTeam));
+  const list = groupList();
   let body;
   if (t === "people"){
-    const q = S.q.trim().toLowerCase();
-    if (q) list = list.filter(p => p.name.toLowerCase().includes(q));
-    const req = reqItems().length;
-    body = `<input class="input" type="search" id="q" placeholder="Caută un nume" value="${esc(S.q)}" aria-label="Caută un nume">
-      <div class="list">${list.map(p => { const h = req - missingOf(p).length, car = carOf(p.id), tm = teamOf(p.id);
-        return `<button class="person" data-person="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.id === S.uid ? " (tu)" : ""}</b>
-          <span>${esc(tm ? tm.name : "Fără echipă")} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : "fără loc"}</span></span>
-          <span class="r">${h === req ? '<span class="chip ok">Gata</span>' : `${h}/${req}<span class="bar thin"><i style="width:${req ? h / req * 100 : 0}%"></i></span>`}</span></button>`; }).join("")
-        || '<div class="empty">Nimeni aici.</div>'}</div>`;
+    body = `<input class="input" type="search" id="q" placeholder="Caută un nume" value="${esc(S.q)}" aria-label="Caută un nume" autocomplete="off" enterkeyhint="search">
+      <div class="list" id="peopleList">${peopleRows(list, reqItems().length)}</div>`;
   } else if (t === "needs"){
-    const rows = S.items.map(i => ({ i, need: list.filter(p => st(p, i.id).flag === "need"), lend: list.filter(p => st(p, i.id).flag === "lend") }))
+    const rows = S.items.map(i => ({ i, need: list.filter(p => st(p, i.id).need), lend: people().filter(p => st(p, i.id).lend) }))
       .filter(r => r.need.length).sort((a, b) => b.need.length - a.need.length);
-    body = rows.length ? `<p class="muted">Cine caută ceva și cine are în plus. Vorbiți direct între voi.</p><div class="list">${rows.map(r => `<div class="need-card"><b>${esc(r.i.name)}</b>
-        <div class="pair"><span class="k">Caută</span><span class="chips">${r.need.map(p => `<span class="chip need">${esc(p.name)}</span>`).join("")}</span>
-        <span class="k">Are în plus</span><span class="chips">${r.lend.length ? r.lend.map(p => `<span class="chip lend">${esc(p.name)}</span>`).join("") : '<span class="muted small">nimeni încă</span>'}</span></div></div>`).join("")}</div>`
+    body = rows.length ? `<p class="muted">Cine caută ceva și cine are în plus. Vorbiți pe grupul de WhatsApp.</p><div class="list">${rows.map(r => `<div class="need-card"><b>${esc(r.i.name)}</b>
+        <div class="pair"><span class="k">Caută</span><span class="chips">${r.need.map(p => personBtn(p, "need")).join("")}</span>
+        <span class="k">Are în plus</span><span class="chips">${r.lend.length ? r.lend.map(p => personBtn(p, "lend")).join("") : '<span class="muted small">nimeni încă</span>'}</span></div></div>`).join("")}</div>`
       : '<div class="block empty"><b>Nimeni nu caută nimic</b>Când cineva apasă „Am nevoie” la un obiect, apare aici.</div>';
   } else {
     const n = list.length;
-    body = n ? `<div class="list">${S.items.map(i => { const h = list.filter(p => has(p, i.id)), miss = list.filter(p => !has(p, i.id) && st(p, i.id).flag !== "skip");
-      return `<div class="need-card"><div class="block-head"><b>${esc(i.name)}</b><span class="muted small">${h.length}/${n}</span></div>
+    const groups = {};
+    for (const it of S.items) (groups[isTeam(it) ? "De echipă" : groupOf(it)] ??= []).push(it);
+    body = n ? Object.entries(groups).map(([g, its]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div><div class="list">${its.map(i => {
+      if (isTeam(i) && S.teams.length){
+        const lines = S.teams.map(tm => { const b = membersOf(tm.id).filter(p => has(p, i.id)); return `<span class="small ${b.length ? "" : "muted"}">${esc(tm.name)}: ${b.length ? `aduce ${esc(b.map(shortName).join(", "))}` : (isOpt(i) ? "nimeni" : '<b style="color:var(--need)">nimeni încă</b>')}</span>`; }).join("");
+        return `<div class="need-card"><b>${esc(i.name)}</b>${lines}</div>`;
+      }
+      const h = list.filter(p => has(p, i.id)), miss = list.filter(p => !has(p, i.id) && !st(p, i.id).skip);
+      return `<div class="need-card"><div class="block-head"><b>${esc(i.name)}</b><span class="count muted small">${h.length}/${n}</span></div>
         <span class="bar thin"><i style="width:${h.length / n * 100}%"></i></span>
-        ${miss.length && miss.length < n ? `<span class="small muted">Nu au bifat: ${esc(miss.map(p => firstName(p.name)).join(", "))}</span>` : ""}</div>`; }).join("")}</div>` : '<div class="block empty">Nimeni aici.</div>';
+        ${miss.length && miss.length < n ? `<span class="small muted">Nu au bifat: ${esc(miss.map(shortName).join(", "))}</span>` : ""}</div>`; }).join("")}</div></section>`).join("")
+      : '<div class="block empty">Nimeni aici.</div>';
   }
-  return `<h1 class="h1">Echipa</h1>${seg}${filter}${body}`;
+  return `<h1 class="h1">Grupul</h1>${seg}${filter}${body}`;
+}
+function peopleRows(list, req){
+  const q = S.q.trim().toLowerCase();
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q));
+  return list.map(p => { const h = req - missingOf(p).length, car = carOf(p.id), tm = teamOf(p.id);
+    return `<button class="person" data-person="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.id === S.uid ? " (tu)" : ""}</b>
+      <span>${esc(tm ? tm.name : "fără echipă")} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : ownWay(p) ? "pe cont propriu" : "fără loc"}</span></span>
+      <span class="r">${h === req ? '<span class="chip ready">Gata</span>' : `${h}/${req}<span class="bar thin"><i style="width:${req ? h / req * 100 : 0}%"></i></span>`}</span></button>`; }).join("")
+    || '<div class="empty">Nimeni cu numele ăsta.</div>';
+}
+
+/* plain-text summary for WhatsApp / 4M */
+function summaryText(){
+  const L = [];
+  L.push(`XCC ${S.cfg.start_date ? dateRange(S.cfg.start_date, 3) : "2026"} — ${plural(people().length, "om", "oameni")}`);
+  if (S.teams.length){ L.push("", "ECHIPE");
+    for (const t of S.teams){ const m = membersOf(t.id), g = teamGaps(t.id); L.push(`${t.name}: ${m.map(p => p.name).join(", ") || "—"}${g.length ? ` (lipsesc: ${g.map(i => i.name).join(", ")})` : ""}`); }
+    const nt = people().filter(p => !teamOf(p.id)); if (nt.length) L.push(`Fără echipă: ${nt.map(p => p.name).join(", ")}`); }
+  L.push("", "MAȘINI");
+  for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"} — ${c.label || "mașină"}${c.from_city ? `, din ${c.from_city}` : ""}${c.when_text ? `, ${c.when_text}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
+  if (!S.cars.length) L.push("—");
+  const nr = noRide(); if (nr.length) L.push(`Fără loc: ${nr.map(p => p.name).join(", ")}`);
+  const own = people().filter(ownWay); if (own.length) L.push(`Pe cont propriu: ${own.map(p => p.name).join(", ")}`);
+  const notReady = people().filter(p => missingOf(p).length);
+  if (notReady.length){ L.push("", "LE LIPSEȘTE (obligatoriu)"); for (const p of notReady){ const m = missingOf(p); L.push(`${p.name}: ${m.length > 6 ? `${m.length} lucruri` : m.map(i => i.name).join(", ")}`); } }
+  return L.join("\n");
 }
 
 function pageAdmin(){
@@ -687,70 +874,98 @@ function pageAdmin(){
       .map(([k, l, n]) => `<button role="tab" data-atab="${k}" aria-selected="${t === k}">${l}${n ? `<span class="n">${n}</span>` : ""}</button>`).join("")}</div>`;
   let body = "";
   if (t === "requests"){
-    const invite = `Hai în echipa XCC! Îți faci cont aici și te aprob: ${SITE}`;
+    const invite = `Hai în aplicația noastră pentru XCC! Îți faci cont aici și te aprob: ${INVITE}`;
     body = `<div class="block stack"><h2 class="h3">Invită oameni</h2>
-        <div class="linkbox" id="linkBox">${esc(SITE)}</div>
-        <div class="row"><button class="btn sm" data-copy>Copiază linkul</button>
-          <a class="btn sec sm" href="https://wa.me/?text=${encodeURIComponent(invite)}" target="_blank" rel="noopener">Trimite pe WhatsApp</a>
-          ${navigator.share ? '<button class="btn ghost sm" data-share>Altă aplicație</button>' : ""}</div>
-        <p class="small muted">Își fac cont cu nume, email și parolă. Apar aici și nu văd nimic până nu îi aprobi.</p></div>
-      ${pending().length ? `<div class="list">${pending().map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>s-a înscris ${new Date(p.created_at).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })}</span></span>
-          <span class="row" style="flex:none"><button class="btn ok sm" data-approve="${esc(p.id)}">Aprobă</button><button class="btn ghost sm" data-reject="${esc(p.id)}" aria-label="Respinge ${esc(p.name)}">✕</button></span></div>`).join("")}</div>`
+        <div class="linkbox" id="linkBox">${esc(INVITE)}</div>
+        <div class="pair-btns"><button class="btn sm" data-copy="${esc(invite)}">Copiază mesajul</button>
+          <a class="btn sec sm" href="https://wa.me/?text=${encodeURIComponent(invite)}" target="_blank" rel="noopener">Trimite pe WhatsApp</a></div>
+        <p class="small muted">Linkul deschide direct formularul de cont nou. Cei care se înscriu apar mai jos și nu văd nimic până nu îi aprobi.</p></div>
+      ${pending().length ? `${pending().length > 1 ? `<button class="btn ink" data-approve-all>Aprobă toți (${pending().length})</button>` : ""}
+        <div class="list">${pending().map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>s-a înscris ${new Date(p.created_at).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })}</span></span>
+          <span class="row" style="flex:none;gap:8px"><button class="btn ink sm" data-approve="${esc(p.id)}">Aprobă</button><button class="btn sec sm" data-reject="${esc(p.id)}">Respinge</button></span></div>`).join("")}</div>`
         : '<div class="block empty"><b>Nicio cerere nouă</b>Trimite linkul de mai sus și cererile apar aici.</div>'}`;
   }
   if (t === "people"){
+    const all = people(), notReady = all.filter(p => missingOf(p).length), noSeat = noRide(), noTeam = all.filter(p => !teamOf(p.id));
+    const f = S.adminFilter, shown = f === "notready" ? notReady : f === "noseat" ? noSeat : f === "noteam" ? noTeam : all;
     const rej = S.profiles.filter(p => p.status === "rejected");
-    body = `<div class="list">${people().map(p => `<button class="person" data-aperson="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.role === "admin" ? ' <span class="chip">admin</span>' : ""}</b>
-        <span>${esc(teamOf(p.id)?.name || "Fără echipă")}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div>
-      ${rej.length ? `<div class="stack"><h2 class="h3">Respinși</h2><div class="list">${rej.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-approve="${esc(p.id)}">Reprimește</button></div>`).join("")}</div></div>` : ""}`;
+    const tile = (k, n, l) => `<button class="tile ${n ? "alarm" : ""}" data-afilter="${k}" aria-pressed="${f === k}"><b>${n}</b><span>${l}</span></button>`;
+    body = `<div class="tiles">${tile("notready", notReady.length, "nu sunt gata")}${tile("noseat", noSeat.length, "fără loc")}${tile("noteam", noTeam.length, "fără echipă")}</div>
+      ${f !== "all" ? `<button class="btn ghost sm" data-afilter="all" style="align-self:flex-start">Arată toți (${all.length})</button>` : ""}
+      <div class="list">${shown.map(p => { const m = missingOf(p).length, car = carOf(p.id);
+        return `<button class="person" data-aperson="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.role === "admin" ? ' <span class="chip">admin</span>' : ""}</b>
+          <span>${esc(teamOf(p.id)?.name || "fără echipă")} · ${m ? `îi lipsesc ${m}` : "gata"} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : ownWay(p) ? "pe cont propriu" : "fără loc"}</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("") || '<div class="empty">Nimeni aici.</div>'}</div>
+      ${rej.length ? `<section class="section"><h2 class="h3">Respinși sau scoși</h2><div class="list">${rej.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-approve="${esc(p.id)}">Aprobă totuși</button></div>`).join("")}</div></section>` : ""}`;
   }
   if (t === "teams"){
-    const unassigned = people().filter(p => !teamOf(p.id));
-    body = `<p class="muted">Creează echipele după ce primiți listele de la 4M, apoi pune oamenii în ele.</p>
-      ${S.teams.map(tm => { const mem = people().filter(p => p.team === tm.id);
-        return `<div class="block stack"><div class="block-head"><h2 class="h3">${esc(tm.name)}</h2><button class="btn ghost sm" data-team-edit="${esc(tm.id)}">Redenumește</button></div>
-          <div class="chips">${mem.map(p => `<span class="chip">${esc(p.name)}</span>`).join("") || '<span class="muted small">Nimeni încă</span>'}</div>
-          <button class="btn sec sm" data-team-members="${esc(tm.id)}" style="align-self:flex-start">Alege membrii</button></div>`; }).join("")}
+    body = `<p class="muted">După ce primim listele de la 4M, creează echipele și alege echipa fiecăruia mai jos.</p>
+      ${S.teams.map(tm => { const mem = membersOf(tm.id), gaps = teamGaps(tm.id);
+        return `<div class="block stack"><div class="block-head"><h2 class="h3">${esc(tm.name)} · ${mem.length}</h2><button class="btn sec sm" data-team-edit="${esc(tm.id)}">Redenumește</button></div>
+          ${gaps.length ? `<p class="small" style="color:var(--need)">Lipsesc: ${esc(gaps.map(i => i.name).join(", "))}</p>` : mem.length ? '<span class="chip ready" style="align-self:flex-start">Are tot echipamentul comun</span>' : ""}</div>`; }).join("")}
       <form class="row" id="addTeam"><input class="input" id="teamNameNew" placeholder="ex. Echipa 3" maxlength="40" style="flex:1;min-width:0" aria-label="Numele echipei noi"><button class="btn" type="submit">Creează</button></form>
-      ${S.teams.length && unassigned.length ? `<p class="small muted">Fără echipă: ${esc(unassigned.map(p => p.name).join(", "))}</p>` : ""}`;
+      ${S.teams.length ? `<section class="section"><h2 class="h2">Cine în ce echipă</h2><div class="list">${[...people()].sort((a, b) => (teamOf(a.id) ? 1 : 0) - (teamOf(b.id) ? 1 : 0)).map(p => `<div class="person" style="cursor:default;flex-wrap:wrap">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span>
+          <span class="teamchips">${S.teams.map((tm, i) => `<button data-setteam="${esc(p.id)}" data-tid="${esc(tm.id)}" aria-pressed="${p.team === tm.id}" aria-label="${esc(tm.name)}">${i + 1}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}" aria-label="Fără echipă">–</button></span></div>`).join("")}</div>
+          <p class="small muted">Numerele sunt echipele în ordinea de mai sus: ${S.teams.map((tm, i) => `${i + 1} = ${esc(tm.name)}`).join(", ")}.</p></section>` : ""}`;
   }
   if (t === "list"){
+    const q = S.listQ.trim().toLowerCase(), all = people().length;
     const groups = {};
-    for (const it of S.items) (groups[isTeam(it) ? "De echipă" : groupOf(it)] ??= []).push(it);
-    body = `<div class="row"><button class="btn" data-item-new>Adaugă obiect</button><span class="muted small">Apasă pe un obiect ca să-l modifici.</span></div>
-      ${Object.entries(groups).map(([g, l]) => `<section><div class="group-title"><h2 class="h2">${esc(g)}</h2></div>
-        <div class="list">${l.map(i => `<button class="person" data-item-edit="${esc(i.id)}"><span class="t"><b>${esc(i.name)}</b><span>${esc(i.cat)}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div></section>`).join("")}`;
+    for (const it of S.items.filter(i => !q || i.name.toLowerCase().includes(q))) (groups[isTeam(it) ? "De echipă" : groupOf(it)] ??= []).push(it);
+    body = `<div class="row"><button class="btn" data-item-new>Adaugă obiect</button></div>
+      <input class="input" type="search" id="listQ" placeholder="Caută în listă" value="${esc(S.listQ)}" aria-label="Caută în listă" autocomplete="off">
+      <div id="listBody">${Object.entries(groups).map(([g, l]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div>
+        <div class="list">${l.map(i => `<button class="person" data-item-edit="${esc(i.id)}"><span class="t"><b>${esc(i.name)}</b><span>${isOpt(i) ? "opțional" : "obligatoriu"} · ${people().filter(p => has(p, i.id)).length}/${all} au bifat</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div></section>`).join("") || '<div class="block empty">Nimic găsit.</div>'}</div>`;
   }
   if (t === "settings"){
-    body = `<div class="block stack"><h2 class="h3">Poza de pe Acasă</h2>
+    body = `<div class="block stack"><h2 class="h3">Rezumat pentru WhatsApp sau 4M</h2>
+        <div class="summary" id="summaryBox">${esc(summaryText())}</div>
+        <div class="pair-btns"><button class="btn sm" data-copy-summary>Copiază rezumatul</button>
+          <a class="btn sec sm" href="https://wa.me/?text=${encodeURIComponent(summaryText())}" target="_blank" rel="noopener">Trimite pe WhatsApp</a></div></div>
+      <div class="block stack"><h2 class="h3">Poza de pe Acasă</h2>
         ${S.cfg.hero_url ? `<img class="thumb" src="${esc(S.cfg.hero_url)}" alt="Poza actuală">` : '<p class="muted small">Acum e ilustrația implicită. Pune o poză de-a voastră din aventură.</p>'}
         <div class="row"><label class="btn sec sm" for="heroFile">Alege o poză</label><input type="file" id="heroFile" accept="image/*" hidden>
           ${S.cfg.hero_url ? '<button class="btn ghost sm" data-hero-clear>Revino la ilustrație</button>' : ""}</div></div>
-      <form class="block stack" id="dateForm"><h2 class="h3">Data plecării</h2><p class="muted small">Apare pe Acasă ca numărătoare inversă.</p>
+      <form class="block stack" id="dateForm"><h2 class="h3">Data plecării</h2><p class="muted small">Apare pe Acasă, cu numărătoarea inversă și intervalul de 4 zile.</p>
         <div class="row"><input class="input" type="date" id="startDate" value="${esc(S.cfg.start_date || "")}" style="flex:1;min-width:0"><button class="btn sec" type="submit">Salvează</button></div></form>
-      <div class="block stack"><h2 class="h3">Golește toate bifele</h2><p class="muted small">Pentru o ediție nouă. Oamenii, mașinile și lista rămân.</p>
+      <div class="block stack"><h2 class="h3">Golește toate bifele</h2><p class="muted small">Pentru o ediție nouă. Șterge bifele, notele și cererile tuturor. Oamenii, mașinile și lista rămân.</p>
         <button class="btn danger sm" data-reset-all style="align-self:flex-start">Golește bifele tuturor</button></div>`;
   }
   return `<h1 class="h1">Admin</h1>${seg}${body}`;
 }
 
 /* ---------- sheets ---------- */
-function openSheet(kind, data){ S.sheet = { kind, data }; renderSheet(true); }
-function closeSheet(){ S.sheet = null; $("sheetWrap").hidden = true; document.body.style.overflow = ""; }
+function openSheet(kind, data){
+  if (!S.sheet){ try { history.pushState({ sheet: true }, "", location.href); } catch {} }
+  else if (S.sheet.kind === "item") saveNoteDraft();
+  S.sheet = { kind, data }; renderSheet(true);
+}
+function closeSheet(fromHistory){
+  if (!S.sheet) return;
+  if (S.sheet.kind === "item") saveNoteDraft();
+  S.sheet = null; $("sheetWrap").hidden = true; document.body.style.overflow = ""; document.body.classList.remove("sheet-open");
+  if (!fromHistory){ try { if (history.state?.sheet) history.back(); } catch {} }
+}
+function saveNoteDraft(){
+  const ta = $("noteText"), id = S.sheet?.data;
+  if (!ta || !id) return;
+  const n = ta.value.trim();
+  if (n !== st(S.me, id).note) setItem(id, { note: n }, true);
+}
+const sw = (attrs, label, sub, on, cls = "") => `<button type="button" class="check-row" role="switch" aria-checked="${on}" ${attrs}><span class="lbl"><b>${label}</b>${sub ? `<span>${sub}</span>` : ""}</span><span class="toggle ${cls}" aria-hidden="true"></span></button>`;
 function sheetHtml(){
   const { kind, data } = S.sheet;
   const head = (title, sub) => `<div class="sheet-head"><div style="flex:1"><h2 class="h2">${title}</h2>${sub ? `<p class="muted small" style="margin-top:4px">${sub}</p>` : ""}</div><button class="x" data-close aria-label="Închide">✕</button></div>`;
   if (kind === "item"){
-    const it = S.items.find(i => i.id === data); if (!it) return head("Obiect șters");
+    const it = itemById(data); if (!it) return head("Obiect șters");
     const s = st(S.me, it.id), team = isTeam(it);
-    const row = (key, label, sub, on, cls) => `<div class="check-row"><span><b>${label}</b>${sub ? `<br><span class="muted small">${sub}</span>` : ""}</span><button class="toggle ${cls || ""}" role="switch" aria-checked="${on}" data-flagset="${key}" aria-label="${label}"></button></div>`;
-    return head(esc(it.name), esc(team ? "Echipament de echipă" : groupOf(it))) + `<div>
-      ${row("ok", team ? "Îl aduc eu" : "Îl am", "", !!s.ok)}
-      ${isOpt(it) ? row("skip", "Nu îl iau", "E opțional, poți să-l lași acasă.", s.flag === "skip") : ""}
-      ${team ? "" : row("need", "Am nevoie de el", "Apare la Nevoi, ca să te ajute cineva.", s.flag === "need", "red")}
-      ${team ? "" : row("lend", "Am în plus, pot da", "Apare la „De dat” și la Nevoi.", s.flag === "lend", "blue")}</div>
-      <form class="stack" id="noteForm" style="margin-top:12px"><label class="field"><span>Notă</span><textarea class="input" id="noteText" maxlength="80" placeholder="ex. am doar unul de 35 L">${esc(s.note || "")}</textarea></label>
-      <button class="btn" type="submit">Gata</button></form>`;
+    const lenders = lendersOf(it.id, S.uid);
+    return head(esc(it.name), esc(team ? "Echipament de echipă" : `${groupOf(it)}${isOpt(it) ? "" : " · obligatoriu"}`)) + `<div>
+      ${sw(`data-flagset="ok"`, team ? "Aduc eu" : "Am", "", s.ok)}
+      ${isOpt(it) ? sw(`data-flagset="skip"`, "Nu iau", "E opțional, îl poți lăsa acasă.", s.skip) : ""}
+      ${team ? "" : sw(`data-flagset="need"`, "Am nevoie", lenders.length ? `Au în plus: ${esc(lenders.map(shortName).join(", "))}` : "Apare la Nevoi, ca să te ajute cineva.", s.need, "red")}
+      ${team ? "" : sw(`data-flagset="lend"`, "Am în plus", "Apare la „De dat”, ca să-l găsească cine îl caută.", s.lend, "blue")}</div>
+      <label class="field" style="margin-top:12px"><span>Notă</span><textarea class="input" id="noteText" maxlength="80" placeholder="ex. am doar unul de 35 L">${esc(s.note)}</textarea><small>Se salvează singură.</small></label>
+      <button class="btn block-w" data-close style="margin-top:12px">Gata</button>`;
   }
   if (kind === "person"){
     const p = byId(data); if (!p) return head("Persoană");
@@ -760,47 +975,55 @@ function sheetHtml(){
     const req = reqItems().length;
     return `<div class="sheet-head">${avatar(p, "lg")}<div style="flex:1"><h2 class="h2">${esc(p.name)}</h2><p class="muted small">${esc(tm ? tm.name : "Fără echipă")}</p></div><button class="x" data-close aria-label="Închide">✕</button></div>
       <div class="stack">
-        <div class="prog">${miss.length ? `<div class="big">${req - miss.length}<small>din ${req} obligatorii</small></div>` : '<span class="done-badge">✓ Gata de drum</span>'}<div class="bar"><i style="width:${req ? (req - miss.length) / req * 100 : 0}%"></i></div></div>
+        <div class="prog">${miss.length ? `<div class="big">${req - miss.length}<small>din ${req} obligatorii</small></div>` : '<span class="done-badge">✓ Gata de drum</span>'}<div class="bar ${miss.length ? "" : "full"}"><i style="width:${req ? (req - miss.length) / req * 100 : 0}%"></i></div></div>
         ${sec("Îi lipsește", chipList(miss, ""))}
-        ${sec("Caută", chipList(S.items.filter(i => st(p, i.id).flag === "need"), "need"))}
-        ${sec("Are în plus", chipList(S.items.filter(i => st(p, i.id).flag === "lend"), "lend"))}
+        ${sec("Caută", chipList(S.items.filter(i => st(p, i.id).need), "need"))}
+        ${sec("Are de dat", chipList(S.items.filter(i => st(p, i.id).lend), "lend"))}
         ${sec("Aduce pentru echipă", chipList(teamItems().filter(i => has(p, i.id)), "ok"))}
-        ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(pname(car.owner))}`}${car.label ? `, ${esc(car.label)}` : ""}</span>` : '<span class="chip need">Încă fără loc</span>')}
+        ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(nameOf(car.owner))}`}${car.label ? `, ${esc(car.label)}` : ""}</span>` : ownWay(p) ? "<span>Vine pe cont propriu</span>" : '<span class="chip need" style="align-self:flex-start">Încă fără loc</span>')}
       </div>`;
   }
   if (kind === "car"){
-    const c = data || { seats: 3 };
+    const c = data || { seats: 3 }, riders = c.id ? ridersOf(c) : [], min = riders.length;
+    const seats = Math.max(c.seats ?? 3, min);
     return head(c.id ? "Mașina" : "Am mașină", c.id ? "" : "Ceilalți își iau loc la tine.") + `<form class="stack" id="carForm">
       <label class="field"><span>Ce mașină</span><input class="input" id="cf-label" value="${esc(c.label || "")}" placeholder="ex. Duster gri" maxlength="40"></label>
-      <label class="field"><span>Locuri pentru pasageri</span><input class="input" type="number" inputmode="numeric" id="cf-seats" min="0" max="8" value="${esc(c.seats ?? 3)}"><small>Fără tine, șoferul.</small></label>
-      <div class="grid2"><label class="field"><span>Pleci din</span><input class="input" id="cf-from" value="${esc(c.from_city || "")}" placeholder="ex. Oradea" maxlength="40"></label>
+      <div class="field"><span>Locuri libere (fără șofer)</span><div class="stepper"><button type="button" data-step="-1" aria-label="Mai puține locuri">−</button><output id="cf-seats" data-min="${min}">${seats}</output><button type="button" data-step="1" aria-label="Mai multe locuri">+</button></div>
+        ${min ? `<small>Ai ${plural(min, "pasager", "pasageri")}, deci minim ${min}.</small>` : ""}</div>
+      <div class="grid2"><label class="field"><span>Pleci din</span><input class="input" id="cf-from" value="${esc(c.from_city || "")}" placeholder="ex. Oradea, la Lotus" maxlength="40"></label>
         <label class="field"><span>Când</span><input class="input" id="cf-when" value="${esc(c.when_text || "")}" placeholder="ex. joi la 14" maxlength="40"></label></div>
-      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. am loc de rucsaci mari" maxlength="80"></label>
+      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. încap 3 rucsaci mari" maxlength="80"></label>
+      ${riders.length ? `<div class="kv"><span>Pasageri</span>${riders.map(r => `<div class="row" style="justify-content:space-between"><span>${esc(r.name)}</span><button type="button" class="btn sec sm" data-unseat="${esc(r.id)}">Scoate</button></div>`).join("")}</div>` : ""}
       <button class="btn" type="submit">${c.id ? "Salvează" : "Adaugă mașina"}</button>
-      ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>` : ""}</form>`;
+      ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>${riders.length ? `<p class="small muted">Dacă o ștergi, ${esc(riders.map(shortName).join(", "))} ${riders.length === 1 ? "rămâne" : "rămân"} fără loc.</p>` : ""}` : ""}</form>`;
   }
   if (kind === "assign"){
-    return head("Repartizează", "Alege mașina fiecăruia.") + `<div>${people().map(p => `<div class="check-row"><span>${esc(p.name)}</span>
-      <select class="input" style="max-width:190px" data-assign-sel="${esc(p.id)}" aria-label="Mașina lui ${esc(p.name)}"><option value="">Fără loc</option>
-      ${S.cars.map(c => `<option value="${esc(c.id)}" ${p.ride === c.id ? "selected" : ""}>${esc(firstName(pname(c.owner)))} · ${esc(c.label || "mașină")}</option>`).join("")}</select></div>`).join("")}</div>`;
+    const riders = people().filter(p => !isDriver(p.id));
+    return head("Repartizează", "Alege mașina fiecăruia. Șoferii nu apar aici.") + `<div>${[...riders].sort((a, b) => (carOf(a.id) ? 1 : 0) - (carOf(b.id) ? 1 : 0)).map(p => `<div class="check-row" style="cursor:default"><span>${esc(p.name)}</span>
+      <select class="input" style="max-width:200px" data-assign-sel="${esc(p.id)}" aria-label="Mașina lui ${esc(p.name)}"><option value="">Fără loc</option>
+      ${S.cars.map(c => { const f = freeOf(c), cur = p.ride === c.id; return `<option value="${esc(c.id)}" ${cur ? "selected" : ""} ${!cur && !f ? "disabled" : ""}>${esc(nameOf(c.owner))} · ${cur ? "aici" : f ? `${f} ${f === 1 ? "liber" : "libere"}` : "plină"}</option>`; }).join("")}</select></div>`).join("")}</div>`;
   }
   if (kind === "profile"){
     return `<div class="sheet-head">${avatar(S.me, "lg")}<div style="flex:1"><h2 class="h2">${esc(S.me?.name)}</h2><p class="muted small">${esc(S.email)}</p></div><button class="x" data-close aria-label="Închide">✕</button></div>
-      <form class="stack" id="nameForm"><label class="field"><span>Numele afișat</span><input class="input" id="pn" value="${esc(S.me?.name || "")}" maxlength="30" autocomplete="name"></label><button class="btn sec" type="submit">Salvează numele</button></form>
+      <form class="stack" id="nameForm">
+        <label class="field"><span>Numele afișat</span><input class="input" id="pn" value="${esc(S.me?.name || "")}" maxlength="30" autocomplete="name" required></label>
+        <button class="btn sec" type="submit">Salvează numele</button></form>
       <div class="divider" style="margin:16px 0"></div>
-      <form class="stack" id="passForm"><label class="field"><span>Parolă nouă</span><div class="pw"><input class="input" type="password" id="pp" minlength="8" autocomplete="new-password"><button type="button" data-pw>Arată</button></div></label><button class="btn sec" type="submit">Schimbă parola</button></form>
+      <form class="stack" id="passForm"><input type="text" autocomplete="username" value="${esc(S.email)}" hidden>
+        <label class="field"><span>Parolă nouă</span><div class="pw"><input class="input" type="password" id="pp" minlength="8" autocomplete="new-password"><button type="button" data-pw>Arată</button></div><small>Minim 8 caractere.</small></label><button class="btn sec" type="submit">Schimbă parola</button></form>
       <div class="divider" style="margin:16px 0"></div>
       <button class="btn ghost block-w" data-logout>Ieși din cont</button>`;
   }
   if (kind === "aperson"){
     const p = byId(data); if (!p) return head("Persoană");
-    const self = p.id === S.uid;
+    const self = p.id === S.uid, car = S.cars.find(c => c.owner === p.id);
     return `<div class="sheet-head">${avatar(p, "lg")}<div style="flex:1"><h2 class="h2">${esc(p.name)}</h2><p class="muted small">${p.role === "admin" ? "Admin" : "Membru"}</p></div><button class="x" data-close aria-label="Închide">✕</button></div>
-      <div class="stack"><label class="field"><span>Echipa</span><select class="input" data-ateam="${esc(p.id)}"><option value="">Fără echipă</option>${S.teams.map(t => `<option value="${esc(t.id)}" ${p.team === t.id ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select></label>
-      ${self ? "" : `<div class="check-row"><span><b>Admin</b><br><span class="muted small">Poate aproba oameni și modifica lista.</span></span><button class="toggle" role="switch" aria-checked="${p.role === "admin"}" data-arole="${esc(p.id)}" aria-label="Admin"></button></div>`}
+      <div class="stack"><div class="field"><span>Echipa</span><span class="teamchips">${S.teams.map(t => `<button data-setteam="${esc(p.id)}" data-tid="${esc(t.id)}" aria-pressed="${p.team === t.id}">${esc(t.name)}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}">Fără echipă</button></span>
+        ${S.teams.length ? "" : '<small>Încă nu ai creat echipe (Admin › Echipe).</small>'}</div>
+      ${self ? "" : sw(`data-arole="${esc(p.id)}"`, "Admin", "Poate aproba oameni și modifica lista.", p.role === "admin")}
       <button class="btn sec" data-aview="${esc(p.id)}">Vezi ce are bifat</button>
-      <button class="btn danger" data-areset="${esc(p.id)}">Golește bifele</button>
-      ${self ? "" : `<button class="btn danger" data-reject="${esc(p.id)}">Scoate din grup</button>`}</div>`;
+      <button class="btn danger" data-areset="${esc(p.id)}">Golește bifele lui</button>
+      ${self ? "" : `<button class="btn danger" data-reject="${esc(p.id)}">Scoate din grup</button>${car && ridersOf(car).length ? `<p class="small muted">Are mașină cu ${plural(ridersOf(car).length, "pasager", "pasageri")}. Dacă îl scoți, mașina se șterge și ei rămân fără loc.</p>` : ""}`}</div>`;
   }
   if (kind === "team-edit"){
     const tm = S.teams.find(x => x.id === data); if (!tm) return head("Echipă");
@@ -808,103 +1031,137 @@ function sheetHtml(){
       <button class="btn" type="submit">Salvează</button><button class="btn danger" type="button" data-team-del="${esc(tm.id)}">Șterge echipa</button>
       <p class="small muted">Dacă o ștergi, membrii rămân fără echipă.</p></form>`;
   }
-  if (kind === "team-members"){
-    const tm = S.teams.find(x => x.id === data); if (!tm) return head("Echipă");
-    return head(esc(tm.name), "Bifează cine e în echipă.") + `<div>${people().map(p => { const other = p.team && p.team !== tm.id ? S.teams.find(x => x.id === p.team) : null;
-      return `<div class="check-row"><span><b>${esc(p.name)}</b>${other ? `<br><span class="muted small">acum în ${esc(other.name)}</span>` : ""}</span>
-        <button class="toggle" role="switch" aria-checked="${p.team === tm.id}" data-member="${esc(p.id)}" data-tid="${esc(tm.id)}" aria-label="${esc(p.name)} în ${esc(tm.name)}"></button></div>`; }).join("")}</div>`;
-  }
   if (kind === "item-edit"){
-    const it = data ? S.items.find(i => i.id === data) : null;
+    const it = data ? itemById(data) : null;
     const cats = [...new Set(["Personal obligatoriu", "Îmbrăcăminte obligatoriu", "Dormit obligatoriu", "Masă obligatoriu", "Echipă obligatoriu", "Opțional", "Echipă opțional", ...S.items.map(i => i.cat)])];
-    return head(it ? "Modifică obiectul" : "Obiect nou") + `<form class="stack" id="itemForm" data-id="${esc(it?.id || "")}">
+    return head(it ? "Modifică obiectul" : "Obiect nou") + `<form class="stack" id="itemForm" data-id="${esc(it?.id || "")}" data-team="${it && isTeam(it) ? 1 : 0}">
       <label class="field"><span>Nume</span><input class="input" id="in" value="${esc(it?.name || "")}" maxlength="60" required></label>
       <label class="field"><span>Unde apare</span><select class="input" id="ic">${cats.map(c => `<option ${c === (it?.cat || "Personal obligatoriu") ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
-        <small>„Echipă …” înseamnă unul pe echipă. „Opțional” se poate lăsa acasă.</small></label>
+        <small>„Echipă …” înseamnă că se aduce pentru toată echipa. „Opțional” se poate lăsa acasă.</small></label>
       <button class="btn" type="submit">${it ? "Salvează" : "Adaugă"}</button>
       ${it ? `<button class="btn danger" type="button" data-item-del="${esc(it.id)}">Șterge obiectul</button>` : ""}</form>`;
   }
   return "";
 }
+/* re-render keeps whatever the person has typed in the sheet */
 function renderSheet(first){
   if (!S.sheet) return;
-  const a = document.activeElement;
-  if (!first && a && $("sheetBody").contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
-  $("sheetBody").innerHTML = `<div class="grab" aria-hidden="true"></div>` + sheetHtml();
-  $("sheetWrap").hidden = false; document.body.style.overflow = "hidden";
-  if (first) setTimeout(() => $("sheetBody").querySelector(".x")?.focus(), 30);
+  const body = $("sheetBody"), keep = {};
+  if (!first) body.querySelectorAll("input,textarea,select,output").forEach(el => { if (el.id && el.type !== "file") keep[el.id] = el.tagName === "OUTPUT" ? el.textContent : el.value; });
+  const focusId = !first && body.contains(document.activeElement) ? document.activeElement.id : null;
+  body.innerHTML = `<div class="grab" aria-hidden="true"></div>` + sheetHtml();
+  for (const [id, v] of Object.entries(keep)){ const el = $(id); if (!el) continue; if (el.tagName === "OUTPUT") el.textContent = v; else el.value = v; }
+  if (focusId && $(focusId)) $(focusId).focus();
+  $("sheetWrap").hidden = false; document.body.style.overflow = "hidden"; document.body.classList.add("sheet-open");
+  if (first) setTimeout(() => body.querySelector(".x")?.focus({ preventScroll: true }), 30);
 }
 
 /* ---------- render ---------- */
-function navBadges(){ return { gear: missingOf(S.me).length || "", transport: carOf(S.uid) ? "" : "!", admin: pending().length || "" }; }
+function navBadges(){ const m = missingOf(S.me).length; return { gear: m ? (m > 9 ? "9+" : m) : "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "!", admin: pending().length || "" }; }
 function renderChrome(inApp){
   document.body.classList.toggle("noapp", !inApp);
-  if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; return; }
+  if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; $("avatarBtn").innerHTML = ""; return; }
   const b = navBadges();
-  const items = [["home", "Acasă", "band"], ["gear", "Echipament", "dot"], ["transport", "Transport", "cross"], ["group", "Echipa", "tri"]];
-  if (isAdmin()) items.push(["admin", "Admin", "gear"]);
-  $("tabbar").innerHTML = items.map(([k, l, m]) => `<button class="tab" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}>${marker(m)}${l}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</button>`).join("");
+  const items = [["home", "Acasă", "band"], ["gear", "Echipament", "dot"], ["transport", "Transport", "tri"], ["group", "Grupul", "cross"]];
+  if (isAdmin()) items.push(["admin", "Admin", "key"]);
+  $("tabbar").innerHTML = items.map(([k, l, m]) => `<button class="tab" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}><span class="ic">${marker(m)}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</span>${l}</button>`).join("");
   $("rail").innerHTML = `<a class="brand" href="#" data-go="home">${marker("band")}XCC</a>`
     + items.map(([k, l, m]) => `<button class="nav" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}>${marker(m)}${l}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</button>`).join("")
     + `<button class="me" data-profile>${avatar(S.me)}<span>${esc(S.me.name)}<small>Contul meu</small></span></button>`;
   $("avatarBtn").innerHTML = avatar(S.me);
 }
+let lastView = "";
+const viewKey = () => [S.uid ? (S.me?.status || "-") : "out", S.recovering, S.authMode, S.page, S.gearTab, S.groupTab, S.adminTab].join("|");
 function render(){
-  const inApp = !!(S.uid && approved() && !S.recovering);
+  const inApp = !!(S.uid && S.me && approved() && !S.recovering && !S.loadFailed);
   renderChrome(inApp);
   let html;
   if (!S.loaded) html = '<div class="block empty">Se încarcă…</div>';
+  else if (S.loadFailed) html = `<div class="block empty"><b>Nu s-au încărcat datele</b>Verifică internetul.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn sec sm" data-retry>Reîncearcă</button></div></div>`;
   else if (!S.uid || S.recovering) html = pageAuth();
-  else if (!S.me) html = '<div class="block empty">Îți pregătim contul…</div>';
+  else if (!S.me) html = S.meMissing >= 3 ? `<div class="auth"><div class="block stack"><h2 class="h2">Ceva n-a mers</h2><p class="muted">Contul tău nu s-a putut pregăti. Scrie-i lui Clau.</p><button class="btn sec" data-logout>Ieși din cont</button></div></div>` : '<div class="block empty">Îți pregătim contul…</div>';
   else if (!approved()) html = pagePending();
   else {
     if (S.page === "admin" && !isAdmin()) S.page = "home";
     html = { home: pageHome, gear: pageGear, transport: pageTransport, group: pageGroup, admin: pageAdmin }[S.page]();
   }
-  const a = document.activeElement, keepQ = a?.id === "q" ? a.selectionStart : null;
-  $("page").innerHTML = html;
-  if (keepQ !== null && $("q")){ $("q").focus(); $("q").setSelectionRange(keepQ, keepQ); }
+  // don't wipe a field the person is typing in
+  const a = document.activeElement, typing = a && $("page").contains(a) && (a.tagName === "INPUT" || a.tagName === "TEXTAREA") ? a.id : null;
+  if (typing === "q" && $("peopleList") && viewKey() === lastView){ $("peopleList").innerHTML = peopleRows(groupList(), reqItems().length); }
+  else if (typing === "listQ" && $("listBody") && viewKey() === lastView){ const tmp = document.createElement("div"); tmp.innerHTML = html; const nb = tmp.querySelector("#listBody"); if (nb) $("listBody").innerHTML = nb.innerHTML; }
+  else if (typing && viewKey() === lastView){ /* keep the form as is; it refreshes on the next render */ }
+  else $("page").innerHTML = html;
+  lastView = viewKey();
   if (S.sheet) renderSheet(false);
 }
 
 /* ---------- writes ---------- */
-function setItem(itemId, patch){
+function setItem(itemId, patch, quiet){
   if (!S.me) return;
-  const cur = { ok: false, flag: "", note: "", ...st(S.me, itemId), ...patch };
-  S.me.items = { ...(S.me.items || {}), [itemId]: cur };
-  render();
-  return write(() => sb.rpc("set_item", { item_id: itemId, val: cur }));
+  const it = itemById(itemId) || {};
+  const cur = { ...st(S.me, itemId), ...patch };
+  if (patch.ok === true){ cur.need = false; cur.skip = false; }
+  if (patch.ok === false && !isOpt(it)) cur.lend = false;
+  if (patch.need === true){ cur.ok = false; cur.skip = false; cur.lend = false; }
+  if (patch.skip === true){ cur.ok = false; cur.need = false; }
+  if (patch.lend === true){ cur.need = false; if (!isOpt(it) && !isTeam(it)) cur.ok = true; }
+  const val = { ok: cur.ok, need: cur.need, lend: cur.lend, skip: cur.skip, note: cur.note };
+  S.me.items = { ...(S.me.items || {}), [itemId]: val };
+  if (!quiet) render();
+  return write(() => sb.rpc("set_item", { item_id: itemId, val }));
 }
 const upd = (id, v, msg) => write(() => sb.from("profiles").update(v).eq("id", id), msg);
 const setRide = (uid, carId, msg) => write(() => sb.from("profiles").update({ ride: carId || null }).eq("id", uid), msg);
+async function copyText(txt, okMsg){
+  try { await navigator.clipboard.writeText(txt); toast(okMsg); }
+  catch { toast("Nu am putut copia. Selectează textul și copiază-l manual.", true); }
+}
 
 /* ---------- events ---------- */
 document.addEventListener("click", async e => {
   const t = e.target, q = sel => t.closest(sel);
   let b;
-  if ((b = q("[data-go]"))){ e.preventDefault(); const tab = b.dataset.tab; go(b.dataset.go, tab ? (b.dataset.go === "admin" ? { adminTab: tab } : { gearTab: tab }) : {}); return; }
+  if ((b = q("[data-go]"))){
+    e.preventDefault(); const tab = b.dataset.tab, pg = b.dataset.go;
+    go(pg, tab ? (pg === "admin" ? { adminTab: tab } : pg === "gear" ? { gearTab: tab } : {}) : {});
+    return;
+  }
   if (q("[data-close]") || t.classList.contains("sheet-scrim")){ closeSheet(); return; }
-  if ((b = q("[data-auth]"))){ S.authMode = b.dataset.auth; render(); return; }
+  if (q("[data-retry]")){ S.loaded = false; S.loadFailed = false; render(); loadAll(); return; }
+  if ((b = q("[data-auth]"))){
+    const em = $("le")?.value || $("se")?.value; if (em) S.checkEmail = em.trim();
+    S.authMode = b.dataset.auth; render(); return;
+  }
   if ((b = q("[data-pw]"))){ const i = b.parentElement.querySelector("input"); i.type = i.type === "password" ? "text" : "password"; b.textContent = i.type === "password" ? "Arată" : "Ascunde"; return; }
   if (q("[data-logout]")){ closeSheet(); await sb.auth.signOut(); return; }
-  if (q("[data-profile]") || q("#avatarBtn")){ openSheet("profile"); return; }
-  if ((b = q("[data-gtab]"))){ S.gearTab = b.dataset.gtab; render(); return; }
-  if ((b = q("[data-grtab]"))){ S.groupTab = b.dataset.grtab; render(); return; }
-  if ((b = q("[data-atab]"))){ S.adminTab = b.dataset.atab; render(); return; }
+  if (q("[data-welcome]")){ lsSet("xcc-welcome", "1"); render(); return; }
+  if ((b = q("[data-resend]"))){
+    await busy(b, async () => {
+      const r = S.authMode === "sent" ? await sb.auth.resetPasswordForEmail(S.checkEmail, { redirectTo: SITE }) : await sb.auth.resend({ type: "signup", email: S.checkEmail, options: { emailRedirectTo: SITE } });
+      toast(r?.error ? authErr(r.error.message) : "Am retrimis emailul.", !!r?.error);
+    }); return;
+  }
+  if (q("[data-profile]") || q("#avatarBtn")){ if (S.me) openSheet("profile"); return; }
+  if ((b = q("[data-gtab]"))){ go("gear", { gearTab: b.dataset.gtab }); return; }
+  if ((b = q("[data-grtab]"))){ S.groupTab = b.dataset.grtab; try { history.replaceState(null, "", routeHash("group", S.groupTab === "people" ? "" : S.groupTab)); } catch {} render(); return; }
+  if ((b = q("[data-atab]"))){ S.adminTab = b.dataset.atab; try { history.replaceState(null, "", routeHash("admin", S.adminTab === "requests" ? "" : S.adminTab)); } catch {} render(); return; }
+  if ((b = q("[data-afilter]"))){ S.adminFilter = S.adminFilter === b.dataset.afilter ? "all" : b.dataset.afilter; render(); return; }
   if (q("[data-missing]")){ S.onlyMissing = !S.onlyMissing; render(); return; }
   if ((b = q("[data-team-filter]"))){ S.groupTeam = b.dataset.teamFilter; render(); return; }
   if ((b = q("[data-toggle]"))){
-    const id = b.dataset.toggle, s = st(S.me, id), on = !s.ok;
-    setItem(id, on && s.flag === "skip" ? { ok: true, flag: "" } : on && s.flag === "need" ? { ok: true, flag: "" } : { ok: on });
+    const id = b.dataset.toggle, on = !st(S.me, id).ok;
+    if (S.onlyMissing && on){ S.leaving[id] = true; setTimeout(() => { delete S.leaving[id]; render(); }, 700); }
+    setItem(id, { ok: on });
+    const row = document.querySelector(`[data-row="${CSS.escape(id)}"]`); if (row && on){ row.classList.add("pop"); setTimeout(() => row.classList.remove("pop"), 160); }
     if (navigator.vibrate) try { navigator.vibrate(8); } catch {}
     return;
   }
-  if ((b = q("[data-extra]"))){ const id = b.dataset.extra, on = st(S.me, id).flag !== "lend"; setItem(id, { flag: on ? "lend" : "" }); if (on) toast("Trecut la „De dat”"); return; }
+  if ((b = q("[data-extra]"))){ const id = b.dataset.extra, on = !st(S.me, id).lend; setItem(id, { lend: on }); toast(on ? "Pus la „De dat”" : "Scos de la „De dat”"); return; }
   if ((b = q("[data-more]"))){ openSheet("item", b.dataset.more); return; }
   if ((b = q("[data-flagset]"))){
-    const id = S.sheet?.data, key = b.dataset.flagset, s = st(S.me, id), on = b.getAttribute("aria-checked") !== "true";
-    if (key === "ok") setItem(id, on ? { ok: true, flag: s.flag === "skip" || s.flag === "need" ? "" : s.flag } : { ok: false });
-    else setItem(id, on ? { flag: key, ...(key === "skip" || key === "need" ? { ok: false } : {}) } : { flag: "" });
+    const id = S.sheet?.data, key = b.dataset.flagset, on = b.getAttribute("aria-checked") !== "true";
+    saveNoteDraft();
+    setItem(id, { [key]: on });
     return;
   }
   if ((b = q("[data-person]"))){ openSheet("person", b.dataset.person); return; }
@@ -912,38 +1169,49 @@ document.addEventListener("click", async e => {
   // transport
   if (q("[data-car-new]")){ openSheet("car", null); return; }
   if ((b = q("[data-car-edit]"))){ openSheet("car", { ...S.cars.find(c => c.id === b.dataset.carEdit) }); return; }
-  if ((b = q("[data-join]"))){ await setRide(S.uid, b.dataset.join, "Ți-ai luat loc"); return; }
+  if ((b = q("[data-step]"))){ const o = $("cf-seats"), v = Math.max(Number(o.dataset.min) || 0, Math.min(8, Number(o.textContent) + Number(b.dataset.step))); o.textContent = v; return; }
+  if ((b = q("[data-join]"))){ const c = S.cars.find(x => x.id === b.dataset.join); await busy(b, () => upd(S.uid, { ride: b.dataset.join, own_transport: false }, `Ai loc la ${nameOf(c?.owner)}`)); return; }
   if (q("[data-leave]")){ await setRide(S.uid, null, "Ai renunțat la loc"); return; }
-  if ((b = q("[data-car-del]"))){ if (!arm(b)) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
+  if ((b = q("[data-ownway]"))){ const on = b.dataset.ownway === "1"; await busy(b, () => upd(S.uid, { own_transport: on, ...(on ? { ride: null } : {}) }, on ? "Notat: vii pe cont propriu" : "Gata, alege un loc")); return; }
+  if ((b = q("[data-unseat]"))){ await setRide(b.dataset.unseat, null, `${nameOf(b.dataset.unseat)} nu mai e în mașină`); return; }
+  if ((b = q("[data-car-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
   if (q("[data-assign]")){ openSheet("assign"); return; }
   // admin
-  if (q("[data-copy]")){
-    try { await navigator.clipboard.writeText(SITE); toast("Link copiat"); }
-    catch { const r = document.createRange(); r.selectNodeContents($("linkBox")); getSelection().removeAllRanges(); getSelection().addRange(r); toast("Linkul e selectat, copiază-l"); }
-    return;
+  if ((b = q("[data-copy]"))){ await copyText(b.dataset.copy, "Mesaj copiat"); return; }
+  if (q("[data-copy-summary]")){ await copyText(summaryText(), "Rezumat copiat"); return; }
+  if ((b = q("[data-approve]"))){ const p = byId(b.dataset.approve); await busy(b, () => upd(b.dataset.approve, { status: "approved" }, `${firstName(p?.name)} e în grup`)); return; }
+  if ((b = q("[data-approve-all]"))){ if (!arm(b, `Apasă încă o dată: aprobi ${pending().length}`)) return; await busy(b, async () => { let ok = 0; for (const p of pending()){ const r = await sb.from("profiles").update({ status: "approved" }).eq("id", p.id); if (!r.error) ok++; } toast(plural(ok, "om aprobat", "oameni aprobați")); scheduleReload(100); }); return; }
+  if ((b = q("[data-reject]"))){
+    const p = byId(b.dataset.reject); if (!arm(b, "Apasă încă o dată ca să confirmi")) return;
+    const car = S.cars.find(c => c.owner === p?.id);
+    if (car) await write(() => sb.from("cars").delete().eq("id", car.id));
+    await upd(b.dataset.reject, { status: "rejected", ride: null, team: null }, `${firstName(p?.name)} nu mai e în grup`); closeSheet(); return;
   }
-  if (q("[data-share]")){ try { await navigator.share({ title: "XCC", text: "Hai în echipa XCC! Îți faci cont și te aprob:", url: SITE }); } catch {} return; }
-  if ((b = q("[data-approve]"))){ const p = byId(b.dataset.approve); await upd(b.dataset.approve, { status: "approved" }, `${firstName(p?.name)} e în grup`); return; }
-  if ((b = q("[data-reject]"))){ if (!arm(b, "Sigur?")) return; await upd(b.dataset.reject, { status: "rejected", ride: null }, "Gata"); closeSheet(); return; }
   if ((b = q("[data-aperson]"))){ openSheet("aperson", b.dataset.aperson); return; }
-  if ((b = q("[data-arole]"))){ const on = b.getAttribute("aria-checked") !== "true"; await upd(b.dataset.arole, { role: on ? "admin" : "member" }, on ? "E admin acum" : "Nu mai e admin"); return; }
-  if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, "Bifele au fost golite"); return; }
+  if ((b = q("[data-arole]"))){ const on = b.getAttribute("aria-checked") !== "true"; if (!arm(b, on ? "Apasă încă o dată: îl faci admin" : "Apasă încă o dată: nu mai e admin")) return; await upd(b.dataset.arole, { role: on ? "admin" : "member" }, on ? "E admin acum" : "Nu mai e admin"); return; }
+  if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, "Bifele lui au fost golite"); return; }
+  if ((b = q("[data-setteam]"))){ const pid = b.dataset.setteam, tid = b.dataset.tid || null, p = byId(pid); if (p) p.team = tid; render(); await upd(pid, { team: tid }, tid ? `${shortName(p)} e în ${S.teams.find(x => x.id === tid)?.name}` : `${shortName(p)} e fără echipă`); return; }
   if ((b = q("[data-team-edit]"))){ openSheet("team-edit", b.dataset.teamEdit); return; }
-  if ((b = q("[data-team-members]"))){ openSheet("team-members", b.dataset.teamMembers); return; }
-  if ((b = q("[data-member]"))){ const on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", on); await upd(b.dataset.member, { team: on ? b.dataset.tid : null }); return; }
-  if ((b = q("[data-team-del]"))){ if (!arm(b)) return; if (await write(() => sb.from("teams").delete().eq("id", b.dataset.teamDel), "Echipa a fost ștearsă")) closeSheet(); return; }
+  if ((b = q("[data-team-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("teams").delete().eq("id", b.dataset.teamDel), "Echipa a fost ștearsă")) closeSheet(); return; }
   if (q("[data-item-new]")){ openSheet("item-edit", null); return; }
   if ((b = q("[data-item-edit]"))){ openSheet("item-edit", b.dataset.itemEdit); return; }
-  if ((b = q("[data-item-del]"))){ if (!arm(b)) return; if (await write(() => sb.from("items").delete().eq("id", b.dataset.itemDel), "Obiectul a fost șters")) closeSheet(); return; }
+  if ((b = q("[data-item-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("items").delete().eq("id", b.dataset.itemDel), "Obiectul a fost șters")) closeSheet(); return; }
   if ((b = q("[data-hero-clear]"))){ if (!arm(b)) return; await write(() => sb.from("config").update({ hero_url: "" }).eq("id", 1), "Ilustrația e înapoi"); return; }
-  if ((b = q("[data-reset-all]"))){ if (!arm(b, "Sigur? Se golesc bifele tuturor")) return; for (const p of people()) await upd(p.id, { items: {} }); toast("Bifele tuturor au fost golite"); return; }
+  if ((b = q("[data-reset-all]"))){
+    if (!arm(b, "Sigur? Apasă încă o dată: se golesc bifele tuturor")) return;
+    await busy(b, async () => { let fail = 0; for (const p of people()){ const r = await sb.from("profiles").update({ items: {} }).eq("id", p.id); if (r.error) fail++; } toast(fail ? `${fail} n-au reușit. Încearcă din nou.` : "Bifele tuturor au fost golite", !!fail); scheduleReload(100); });
+    return;
+  }
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.sheet) closeSheet(); });
-document.addEventListener("input", e => { if (e.target.id === "q"){ S.q = e.target.value; render(); } });
+document.addEventListener("input", e => {
+  if (e.target.id === "q"){ S.q = e.target.value; render(); }
+  if (e.target.id === "listQ"){ S.listQ = e.target.value; render(); }
+});
+document.addEventListener("focusout", e => { if (e.target.id === "noteText") saveNoteDraft(); });
 document.addEventListener("change", async e => {
   const t = e.target;
   if (t.dataset.assignSel !== undefined){ await setRide(t.dataset.assignSel, t.value, "Salvat"); return; }
-  if (t.dataset.ateam !== undefined){ await upd(t.dataset.ateam, { team: t.value || null }, "Echipa a fost schimbată"); return; }
   if (t.id === "heroFile" && t.files?.[0]){
     const f = t.files[0];
     if (f.size > 8e6){ toast("Poza e prea mare. Maxim 8 MB.", true); return; }
@@ -958,59 +1226,67 @@ document.addEventListener("change", async e => {
 });
 document.addEventListener("submit", async e => {
   e.preventDefault();
-  const id = e.target.id, v = x => $(x).value.trim();
-  if (id === "loginForm"){
-    const r = await sb.auth.signInWithPassword({ email: v("le"), password: $("lp").value });
-    if (r.error) toast(/confirm/i.test(r.error.message) ? "Confirmă întâi emailul din mesajul primit." : "Email sau parolă greșită.", true);
-  }
-  if (id === "signupForm"){
-    if ($("sp").value.length < 8){ toast("Parola trebuie să aibă minim 8 caractere.", true); return; }
-    const r = await sb.auth.signUp({ email: v("se"), password: $("sp").value, options: { data: { name: v("sn") }, emailRedirectTo: SITE } });
-    if (r.error) toast(/registered|exists/i.test(r.error.message) ? "Ai deja cont cu acest email. Apasă „Am cont”." : "Contul nu s-a creat: " + r.error.message, true);
-    else if (!r.data.session) toast("Ți-am trimis un email de confirmare. Apasă linkul din el, apoi intră.");
-  }
-  if (id === "forgotForm"){
-    const r = await sb.auth.resetPasswordForEmail(v("fe"), { redirectTo: SITE });
-    toast(r.error ? "Emailul nu s-a trimis. Încearcă mai târziu." : "Dacă ai cont, ai primit un link pe email.", !!r.error);
-  }
-  if (id === "newPassForm" || id === "passForm"){
-    const pw = $(id === "newPassForm" ? "np" : "pp").value;
-    if (pw.length < 8){ toast("Parola trebuie să aibă minim 8 caractere.", true); return; }
-    const r = await sb.auth.updateUser({ password: pw });
-    if (r.error) toast("Parola nu s-a schimbat: " + r.error.message, true);
-    else { S.recovering = false; closeSheet(); toast("Parola a fost schimbată"); render(); }
-  }
-  if (id === "nameForm"){ if (v("pn")) await upd(S.uid, { name: v("pn") }, "Numele a fost salvat"); closeSheet(); }
-  if (id === "noteForm"){ const itId = S.sheet?.data; const n = v("noteText"); if (n !== (st(S.me, itId).note || "")) setItem(itId, { note: n }); closeSheet(); }
-  if (id === "carForm"){
-    const c = S.sheet?.data;
-    const data = { label: v("cf-label"), seats: Math.max(0, Math.min(8, parseInt($("cf-seats").value) || 0)), from_city: v("cf-from"), when_text: v("cf-when"), note: v("cf-note") };
-    if (c?.id){ if (await write(() => sb.from("cars").update(data).eq("id", c.id), "Mașina a fost salvată")) closeSheet(); }
-    else {
-      const r = await write(() => sb.from("cars").insert({ ...data, owner: S.uid }).select().single());
-      if (r?.data){ await setRide(S.uid, r.data.id, "Mașina ta e pe listă"); closeSheet(); }
+  const id = e.target.id, v = x => $(x).value.trim(), btn = e.submitter || e.target.querySelector('[type="submit"]');
+  await busy(btn, async () => {
+    if (id === "loginForm"){
+      const r = await sb.auth.signInWithPassword({ email: v("le"), password: $("lp").value });
+      if (r.error) toast(/confirm/i.test(r.error.message) ? "Confirmă întâi emailul din mesajul primit." : /invalid|credentials/i.test(r.error.message) ? "Email sau parolă greșită. Ai uitat parola? Apasă „Am uitat parola”." : authErr(r.error.message), true);
     }
-  }
-  if (id === "addTeam"){ const n = v("teamNameNew"); if (n) await write(() => sb.from("teams").insert({ name: n }), `${n} a fost creată`); }
-  if (id === "teamForm"){ const n = v("tn"); if (n && await write(() => sb.from("teams").update({ name: n }).eq("id", S.sheet.data), "Salvat")) closeSheet(); }
-  if (id === "dateForm"){ await write(() => sb.from("config").update({ start_date: $("startDate").value || null }).eq("id", 1), "Data a fost salvată"); }
-  if (id === "itemForm"){
-    const itId = e.target.dataset.id, name = v("in"), cat = $("ic").value;
-    if (!name) return;
-    const ok = itId ? await write(() => sb.from("items").update({ name, cat }).eq("id", itId), "Salvat")
-      : await write(() => sb.from("items").insert({ id: "x" + Date.now().toString(36), name, cat, ord: Math.max(0, ...S.items.map(i => Number(i.ord) || 0)) + 1 }), `${name} e pe listă`);
-    if (ok) closeSheet();
-  }
+    if (id === "signupForm"){
+      if ($("sp").value.length < 8){ toast("Parola trebuie să aibă minim 8 caractere.", true); return; }
+      const email = v("se");
+      const r = await sb.auth.signUp({ email, password: $("sp").value, options: { data: { name: v("sn") }, emailRedirectTo: SITE } });
+      if (r.error) toast(/registered|exists/i.test(r.error.message) ? "Ai deja cont cu acest email. Apasă „Am cont”." : authErr(r.error.message), true);
+      else if (r.data?.user && Array.isArray(r.data.user.identities) && r.data.user.identities.length === 0){ S.checkEmail = email; S.authMode = "login"; render(); toast("Ai deja cont cu acest email. Intră sau apasă „Am uitat parola”.", true); }
+      else if (!r.data?.session){ S.checkEmail = email; S.authMode = "check"; render(); }
+    }
+    if (id === "forgotForm"){
+      const email = v("fe");
+      const r = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE });
+      if (r.error) toast(authErr(r.error.message), true);
+      else { S.checkEmail = email; S.authMode = "sent"; render(); }
+    }
+    if (id === "newPassForm" || id === "passForm"){
+      const pw = $(id === "newPassForm" ? "np" : "pp").value;
+      if (pw.length < 8){ toast("Parola trebuie să aibă minim 8 caractere.", true); return; }
+      const r = await sb.auth.updateUser({ password: pw });
+      if (r.error) toast(authErr(r.error.message), true);
+      else { S.recovering = false; closeSheet(); toast("Parola a fost schimbată"); try { history.replaceState(null, "", SITE); } catch {} loadAll(); }
+    }
+    if (id === "nameForm"){
+      const n = v("pn"); if (!n){ toast("Scrie un nume.", true); return; }
+      if (await upd(S.uid, { name: n }, "Nume salvat")) closeSheet();
+    }
+    if (id === "carForm"){
+      const c = S.sheet?.data;
+      const data = { label: v("cf-label"), seats: Math.max(0, Math.min(8, Number($("cf-seats").textContent) || 0)), from_city: v("cf-from"), when_text: v("cf-when"), note: v("cf-note") };
+      if (c?.id){ if (await write(() => sb.from("cars").update(data).eq("id", c.id), "Mașina a fost salvată")) closeSheet(); }
+      else {
+        const r = await write(() => sb.from("cars").insert({ ...data, owner: S.uid }).select().single());
+        if (r?.data){ await upd(S.uid, { ride: r.data.id, own_transport: false }, "Mașina ta e pe listă"); closeSheet(); }
+      }
+    }
+    if (id === "addTeam"){ const n = v("teamNameNew"); if (n && await write(() => sb.from("teams").insert({ name: n }), `${n} a fost creată`)) $("teamNameNew").value = ""; }
+    if (id === "teamForm"){ const n = v("tn"); if (n && await write(() => sb.from("teams").update({ name: n }).eq("id", S.sheet.data), "Salvat")) closeSheet(); }
+    if (id === "dateForm"){ await write(() => sb.from("config").update({ start_date: $("startDate").value || null }).eq("id", 1), "Data a fost salvată"); }
+    if (id === "itemForm"){
+      const itId = e.target.dataset.id, name = v("in"), cat = $("ic").value;
+      if (!name) return;
+      const ok = itId ? await write(() => sb.from("items").update({ name, cat }).eq("id", itId), "Salvat")
+        : await write(() => sb.from("items").insert({ id: "x" + Date.now().toString(36), name, cat, ord: Math.max(0, ...S.items.map(i => Number(i.ord) || 0)) + 1 }), `${name} e pe listă`);
+      if (ok) closeSheet();
+    }
+  });
 });
 
 /* ---------- boot ---------- */
-(function(){ const h = (location.hash || "").slice(1); if (PAGES.includes(h)) S.page = h; })();
+readHash();
 render();
 sb.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") S.recovering = true;
   const uid = session?.user?.id || null;
   S.email = session?.user?.email || "";
-  if (uid !== S.uid){ S.uid = uid; S.me = null; S.profiles = []; if (uid) subscribe(); }
+  if (uid !== S.uid){ S.uid = uid; S.me = null; S.profiles = []; S.meMissing = 0; if (uid) subscribe(); }
   setTimeout(loadAll, 0);
 });
 
