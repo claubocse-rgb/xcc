@@ -454,7 +454,7 @@ function itemRow(it, kind){
     if (others.length) chips.push(`<span class="chip ok">Aduce ${esc(others.join(", "))}</span>`);
   }
   if (s.flag === "need") chips.push('<span class="chip need">Am nevoie</span>');
-  if (s.flag === "lend") chips.push('<span class="chip lend">Pot împrumuta</span>');
+  if (s.flag === "lend") chips.push('<span class="chip lend">Am în plus</span>');
   if (skip) chips.push('<span class="chip skip">Nu iau</span>');
   return `<div class="it ${on ? "on" : ""} ${skip ? "skip" : ""}">
     <button class="it-main" data-toggle="${esc(it.id)}" aria-pressed="${on}">
@@ -527,20 +527,44 @@ function pageHome(){
   steps.push(team
     ? { go: "gear", tab: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Vezi cine ce aduce pentru echipă" }
     : { go: "group", cls: "wait", ic: "…", t: "Aștepți repartizarea pe echipe", s: "Le facem după listele de la 4M" });
-  const canHelp = S.items.filter(i => has(p, i.id) && people().some(x => x.id !== S.uid && st(x, i.id).flag === "need"));
+  const myExtra = S.items.filter(i => st(p, i.id).flag === "lend");
+  const canHelp = myExtra.filter(i => people().some(x => x.id !== S.uid && st(x, i.id).flag === "need"));
   return `${hero()}
     <div class="stack"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
     ${canHelp.length ? `<div class="stack"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 4).map(i => {
       const who = people().filter(x => x.id !== S.uid && st(x, i.id).flag === "need").map(x => firstName(x.name));
-      return `<div class="need-card"><b>${esc(i.name)}</b><span class="muted small">${esc(who.join(", "))} ${who.length === 1 ? "caută" : "caută"}. Tu îl ai.</span></div>`; }).join("")}</div></div>` : ""}
+      return `<button class="person" data-go="gear" data-tab="extra"><span class="t"><b>${esc(i.name)}</b><span>${esc(who.join(", "))} caută. Tu ai în plus.</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("")}</div></div>`
+      : `<button class="block step" data-go="gear" data-tab="extra" style="border:1px solid var(--line);border-radius:var(--r-m)"><span class="st wait">+</span><span class="t"><b>${myExtra.length ? `Ai ${plural(myExtra.length, "lucru", "lucruri")} de dat` : "Ai echipament în plus?"}</b><span>${myExtra.length ? "Nimeni nu le caută acum. Te anunțăm aici." : "Trece-l la „De dat”, ca să-l găsească cine are nevoie."}</span></span><span class="chev" aria-hidden="true">›</span></button>`}
     <p class="small muted">Lipsa echipamentului obligatoriu înseamnă descalificare, iar organizatorul nu asigură nimic din listă. <a href="https://www.4mro.ro/regulament-xcc" target="_blank" rel="noopener">Regulamentul XCC</a></p>`;
 }
 
 function pageGear(){
   const tab = S.gearTab, p = S.me;
-  const seg = `<div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="team" aria-selected="${tab === "team"}">De echipă</button></div>`;
+  const nExtra = S.items.filter(i => st(p, i.id).flag === "lend").length;
+  const seg = `<div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="team" aria-selected="${tab === "team"}">De echipă</button><button role="tab" data-gtab="extra" aria-selected="${tab === "extra"}">De dat${nExtra ? ` (${nExtra})` : ""}</button></div>`;
+  if (tab === "extra"){
+    const list = S.items.filter(i => !isTeam(i));
+    const row = it => {
+      const s = st(p, it.id), on = s.flag === "lend";
+      const seekers = people().filter(x => x.id !== S.uid && st(x, it.id).flag === "need").map(x => firstName(x.name));
+      return `<div class="it ${on ? "on" : ""}">
+        <button class="it-main" data-extra="${esc(it.id)}" aria-pressed="${on}"><span class="box">${CHECK}</span>
+          <span class="it-body"><span class="it-name">${esc(it.name)}</span>
+          ${seekers.length ? `<span class="chips"><span class="chip need">Caută: ${esc(seekers.join(", "))}</span></span>` : ""}
+          ${on && s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span></button>
+        <button class="it-more" data-more="${esc(it.id)}" aria-label="Mai multe pentru ${esc(it.name)}">•••</button></div>`;
+    };
+    const sought = list.filter(i => people().some(x => x.id !== S.uid && st(x, i.id).flag === "need"));
+    const rest = list.filter(i => !sought.includes(i));
+    return `<h1 class="h1">Echipament</h1>${seg}
+      <div class="block stack"><p><b>Ce ai în plus și poți da altcuiva.</b></p>
+        <p class="muted small">Bifează doar lucrurile pe care le ai în plus, nu pe cele pe care le iei tu. Din ••• adaugi o notă, de exemplu mărimea.</p>
+        ${nExtra ? `<span class="chip lend" style="align-self:flex-start">Ai ${plural(nExtra, "lucru", "lucruri")} de dat</span>` : ""}</div>
+      ${sought.length ? `<section><div class="group-title"><h2 class="h2">Le caută cineva</h2></div><div class="list">${sought.map(row).join("")}</div></section>` : ""}
+      <section><div class="group-title"><h2 class="h2">${sought.length ? "Restul listei" : "Toată lista"}</h2></div><div class="list">${rest.map(row).join("")}</div></section>`;
+  }
   if (tab === "team"){
     const team = teamOf(S.uid), list = teamItems();
     const covered = list.filter(i => !isOpt(i) && (team ? mates() : [p]).some(x => has(x, i.id))).length, needed = list.filter(i => !isOpt(i)).length;
@@ -568,7 +592,7 @@ function pageGear(){
     <div class="block prog">
       ${haveReq === req.length && req.length ? `<span class="done-badge">✓ Ai tot ce e obligatoriu</span>` : `<div class="big">${haveReq}<small>din ${req.length} obligatorii</small></div>`}
       <div class="bar"><i style="width:${req.length ? haveReq / req.length * 100 : 0}%"></i></div>
-      <div class="row"><span class="small muted">Apasă pe un rând ca să-l bifezi. Din ••• ceri sau oferi.</span><span class="spacer"></span>
+      <div class="row"><span class="small muted">Apasă pe un rând ca să-l bifezi. Din ••• ceri ce-ți lipsește.</span><span class="spacer"></span>
         <button class="chip" data-missing aria-pressed="${S.onlyMissing}">Doar ce-mi lipsește</button></div>
     </div>
     ${sections}
@@ -713,7 +737,7 @@ function sheetHtml(){
       ${row("ok", team ? "Îl aduc eu" : "Îl am", "", !!s.ok)}
       ${isOpt(it) ? row("skip", "Nu îl iau", "E opțional, poți să-l lași acasă.", s.flag === "skip") : ""}
       ${team ? "" : row("need", "Am nevoie de el", "Apare la Nevoi, ca să te ajute cineva.", s.flag === "need", "red")}
-      ${team ? "" : row("lend", "Pot împrumuta altcuiva", "Am în plus și pot da.", s.flag === "lend", "blue")}</div>
+      ${team ? "" : row("lend", "Am în plus, pot da", "Apare la „De dat” și la Nevoi.", s.flag === "lend", "blue")}</div>
       <form class="stack" id="noteForm" style="margin-top:12px"><label class="field"><span>Notă</span><textarea class="input" id="noteText" maxlength="80" placeholder="ex. am doar unul de 35 L">${esc(s.note || "")}</textarea></label>
       <button class="btn" type="submit">Gata</button></form>`;
   }
@@ -728,7 +752,7 @@ function sheetHtml(){
         <div class="prog">${miss.length ? `<div class="big">${req - miss.length}<small>din ${req} obligatorii</small></div>` : '<span class="done-badge">✓ Gata de drum</span>'}<div class="bar"><i style="width:${req ? (req - miss.length) / req * 100 : 0}%"></i></div></div>
         ${sec("Îi lipsește", chipList(miss, ""))}
         ${sec("Caută", chipList(S.items.filter(i => st(p, i.id).flag === "need"), "need"))}
-        ${sec("Poate împrumuta", chipList(S.items.filter(i => st(p, i.id).flag === "lend"), "lend"))}
+        ${sec("Are în plus", chipList(S.items.filter(i => st(p, i.id).flag === "lend"), "lend"))}
         ${sec("Aduce pentru echipă", chipList(teamItems().filter(i => has(p, i.id)), "ok"))}
         ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(pname(car.owner))}`}${car.label ? `, ${esc(car.label)}` : ""}</span>` : '<span class="chip need">Încă fără loc</span>')}
       </div>`;
@@ -864,6 +888,7 @@ document.addEventListener("click", async e => {
     if (navigator.vibrate) try { navigator.vibrate(8); } catch {}
     return;
   }
+  if ((b = q("[data-extra]"))){ const id = b.dataset.extra, on = st(S.me, id).flag !== "lend"; setItem(id, { flag: on ? "lend" : "" }); if (on) toast("Trecut la „De dat”"); return; }
   if ((b = q("[data-more]"))){ openSheet("item", b.dataset.more); return; }
   if ((b = q("[data-flagset]"))){
     const id = S.sheet?.data, key = b.dataset.flagset, s = st(S.me, id), on = b.getAttribute("aria-checked") !== "true";
