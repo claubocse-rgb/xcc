@@ -441,13 +441,21 @@ function daysLeft(){
   return Math.ceil((d - new Date(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5);
 }
 function fmtDate(iso){ try { return new Date(iso + "T00:00:00").toLocaleDateString("ro-RO", { day: "numeric", month: "long" }); } catch { return iso; } }
+/* "5–8 noiembrie 2026" (or "30 octombrie – 2 noiembrie 2026" across months) */
+function dateRange(iso, days){
+  try {
+    const s = new Date(iso + "T00:00:00"), e = new Date(s); e.setDate(s.getDate() + days);
+    const m = d => d.toLocaleDateString("ro-RO", { month: "long" });
+    return s.getMonth() === e.getMonth() ? `${s.getDate()}–${e.getDate()} ${m(e)} ${e.getFullYear()}` : `${s.getDate()} ${m(s)} – ${e.getDate()} ${m(e)} ${e.getFullYear()}`;
+  } catch { return iso; }
+}
 function hero(compact){
   const dl = daysLeft();
-  const when = S.cfg.start_date ? `Plecăm pe ${fmtDate(S.cfg.start_date)}` : "Noiembrie 2026";
+  const when = S.cfg.start_date ? dateRange(S.cfg.start_date, 3) : "Noiembrie 2026";
   return `<section class="hero">${heroArt()}<div class="txt">
     ${dl !== null && dl > 0 ? `<span class="count-pill"><b>${dl}</b>${dl === 1 ? "zi până la start" : "zile până la start"}</span>` : dl === 0 ? `<span class="count-pill"><b>Azi</b>plecăm</span>` : ""}
     <h1>Xtreme Character Challenge</h1>
-    ${compact ? "" : `<p>${esc(when)}. 72 de ore în sălbăticie.</p>`}</div></section>`;
+    ${compact ? "" : `<p>${esc(when)}</p>`}</div></section>`;
 }
 function itemRow(it, kind){
   const s = st(S.me, it.id), on = !!s.ok, skip = s.flag === "skip";
