@@ -676,7 +676,7 @@ function pageHome(){
   const found = S.items.filter(i => st(p, i.id).need && lendersOf(i.id, S.uid).length);
   if (found.length) steps.push({ go: "gear", cls: "help", ic: found.length, t: found.length === 1 ? `Cineva are în plus: ${found[0].name}` : `Cineva are în plus ${found.length} lucruri pe care le cauți`, s: found.map(i => `${i.name}: ${lendersOf(i.id, S.uid).map(shortName).join(", ")}`).join(" · ") });
   steps.push(car
-    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? `Conduci ${car.label || "mașina ta"}` : `Mergi cu ${nameOf(car.owner)}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
+    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? "Conduci" : `Mergi cu ${nameOf(car.owner)}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
     : ownWay(p) ? { go: "transport", cls: "done", ic: "✓", t: "Vii pe cont propriu", s: "Dacă se schimbă ceva, alege un loc la Transport." }
     : { go: "transport", cls: "todo", ic: "!", t: "Încă n-ai loc într-o mașină", s: S.cars.length ? `${plural(S.cars.reduce((n, c) => n + freeOf(c), 0), "loc liber", "locuri libere")} acum` : "Ai mașină? Adaug-o." });
   if (!team) steps.push({ go: "gear", tab: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Le facem după ce primim listele de la 4M." });
@@ -777,7 +777,7 @@ function pageTransport(){
   const route = c => { const parts = [c.from_city && `Din <b>${esc(c.from_city)}</b>`, c.when_text && esc(c.when_text)].filter(Boolean); return parts.length ? `<p class="car-route">${parts.join(", ")}</p>` : ""; };
   let myBlock;
   if (mine) myBlock = `<div class="block mycar car">
-      <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(mine.owner))}`}</h2><span class="muted small">${esc(mine.label || "Mașină")}</span></div>
+      <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(mine.owner))}`}</h2></div>
       ${route(mine)}${seats(mine)}${mine.note ? `<p class="muted small">${esc(mine.note)}</p>` : ""}
       <div class="row">${mine.owner === S.uid ? `<button class="btn sec sm" data-car-edit="${esc(mine.id)}">Editează mașina</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`;
   else if (ownWay(p)) myBlock = `<div class="block stack"><h2 class="h2">Vii pe cont propriu</h2>
@@ -791,7 +791,7 @@ function pageTransport(){
     ${others.length ? `<section class="section"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
       ${others.map(c => { const f = freeOf(c), canJoin = !owned && f > 0, canEdit = isAdmin() && c.owner !== S.uid;
         return `<div class="block car">
-        <div class="block-head"><h3 class="h3">${esc(c.label || "Mașină")}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plină</span>'}</div>
+        <div class="block-head"><h3 class="h3">Mașina lui ${esc(nameOf(c.owner))}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plină</span>'}</div>
         ${route(c)}${seats(c)}${c.note ? `<p class="muted small">${esc(c.note)}</p>` : ""}
         ${canJoin || canEdit ? `<div class="row">${canJoin ? `<button class="btn ${mine ? "sec" : ""} sm" data-join="${esc(c.id)}">${mine ? "Mută-mă aici" : "Iau un loc"}</button>` : ""}${canEdit ? `<button class="btn sec sm" data-car-edit="${esc(c.id)}">Editează</button>` : ""}</div>` : ""}
       </div>`; }).join("")}</section>` : (mine ? "" : '<div class="block empty"><b>Nicio mașină încă</b>Cine are mașină o adaugă cu „Am mașină”.</div>')}
@@ -858,7 +858,7 @@ function summaryText(){
     for (const t of S.teams){ const m = membersOf(t.id), g = teamGaps(t.id); L.push(`${t.name}: ${m.map(p => p.name).join(", ") || "—"}${g.length ? ` (lipsesc: ${g.map(i => i.name).join(", ")})` : ""}`); }
     const nt = people().filter(p => !teamOf(p.id)); if (nt.length) L.push(`Fără echipă: ${nt.map(p => p.name).join(", ")}`); }
   L.push("", "MAȘINI");
-  for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"} — ${c.label || "mașină"}${c.from_city ? `, din ${c.from_city}` : ""}${c.when_text ? `, ${c.when_text}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
+  for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"}${c.from_city ? `, din ${c.from_city}` : ""}${c.when_text ? `, ${c.when_text}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
   if (!S.cars.length) L.push("—");
   const nr = noRide(); if (nr.length) L.push(`Fără loc: ${nr.map(p => p.name).join(", ")}`);
   const own = people().filter(ownWay); if (own.length) L.push(`Pe cont propriu: ${own.map(p => p.name).join(", ")}`);
@@ -980,19 +980,18 @@ function sheetHtml(){
         ${sec("Caută", chipList(S.items.filter(i => st(p, i.id).need), "need"))}
         ${sec("Are de dat", chipList(S.items.filter(i => st(p, i.id).lend), "lend"))}
         ${sec("Aduce pentru echipă", chipList(teamItems().filter(i => has(p, i.id)), "ok"))}
-        ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(nameOf(car.owner))}`}${car.label ? `, ${esc(car.label)}` : ""}</span>` : ownWay(p) ? "<span>Vine pe cont propriu</span>" : '<span class="chip need" style="align-self:flex-start">Încă fără loc</span>')}
+        ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(nameOf(car.owner))}`}</span>` : ownWay(p) ? "<span>Vine pe cont propriu</span>" : '<span class="chip need" style="align-self:flex-start">Încă fără loc</span>')}
       </div>`;
   }
   if (kind === "car"){
     const c = data || { seats: 3 }, riders = c.id ? ridersOf(c) : [], min = riders.length;
     const seats = Math.max(c.seats ?? 3, min);
     return head(c.id ? "Mașina" : "Am mașină", c.id ? "" : "Ceilalți își iau loc la tine.") + `<form class="stack" id="carForm">
-      <label class="field"><span>Ce mașină</span><input class="input" id="cf-label" value="${esc(c.label || "")}" placeholder="ex. Duster gri" maxlength="40"></label>
       <div class="field"><span>Locuri libere (fără șofer)</span><div class="stepper"><button type="button" data-step="-1" aria-label="Mai puține locuri">−</button><output id="cf-seats" data-min="${min}">${seats}</output><button type="button" data-step="1" aria-label="Mai multe locuri">+</button></div>
         ${min ? `<small>Ai ${plural(min, "pasager", "pasageri")}, deci minim ${min}.</small>` : ""}</div>
       <div class="grid2"><label class="field"><span>Pleci din</span><input class="input" id="cf-from" value="${esc(c.from_city || "")}" placeholder="ex. Oradea, la Lotus" maxlength="40"></label>
         <label class="field"><span>Când</span><input class="input" id="cf-when" value="${esc(c.when_text || "")}" placeholder="ex. joi la 14" maxlength="40"></label></div>
-      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. încap 3 rucsaci mari" maxlength="80"></label>
+      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. încap 3 rucsaci mari, ne întoarcem duminică" maxlength="80"></label>
       ${riders.length ? `<div class="kv"><span>Pasageri</span>${riders.map(r => `<div class="row" style="justify-content:space-between"><span>${esc(r.name)}</span><button type="button" class="btn sec sm" data-unseat="${esc(r.id)}">Scoate</button></div>`).join("")}</div>` : ""}
       <button class="btn" type="submit">${c.id ? "Salvează" : "Adaugă mașina"}</button>
       ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>${riders.length ? `<p class="small muted">Dacă o ștergi, ${esc(riders.map(shortName).join(", "))} ${riders.length === 1 ? "rămâne" : "rămân"} fără loc.</p>` : ""}` : ""}</form>`;
@@ -1259,7 +1258,7 @@ document.addEventListener("submit", async e => {
     }
     if (id === "carForm"){
       const c = S.sheet?.data;
-      const data = { label: v("cf-label"), seats: Math.max(0, Math.min(8, Number($("cf-seats").textContent) || 0)), from_city: v("cf-from"), when_text: v("cf-when"), note: v("cf-note") };
+      const data = { seats: Math.max(0, Math.min(8, Number($("cf-seats").textContent) || 0)), from_city: v("cf-from"), when_text: v("cf-when"), note: v("cf-note") };
       if (c?.id){ if (await write(() => sb.from("cars").update(data).eq("id", c.id), "Mașina a fost salvată")) closeSheet(); }
       else {
         const r = await write(() => sb.from("cars").insert({ ...data, owner: S.uid }).select().single());
