@@ -341,6 +341,21 @@ body.sheet-open .toasts{bottom:calc(16px + env(safe-area-inset-bottom,0px));top:
 .divider{height:1px;background:var(--line);margin:4px 0}
 .summary{white-space:pre-wrap;font:500 .86rem/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:12px;max-height:280px;overflow:auto}
 
+/* ---- Au de dat (others' extras) ---- */
+.give-card{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.list > .give-card:first-child{border-top:0}
+.give-card.wanted{box-shadow:inset 4px 0 0 var(--need)}
+.give-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.give-head b{font-size:16px;line-height:1.3}
+.givers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.givers li{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.givers .chip{display:inline-flex;align-items:center;gap:8px;padding-left:4px}
+.givers .chip .av{width:26px;height:26px;font-size:11px}
+.give-note{font-size:14px;color:var(--muted);font-style:italic}
+.give-act{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.give-act .btn{flex:none}
+.give-head .chip{flex:none;white-space:nowrap}
+
 </style>
 </head>
 <body class="noapp">
@@ -406,6 +421,7 @@ const isDriver = id => S.cars.some(c => c.owner === id);
 const ownWay = p => !!p?.own_transport;
 const noRide = () => people().filter(p => !carOf(p.id) && !ownWay(p));
 const missingOf = p => reqItems().filter(i => !has(p, i.id));
+const othersExtra = () => S.items.filter(i => !isTeam(i) && lendersOf(i.id, S.uid).length);
 const lendersOf = (id, except) => people().filter(x => x.id !== except && st(x, id).lend);
 const seekersOf = (id, except) => people().filter(x => x.id !== except && st(x, id).need);
 const firstName = n => String(n || "").trim().split(/\s+/)[0] || "";
@@ -533,7 +549,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && S.
 function routeHash(page, tab){ return page === "home" ? location.pathname + location.search : `#${page}${tab ? "/" + tab : ""}`; }
 function go(page, opts = {}, push = true){
   if (!PAGES.includes(page) || (page === "admin" && !isAdmin())) page = "home";
-  const changed = page !== S.page || opts.gearTab || opts.adminTab;
+  const changed = page !== S.page || opts.gearTab || opts.adminTab || opts.groupTab;
   Object.assign(S, opts);
   if (S.sheet) closeSheet(true);
   S.page = page;
@@ -546,7 +562,7 @@ function readHash(){
   S.page = PAGES.includes(p) ? p : "home";
   if (p === "gear") S.gearTab = ["mine", "team", "extra"].includes(t) ? t : "mine";
   if (p === "admin") S.adminTab = ["requests", "people", "teams", "list", "settings"].includes(t) ? t : "requests";
-  if (p === "group") S.groupTab = ["people", "needs", "items"].includes(t) ? t : "people";
+  if (p === "group") S.groupTab = ["people", "give", "needs", "items"].includes(t) ? t : "people";
 }
 window.addEventListener("popstate", () => {
   if (S.sheet){ closeSheet(true); return; }
@@ -683,6 +699,9 @@ function pageHome(){
   else { const gaps = teamGaps(team.id);
     steps.push(gaps.length ? { go: "gear", tab: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru" : `lipsesc ${gaps.length} lucruri`} de echipă`, s: gaps.map(i => i.name).join(", ") }
       : { go: "gear", tab: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Echipa are tot echipamentul comun." }); }
+  const othersOffer = othersExtra().filter(i => !isOpt(i) && !has(p, i.id) && !st(p, i.id).need);
+  if (othersOffer.length) steps.splice(1, 0, { go: "group", tab: "give", cls: "help", ic: othersOffer.length, t: othersOffer.length === 1 ? `Cineva are în plus: ${othersOffer[0].name}` : `${othersOffer.length} lucruri care îți lipsesc le are cineva în plus`, s: othersOffer.slice(0, 3).map(i => i.name).join(", ") + (othersOffer.length > 3 ? "…" : "") });
+  const nOffer = othersExtra().length;
   const canHelp = S.items.filter(i => st(p, i.id).lend && seekersOf(i.id, S.uid).length);
   const myExtra = S.items.filter(i => st(p, i.id).lend);
   const welcome = !lsGet("xcc-welcome") ? `<div class="block welcome stack"><h2 class="h2">Bine ai venit în grup</h2>
@@ -693,6 +712,7 @@ function pageHome(){
     <div class="section"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
+    ${nOffer ? `<button class="block step" data-go="group" data-tab="give"><span class="st help">${nOffer}</span><span class="t"><b>Vezi ce au alții de dat</b><span>${plural(nOffer, "lucru pus", "lucruri puse")} la dispoziție de grup</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}
     <div class="warnline">${WARN}<span>Fără echipamentul obligatoriu nu poți participa. Organizatorul nu asigură nimic din listă.</span></div>
     ${canHelp.length ? `<div class="section"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 5).map(i => {
       const who = seekersOf(i.id, S.uid);
@@ -807,8 +827,9 @@ function pageGroup(){
   const t = S.groupTab;
   const seg = `<div class="seg" role="tablist">
     <button role="tab" data-grtab="people" aria-selected="${t === "people"}">Oameni</button>
-    <button role="tab" data-grtab="needs" aria-selected="${t === "needs"}">Nevoi</button>
-    <button role="tab" data-grtab="items" aria-selected="${t === "items"}">Pe obiect</button></div>`;
+    <button role="tab" data-grtab="give" aria-selected="${t === "give"}">De dat</button>
+    <button role="tab" data-grtab="needs" aria-selected="${t === "needs"}">Caută</button>
+    <button role="tab" data-grtab="items" aria-selected="${t === "items"}">Obiecte</button></div>`;
   const filter = S.teams.length ? `<div class="chips" role="group" aria-label="Arată doar o echipă">
     ${[["all", "Toți"], ...S.teams.map(x => [x.id, x.name]), ["none", "Fără echipă"]].map(([v, l]) => `<button class="chip" data-team-filter="${esc(v)}" aria-pressed="${S.groupTeam === v}">${esc(l)}</button>`).join("")}</div>` : "";
   const list = groupList();
@@ -816,6 +837,22 @@ function pageGroup(){
   if (t === "people"){
     body = `<input class="input" type="search" id="q" placeholder="Caută un nume" value="${esc(S.q)}" aria-label="Caută un nume" autocomplete="off" enterkeyhint="search">
       <div class="list" id="peopleList">${peopleRows(list, reqItems().length)}</div>`;
+  } else if (t === "give"){
+    const rows = othersExtra().map(i => ({ i, by: lendersOf(i.id, S.uid).filter(p => list.includes(p)) })).filter(r => r.by.length);
+    const groups = {};
+    for (const r of rows) (groups[groupOf(r.i)] ??= []).push(r);
+    const card = ({ i, by }) => { const s = st(S.me, i.id);
+      return `<div class="give-card ${s.need ? "wanted" : ""}">
+        <div class="give-head"><b>${esc(i.name)}</b>${!isOpt(i) && !s.ok ? '<span class="chip need">Îți lipsește</span>' : ""}</div>
+        <ul class="givers">${by.map(p => `<li><button class="chip link lend" data-person="${esc(p.id)}">${avatar(p)}${esc(shortName(p))}</button>${st(p, i.id).note ? `<span class="give-note">${esc(st(p, i.id).note)}</span>` : ""}</li>`).join("")}</ul>
+        ${s.need ? '<div class="give-act"><span class="small">Ai cerut. Vorbiți pe grupul de WhatsApp.</span><button class="btn ghost sm" data-want="0" data-id="' + esc(i.id) + '">Anulează</button></div>'
+          : s.ok ? '<div class="give-act"><span class="small muted">Îl ai deja.</span></div>'
+          : `<div class="give-act"><button class="btn ink sm" data-want="1" data-id="${esc(i.id)}">Îl vreau</button></div>`}</div>`; };
+    const mine = rows.filter(r => !isOpt(r.i) && !st(S.me, r.i.id).ok);
+    body = rows.length ? `<p class="muted">Ce au alții în plus și pot da. Apasă „Îl vreau” ca să vadă că îl ceri, apoi vorbiți pe grupul de WhatsApp.</p>
+      ${mine.length ? `<section class="section"><div class="group-title"><h2 class="h2">Îți lipsesc și le are cineva</h2></div><div class="list">${mine.map(card).join("")}</div></section>` : ""}
+      ${Object.entries(groups).map(([g, l]) => { const rest = l.filter(r => !mine.includes(r)); return rest.length ? `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2><span class="count muted small">${rest.length}</span></div><div class="list">${rest.map(card).join("")}</div></section>` : ""; }).join("")}`
+      : '<div class="block empty"><b>Nimeni n-a pus nimic la „De dat” încă</b>Când cineva bifează ceva ce are în plus, apare aici, cu numele lui.</div>';
   } else if (t === "needs"){
     const rows = S.items.map(i => ({ i, need: list.filter(p => st(p, i.id).need), lend: people().filter(p => st(p, i.id).lend) }))
       .filter(r => r.need.length).sort((a, b) => b.need.length - a.need.length);
@@ -962,8 +999,8 @@ function sheetHtml(){
     return head(esc(it.name), esc(team ? "Echipament de echipă" : `${groupOf(it)}${isOpt(it) ? "" : " · obligatoriu"}`)) + `<div>
       ${sw(`data-flagset="ok"`, team ? "Aduc eu" : "Am", "", s.ok)}
       ${isOpt(it) ? sw(`data-flagset="skip"`, "Nu iau", "E opțional, îl poți lăsa acasă.", s.skip) : ""}
-      ${team ? "" : sw(`data-flagset="need"`, "Am nevoie", lenders.length ? `Au în plus: ${esc(lenders.map(shortName).join(", "))}` : "Apare la Nevoi, ca să te ajute cineva.", s.need, "red")}
-      ${team ? "" : sw(`data-flagset="lend"`, "Am în plus", "Apare la „De dat”, ca să-l găsească cine îl caută.", s.lend, "blue")}</div>
+      ${team ? "" : sw(`data-flagset="need"`, "Am nevoie", lenders.length ? `Au în plus: ${esc(lenders.map(shortName).join(", "))}` : "Apare la Grupul › Caută, ca să te ajute cineva.", s.need, "red")}
+      ${team ? "" : sw(`data-flagset="lend"`, "Am în plus", "Apare la Grupul › De dat, ca să-l găsească cine îl caută.", s.lend, "blue")}</div>
       <label class="field" style="margin-top:12px"><span>Notă</span><textarea class="input" id="noteText" maxlength="80" placeholder="ex. am doar unul de 35 L">${esc(s.note)}</textarea><small>Se salvează singură.</small></label>
       <button class="btn block-w" data-close style="margin-top:12px">Gata</button>`;
   }
@@ -1122,7 +1159,7 @@ document.addEventListener("click", async e => {
   let b;
   if ((b = q("[data-go]"))){
     e.preventDefault(); const tab = b.dataset.tab, pg = b.dataset.go;
-    go(pg, tab ? (pg === "admin" ? { adminTab: tab } : pg === "gear" ? { gearTab: tab } : {}) : {});
+    go(pg, tab ? (pg === "admin" ? { adminTab: tab } : pg === "gear" ? { gearTab: tab } : pg === "group" ? { groupTab: tab } : {}) : {});
     return;
   }
   if (q("[data-close]") || t.classList.contains("sheet-scrim")){ closeSheet(); return; }
@@ -1155,6 +1192,7 @@ document.addEventListener("click", async e => {
     if (navigator.vibrate) try { navigator.vibrate(8); } catch {}
     return;
   }
+  if ((b = q("[data-want]"))){ const on = b.dataset.want === "1"; setItem(b.dataset.id, { need: on }); toast(on ? "Ai cerut. Spune-le și pe WhatsApp." : "Cerere anulată"); return; }
   if ((b = q("[data-extra]"))){ const id = b.dataset.extra, on = !st(S.me, id).lend; setItem(id, { lend: on }); toast(on ? "Pus la „De dat”" : "Scos de la „De dat”"); return; }
   if ((b = q("[data-more]"))){ openSheet("item", b.dataset.more); return; }
   if ((b = q("[data-flagset]"))){
