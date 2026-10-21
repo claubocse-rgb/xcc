@@ -410,6 +410,12 @@ body.is-dragging{cursor:grabbing;user-select:none}
 .step .st .mk{width:20px;height:20px}
 a.step.doc{text-decoration:none;color:inherit;border:2px solid var(--text)}
 .st.ink-st{background:var(--text);color:var(--surface);font-weight:800}
+.tg-count{flex:none;min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:grid;place-items:center;font-weight:800;font-size:15px;background:var(--line);font-variant-numeric:tabular-nums}
+.tg-count.low{background:color-mix(in srgb,var(--need) 14%,transparent);color:var(--need)}
+.qty{flex:none;display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:999px;height:40px;overflow:hidden}
+.qty button{width:40px;height:40px;border:0;background:transparent;color:var(--text);font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+.qty button:hover{background:var(--line)}
+.qty b{min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
 
 </style>
 </head>
@@ -463,8 +469,11 @@ const byId = id => S.profiles.find(p => p.id === id);
 /* item state: {ok, need, lend, skip, note}; older rows used a single `flag` field */
 function st(p, id){
   const s = p?.items?.[id] || {};
-  return { ok: !!s.ok, need: s.need ?? s.flag === "need", lend: s.lend ?? s.flag === "lend", skip: s.skip ?? s.flag === "skip", note: s.note || "" };
+  return { ok: !!s.ok, need: s.need ?? s.flag === "need", lend: s.lend ?? s.flag === "lend", skip: s.skip ?? s.flag === "skip", note: s.note || "", qty: Math.max(1, Number(s.qty) || 1) };
 }
+/* "Arzător + butelii (2–3/echipă)" -> 2; "Busolă (min. 1/echipă)" -> 1 */
+const teamNeed = it => { const m = String(it.name).match(/(\d+)\s*(?:[–-]\s*\d+\s*)?\/\s*echip/i); return m ? Number(m[1]) : 1; };
+const teamCount = (tid, it) => membersOf(tid).filter(p => has(p, it.id)).reduce((n, p) => n + st(p, it.id).qty, 0);
 const has = (p, id) => st(p, id).ok;
 const carOf = id => { const r = byId(id)?.ride; return S.cars.find(c => c.id === r) || null; };
 const teamOf = id => { const t = byId(id)?.team; return S.teams.find(x => x.id === t) || null; };
@@ -501,7 +510,7 @@ function rosterMatch(p){
 function teamHas(tid, it){
   const m = membersOf(tid), ti = /cort/i.test(it.name) ? S.tents.filter(t => t.team === tid) : [];
   if (ti.length) return ti.reduce((n, t) => n + (t.places || 0), 0) >= m.length + noAccount(tid).length;
-  return m.some(p => has(p, it.id));
+  return teamCount(tid, it) >= teamNeed(it);
 }
 function teamGaps(tid){ return teamReq().filter(i => !teamHas(tid, i)); }
 
@@ -964,12 +973,15 @@ function pageTeam(){
   const gearRow = it => {
     const by = mem.filter(x => has(x, it.id)), me = mine && has(S.me, it.id), ok = by.length > 0;
     const isTent = tItem && it.id === tItem.id;
-    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : ok ? `Aduce ${by.map(shortName).join(", ")}. Adăugați corturile mai jos, ca să vă împărțiți locurile.` : "Nimeni n-a adăugat un cort încă") : ok ? `Aduce ${by.map(shortName).join(", ")}` : (isOpt(it) ? "Opțional" : "Nu aduce nimeni încă");
-    const good = teamHas(tm.id, it);
+    const good = teamHas(tm.id, it), cnt = teamCount(tm.id, it), need = teamNeed(it), myQ = st(S.me, it.id).qty;
+    const who = by.map(x => shortName(x) + (st(x, it.id).qty > 1 ? ` ×${st(x, it.id).qty}` : "")).join(", ");
+    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : ok ? `Aduce ${by.map(shortName).join(", ")}. Adăugați corturile mai jos, ca să vă împărțiți locurile.` : "Nimeni n-a adăugat un cort încă") : ok ? `${cnt} din minim ${need}: ${who}` : (isOpt(it) ? "Opțional" : `Trebuie minim ${need}. Nu aduce nimeni încă`);
     return `<div class="tg-row ${good ? "ok" : isOpt(it) ? "" : "miss"}">
       <span class="tg-ic" aria-hidden="true">${good ? "✓" : isOpt(it) ? "–" : "!"}</span>
       <span class="t"><b>${esc(it.name)}</b><span>${esc(sub)}</span></span>
-      ${mine && !isTent ? `<button class="btn ${me || ok ? "sec" : "ink"} sm" data-bring="${esc(it.id)}" aria-pressed="${me}">${me ? "Aduc eu ✓" : "Aduc eu"}</button>` : ""}
+      ${!isTent && cnt ? `<span class="tg-count ${good ? "" : "low"}" aria-label="${cnt} aduse">${cnt}</span>` : ""}
+      ${mine && !isTent ? (me ? `<span class="qty" role="group" aria-label="Câte aduci"><button data-qty="-1" data-id="${esc(it.id)}" aria-label="${myQ === 1 ? "Nu mai aduc" : "Mai puține"}">${myQ === 1 ? "✕" : "−"}</button><b>${myQ}</b><button data-qty="1" data-id="${esc(it.id)}" aria-label="Mai multe">+</button></span>`
+        : `<button class="btn ${ok ? "sec" : "ink"} sm" data-bring="${esc(it.id)}" aria-pressed="false">Aduc eu</button>`) : ""}
       ${mine && isTent && !S.tents.some(t => t.owner === S.uid) ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
   };
   const tentCard = t => {
@@ -989,7 +1001,7 @@ function pageTeam(){
       <div class="bar ${covered === req.length ? "full" : ""}"><i style="width:${req.length ? covered / req.length * 100 : 0}%"></i></div></div>
     </div>
     <section class="section"><div class="group-title"><h2 class="h2">Echipament comun</h2><span class="count muted small">${covered}/${req.length}</span></div>
-      <p class="small muted">Se aduce o dată pentru toată echipa. ${mine ? "Apasă „Aduc eu” la ce iei tu, ca să nu vină toți cu același lucru." : ""}</p>
+      <p class="small muted">Se aduce pentru toată echipa. ${mine ? "Apasă „Aduc eu” la ce iei tu. Cu + și − spui câte bucăți aduci (ex. câte butelii)." : ""}</p>
       <div class="list">${teamItems().sort((a, b) => (isOpt(a) ? 1 : 0) - (isOpt(b) ? 1 : 0)).map(gearRow).join("")}</div></section>
     <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni</span></div>
       ${tents.length ? tents.map(tentCard).join("") : `<div class="block empty"><b>Niciun cort încă</b>${mine ? "Ai cort? Adaugă-l și ceilalți își aleg locul." : "Membrii echipei își adaugă corturile aici."}</div>`}
@@ -1388,7 +1400,7 @@ function setItem(itemId, patch, quiet){
   if (patch.need === true){ cur.ok = false; cur.skip = false; cur.lend = false; }
   if (patch.skip === true){ cur.ok = false; cur.need = false; }
   if (patch.lend === true){ cur.need = false; if (!isOpt(it) && !isTeam(it)) cur.ok = true; }
-  const val = { ok: cur.ok, need: cur.need, lend: cur.lend, skip: cur.skip, note: cur.note };
+  const val = { ok: cur.ok, need: cur.need, lend: cur.lend, skip: cur.skip, note: cur.note, ...(cur.qty > 1 ? { qty: cur.qty } : {}) };
   S.me.items = { ...(S.me.items || {}), [itemId]: val };
   if (!quiet) render();
   return write(() => sb.rpc("set_item", { item_id: itemId, val }));
@@ -1467,6 +1479,8 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-unseat]"))){ await setRide(b.dataset.unseat, null, `${nameOf(b.dataset.unseat)} nu mai e în mașină`); return; }
   if ((b = q("[data-car-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
   if ((b = q("[data-teamview]"))){ S.teamView = b.dataset.teamview; render(); return; }
+  if ((b = q("[data-qty]"))){ const id = b.dataset.id, q2 = st(S.me, id).qty + Number(b.dataset.qty);
+    if (q2 < 1){ setItem(id, { ok: false, qty: 1 }); toast("Nu mai aduci"); } else setItem(id, { qty: Math.min(9, q2) }); return; }
   if ((b = q("[data-bring]"))){ const id = b.dataset.bring, on = !has(S.me, id); setItem(id, { ok: on }); toast(on ? "Notat: aduci tu" : "Nu mai aduci"); return; }
   if (q("[data-tent-new]")){ if (S.tents.some(t => t.owner === S.uid)){ toast("Ai deja un cort. Îl poți edita.", true); return; } openSheet("tent", null); return; }
   if ((b = q("[data-tent-slot]"))){ openSheet("tentpick", b.dataset.tentSlot); return; }
