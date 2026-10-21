@@ -224,3 +224,42 @@ on conflict (id) do nothing;
 
 -- migration (v3): travelling on their own
 alter table public.profiles add column if not exists own_transport boolean not null default false;
+
+-- migration (v4): locations, 4M team roster, tents
+alter table public.config add column if not exists event_name text not null default '' check (char_length(event_name) <= 80);
+alter table public.config add column if not exists event_maps text not null default '' check (char_length(event_maps) <= 500);
+alter table public.config add column if not exists food_name text not null default '' check (char_length(food_name) <= 80);
+alter table public.config add column if not exists food_maps text not null default '' check (char_length(food_maps) <= 500);
+create table if not exists public.roster (
+  id uuid primary key default gen_random_uuid(),
+  team uuid not null references public.teams(id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 60),
+  profile uuid references public.profiles(id) on delete set null
+);
+alter table public.roster enable row level security;
+drop policy if exists "roster read" on public.roster;
+create policy "roster read" on public.roster for select to authenticated using (public.is_approved());
+drop policy if exists "roster admin" on public.roster;
+create policy "roster admin" on public.roster for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create table if not exists public.tents (
+  id uuid primary key default gen_random_uuid(),
+  team uuid not null references public.teams(id) on delete cascade,
+  owner uuid not null references public.profiles(id) on delete cascade,
+  places int not null default 2 check (places between 1 and 8),
+  label text not null default '' check (char_length(label) <= 40),
+  created_at timestamptz not null default now()
+);
+alter table public.profiles add column if not exists tent uuid references public.tents(id) on delete set null;
+alter table public.tents enable row level security;
+drop policy if exists "tents read" on public.tents;
+create policy "tents read" on public.tents for select to authenticated using (public.is_approved());
+drop policy if exists "tents insert own" on public.tents;
+create policy "tents insert own" on public.tents for insert to authenticated with check (owner = auth.uid() and public.is_approved());
+drop policy if exists "tents change own" on public.tents;
+create policy "tents change own" on public.tents for update to authenticated using (owner = auth.uid() or public.is_admin()) with check (owner = auth.uid() or public.is_admin());
+drop policy if exists "tents delete own" on public.tents;
+create policy "tents delete own" on public.tents for delete to authenticated using (owner = auth.uid() or public.is_admin());
+do $$ begin
+  begin alter publication supabase_realtime add table public.roster; exception when others then null; end;
+  begin alter publication supabase_realtime add table public.tents; exception when others then null; end;
+end $$;

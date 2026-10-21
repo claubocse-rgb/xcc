@@ -356,6 +356,56 @@ body.sheet-open .toasts{bottom:calc(16px + env(safe-area-inset-bottom,0px));top:
 .give-act .btn{flex:none}
 .give-head .chip{flex:none;white-space:nowrap}
 
+/* ---- places ---- */
+.places{gap:4px}
+.place{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);color:inherit;text-decoration:none;min-height:52px}
+.places h2 + .place{border-top:0}
+.place .mk{width:28px;height:28px;flex:none}
+.place .t{flex:1;display:flex;flex-direction:column;min-width:0}
+.place .t small{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.place .t b{font-size:16px}
+.place .go{font-weight:700;font-size:14px;color:var(--accent);flex:none}
+
+/* ---- car board (drag & drop) ---- */
+.board-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.board-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.board-stats b{color:var(--text);font-variant-numeric:tabular-nums}
+.board{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:760px){.board{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}}
+.zone{background:var(--surface);border:2px solid var(--line);border-radius:var(--r-l);padding:12px;display:flex;flex-direction:column;gap:10px;transition:border-color .12s,background .12s;cursor:default}
+.zone[data-zone="pool"]{border-style:dashed;border-color:var(--line-2)}
+.zone-head{display:flex;flex-direction:column;gap:2px}
+.zone-head b{font-size:16px}
+.zone-body{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;align-items:center}
+.zone-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.slot{display:inline-flex;align-items:center;height:40px;padding:0 14px;border:2px dashed var(--line-2);border-radius:999px;font-size:13px;color:var(--faint)}
+.zone.full{opacity:.75}
+.zone.can{border-color:var(--text);cursor:pointer}
+.zone.can.full{border-color:var(--line);cursor:not-allowed}
+.zone.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.zone.full.over{border-color:var(--line-2);background:var(--surface)}
+.dnd{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 5px;border-radius:999px;border:1px solid var(--line-2);background:var(--bg);color:var(--text);font:inherit;font-weight:600;font-size:15px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.dnd .av{width:32px;height:32px;font-size:12px}
+.dnd.driver{cursor:default;background:var(--text);color:var(--surface);border-color:var(--text);touch-action:auto}
+.dnd.driver i{font-style:normal;font-weight:400;opacity:.7;font-size:13px}
+.dnd.picked{outline:3px solid var(--accent);outline-offset:2px}
+.dnd.dragging{opacity:.3}
+.dnd.ghost{position:fixed;left:0;top:0;z-index:100;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:.95;cursor:grabbing}
+body.is-dragging{cursor:grabbing;user-select:none}
+
+/* ---- team page ---- */
+.team-people{display:flex;flex-wrap:wrap;gap:6px}
+.tg-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
+.list > .tg-row:first-child{border-top:0}
+.tg-row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tg-row .t b{font-size:15px;line-height:1.3}
+.tg-row .t span{font-size:13px;color:var(--muted)}
+.tg-row .btn{flex:none}
+.tg-ic{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--line);color:var(--muted)}
+.tg-row.ok .tg-ic{background:var(--ready);color:#fff}
+.tg-row.miss .tg-ic{background:var(--need);color:#fff}
+.tg-row.miss .t span{color:var(--need)}
+
 </style>
 </head>
 <body class="noapp">
@@ -377,17 +427,17 @@ const sb = window.XCC_MOCK || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const S = {
   loaded: false, loadFailed: false, uid: null, email: "", me: null, meMissing: 0,
-  profiles: [], items: [], teams: [], cars: [], cfg: {},
+  profiles: [], items: [], teams: [], cars: [], roster: [], tents: [], cfg: {}, teamView: null,
   page: "home", gearTab: "mine", onlyMissing: false, groupTab: "people", groupTeam: "all", q: "",
   adminTab: "requests", adminFilter: "all", listQ: "",
   authMode: new URLSearchParams(location.search).has("nou") ? "signup" : "login", checkEmail: "",
-  recovering: false, sheet: null, leaving: {},
+  recovering: false, sheet: null, leaving: {}, board: false, pick: null,
 };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const SITE = location.origin + location.pathname;
 const INVITE = SITE + "?nou";
-const PAGES = ["home", "gear", "transport", "group", "admin"];
+const PAGES = ["home", "gear", "team", "transport", "group", "admin"];
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 
@@ -434,7 +484,21 @@ function shortName(p){
   return dup && parts.length > 1 ? `${f} ${parts[parts.length - 1][0]}.` : f;
 }
 const nameOf = id => shortName(byId(id));
-function teamGaps(tid){ const m = membersOf(tid); return teamReq().filter(i => !m.some(p => has(p, i.id))); }
+const norm = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/@.*/, "").split(/[^a-z]+/).filter(Boolean);
+const noAccount = tid => S.roster.filter(r => r.team === tid && byId(r.profile)?.status !== "approved");
+/* a roster line (from 4M's list) that fits a new account's name, if exactly one does */
+function rosterMatch(p){
+  const pt = norm(p?.name); if (!pt.length) return null;
+  const hits = S.roster.filter(r => !(r.profile && byId(r.profile) && r.profile !== p.id)).filter(r => { const rt = norm(r.name); return pt.every(t => rt.includes(t)) && pt.some(t => t.length >= 3); });
+  return hits.length === 1 ? hits[0] : null;
+}
+/* the tent line counts as covered when the team's tents have a place for everyone */
+function teamHas(tid, it){
+  const m = membersOf(tid), ti = /cort/i.test(it.name) ? S.tents.filter(t => t.team === tid) : [];
+  if (ti.length) return ti.reduce((n, t) => n + (t.places || 0), 0) >= m.length + noAccount(tid).length;
+  return m.some(p => has(p, it.id));
+}
+function teamGaps(tid){ return teamReq().filter(i => !teamHas(tid, i)); }
 
 function avatar(p, cls = ""){
   const name = p?.name || "?";
@@ -450,6 +514,7 @@ function marker(type){
     dot: '<circle class="red" cx="12" cy="12" r="5.2"/>',
     cross: '<path class="red" d="M9.4 4.5h5.2v4.9h4.9v5.2h-4.9v4.9H9.4v-4.9H4.5V9.4h4.9z"/>',
     tri: '<path class="red" d="M12 5.2l6.6 12.6H5.4z"/>',
+    vband: '<rect class="red" x="8.5" y="2" width="7" height="20"/>',
     key: '<path class="ink" d="M9.5 6.5a3.6 3.6 0 0 1 3.4 4.8l5.6 5.6v2.4h-2.4v-1.6h-1.6v-1.6h-1.6l-1.5-1.5a3.6 3.6 0 1 1-1.9-8.1zm-.9 2.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/>',
   };
   return `<svg class="mk" viewBox="0 0 24 24" aria-hidden="true"><rect class="bg" x="1" y="1" width="22" height="22" rx="3"/>${shapes[type] || shapes.band}</svg>`;
@@ -479,14 +544,14 @@ async function write(fn, okMsg){
     const r = await fn();
     if (r?.error) throw r.error;
     if (okMsg) toast(okMsg);
-    scheduleReload(250);
+    scheduleReload(900);
     return r ?? true;
   } catch(e){
     console.error(e);
     const m = e?.message || "";
     toast(/plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator/i.test(m) ? m
       : /fetch|network|Failed/i.test(m) ? "Nu s-a salvat: nu ai internet." : "Nu s-a salvat. Încearcă din nou.", true);
-    scheduleReload(400);
+    lastSnap = ""; scheduleReload(400);
     return false;
   }
 }
@@ -508,20 +573,26 @@ async function busy(btn, fn){
 }
 
 /* ---------- data ---------- */
+let lastSnap = "";
 async function loadAll(){
   try {
     const cfg = await sb.from("config").select("*").eq("id", 1).maybeSingle();
     if (!cfg.error) S.cfg = cfg.data || {};
     if (S.uid){
-      const [pr, it, tm, cr] = await Promise.all([
+      const [pr, it, tm, cr, ro, tn] = await Promise.all([
         sb.from("profiles").select("*").order("created_at"),
         sb.from("items").select("*").order("ord"),
         sb.from("teams").select("*").order("created_at"),
         sb.from("cars").select("*").order("created_at"),
+        sb.from("roster").select("*").order("name"),
+        sb.from("tents").select("*").order("created_at"),
       ]);
       const err = pr.error || it.error || tm.error || cr.error;
       if (err) throw err;
-      S.profiles = pr.data || []; S.items = it.data || []; S.teams = tm.data || []; S.cars = cr.data || [];
+      const snap = JSON.stringify([cfg.data, pr.data, it.data, tm.data, cr.data, ro.error ? null : ro.data, tn.error ? null : tn.data]);
+      if (snap === lastSnap && S.loaded && !S.loadFailed){ return; }
+      lastSnap = snap;
+      S.profiles = pr.data || []; S.items = it.data || []; S.teams = tm.data || []; S.cars = cr.data || []; S.roster = ro.error ? [] : (ro.data || []); S.tents = tn.error ? [] : (tn.data || []);
       S.me = S.profiles.find(p => p.id === S.uid) || null;
       S.meMissing = S.me ? 0 : S.meMissing + 1;
       if (!S.me && S.meMissing < 3) scheduleReload(1500);
@@ -541,7 +612,7 @@ let channel;
 function subscribe(){
   if (!sb.channel) return;
   if (channel) sb.removeChannel(channel);
-  channel = sb.channel("xcc-live").on("postgres_changes", { event: "*", schema: "public" }, () => scheduleReload()).subscribe();
+  channel = sb.channel("xcc-live").on("postgres_changes", { event: "*", schema: "public" }, () => scheduleReload(700)).subscribe();
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden && S.uid) scheduleReload(100); });
 
@@ -552,6 +623,7 @@ function go(page, opts = {}, push = true){
   const changed = page !== S.page || opts.gearTab || opts.adminTab || opts.groupTab;
   Object.assign(S, opts);
   if (S.sheet) closeSheet(true);
+  if (page !== "transport") S.board = false;
   S.page = page;
   const tab = page === "gear" ? S.gearTab : page === "admin" ? S.adminTab : page === "group" ? S.groupTab : "";
   try { if (push && changed) history.pushState({ page }, "", routeHash(page, ["mine", "requests", "people"].includes(tab) ? "" : tab)); } catch {}
@@ -560,7 +632,7 @@ function go(page, opts = {}, push = true){
 function readHash(){
   const [p, t] = (location.hash || "").slice(1).split("/");
   S.page = PAGES.includes(p) ? p : "home";
-  if (p === "gear") S.gearTab = ["mine", "team", "extra"].includes(t) ? t : "mine";
+  if (p === "gear") S.gearTab = ["mine", "extra"].includes(t) ? t : "mine";
   if (p === "admin") S.adminTab = ["requests", "people", "teams", "list", "settings"].includes(t) ? t : "requests";
   if (p === "group") S.groupTab = ["people", "give", "needs", "items"].includes(t) ? t : "people";
 }
@@ -695,10 +767,10 @@ function pageHome(){
     ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? "Conduci" : `Mergi cu ${nameOf(car.owner)}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
     : ownWay(p) ? { go: "transport", cls: "done", ic: "✓", t: "Vii pe cont propriu", s: "Dacă se schimbă ceva, alege un loc la Transport." }
     : { go: "transport", cls: "todo", ic: "!", t: "Încă n-ai loc într-o mașină", s: S.cars.length ? `${plural(S.cars.reduce((n, c) => n + freeOf(c), 0), "loc liber", "locuri libere")} acum` : "Ai mașină? Adaug-o." });
-  if (!team) steps.push({ go: "gear", tab: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Le facem după ce primim listele de la 4M." });
+  if (!team) steps.push({ go: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Le facem după ce primim listele de la 4M." });
   else { const gaps = teamGaps(team.id);
-    steps.push(gaps.length ? { go: "gear", tab: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru" : `lipsesc ${gaps.length} lucruri`} de echipă`, s: gaps.map(i => i.name).join(", ") }
-      : { go: "gear", tab: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Echipa are tot echipamentul comun." }); }
+    steps.push(gaps.length ? { go: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru" : `lipsesc ${gaps.length} lucruri`} de echipă`, s: gaps.map(i => i.name).join(", ") }
+      : { go: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Echipa are tot echipamentul comun." }); }
   const othersOffer = othersExtra().filter(i => !isOpt(i) && !has(p, i.id) && !st(p, i.id).need);
   if (othersOffer.length) steps.splice(1, 0, { go: "group", tab: "give", cls: "help", ic: othersOffer.length, t: othersOffer.length === 1 ? `Cineva are în plus: ${othersOffer[0].name}` : `${othersOffer.length} lucruri care îți lipsesc le are cineva în plus`, s: othersOffer.slice(0, 3).map(i => i.name).join(", ") + (othersOffer.length > 3 ? "…" : "") });
   const nOffer = othersExtra().length;
@@ -724,7 +796,7 @@ function pageHome(){
 function pageGear(){
   const tab = S.gearTab, p = S.me;
   const nExtra = S.items.filter(i => st(p, i.id).lend).length;
-  const seg = `<div class="sticky-seg"><div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="team" aria-selected="${tab === "team"}">De echipă</button><button role="tab" data-gtab="extra" aria-selected="${tab === "extra"}">De dat${nExtra ? ` (${nExtra})` : ""}</button></div></div>`;
+  const seg = `<div class="sticky-seg"><div class="seg" role="tablist"><button role="tab" data-gtab="mine" aria-selected="${tab === "mine"}">Al meu</button><button role="tab" data-gtab="extra" aria-selected="${tab === "extra"}">De dat${nExtra ? ` (${nExtra})` : ""}</button></div></div>`;
   if (tab === "extra"){
     const list = S.items.filter(i => !isTeam(i) && !st(p, i.id).need);
     const row = it => {
@@ -746,13 +818,14 @@ function pageGear(){
       ${sought.length ? `<section class="section"><div class="group-title"><h2 class="h2">Le caută cineva</h2></div><div class="list">${sought.map(row).join("")}</div></section>` : ""}
       ${Object.entries(groups).map(([g, l]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div><div class="list">${l.map(row).join("")}</div></section>`).join("")}`;
   }
-  if (tab === "team"){
+  if (false){
     const team = teamOf(S.uid), list = teamItems(), who = team ? mates() : [p];
     const sorted = [...list].sort((a, b) => (who.some(x => has(x, a.id)) ? 1 : 0) - (who.some(x => has(x, b.id)) ? 1 : 0));
     const covered = teamReq().filter(i => who.some(x => has(x, i.id))).length, needed = teamReq().length;
     return `<h1 class="h1">Echipament</h1>${seg}
       <div class="block stack">
         ${team ? `<div class="block-head"><h2 class="h3">${esc(team.name)}</h2><span class="muted small">${esc(mates().map(shortName).join(", "))}</span></div>
+          ${noAccount(team.id).length ? `<p class="small muted">Încă fără cont în aplicație: ${esc(noAccount(team.id).map(r => r.name).join(", "))}</p>` : ""}
           <div class="prog">${covered === needed ? '<span class="done-badge">✓ Echipa are tot ce e comun</span>' : `<div class="big alarm">${needed - covered}<small>lipsesc din ${needed} obligatorii</small></div>`}<div class="bar ${covered === needed ? "full" : ""}"><i style="width:${needed ? covered / needed * 100 : 0}%"></i></div></div>`
         : `<p><b>Încă nu ești într-o echipă.</b></p><p class="muted">Echipele le facem după ce primim listele de la 4M. Până atunci, bifează ce ai putea aduce tu.</p>`}
         <p class="small muted">Se aduc pentru toată echipa. Bifează doar ce aduci tu, ca să nu vină toți cu același lucru. Uită-te la cantitate (ex. 2–3 butelii).</p>
@@ -784,7 +857,142 @@ function pageGear(){
       <div class="list">${optVis.map(i => itemRow(i, "mine")).join("")}</div></section>` : ""}`;
 }
 
+/* where we go: event + restaurant (set by admin in Settings) */
+function mapsUrl(name, url){ return url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`; }
+function placesBlock(){
+  const c = S.cfg, rows = [["Locul evenimentului", c.event_name, c.event_maps, "tri"], ["Restaurant", c.food_name, c.food_maps, "dot"]].filter(r => r[1] || r[2]);
+  if (!rows.length) return isAdmin() ? `<button class="block step" data-go="admin" data-tab="settings"><span class="st wait"></span><span class="t"><b>Adaugă locațiile</b><span>Locul evenimentului și restaurantul apar aici, cu link spre hartă.</span></span><span class="chev" aria-hidden="true">›</span></button>` : "";
+  return `<div class="block stack places"><h2 class="h3">Unde mergem</h2>${rows.map(([l, n, u, m]) => `<a class="place" href="${esc(mapsUrl(n, u))}" target="_blank" rel="noopener">${marker(m)}<span class="t"><small>${l}</small><b>${esc(n || "Vezi pe hartă")}</b></span><span class="go">Hartă ›</span></a>`).join("")}</div>`;
+}
+
+/* admin board: drag people onto cars (or tap a person, then tap a car) */
+function pageBoard(){
+  const pool = people().filter(p => !isDriver(p.id) && !carOf(p.id) && !ownWay(p));
+  const own = people().filter(p => !isDriver(p.id) && ownWay(p) && !carOf(p.id));
+  const pick = S.pick ? byId(S.pick) : null;
+  const chip = p => `<button class="dnd ${S.pick === p.id ? "picked" : ""}" data-dnd="${esc(p.id)}" aria-pressed="${S.pick === p.id}">${avatar(p)}<span>${esc(shortName(p))}</span></button>`;
+  const zone = (id, title, sub, people, extra = "", full = false) => `<section class="zone ${full ? "full" : ""} ${pick && !full ? "can" : ""}" data-zone="${esc(id)}">
+      <div class="zone-head"><b>${title}</b><span class="small muted">${sub}</span></div>
+      <div class="zone-body">${extra}${people.map(chip).join("")}${!people.length && !extra ? '<span class="small muted">Trage pe cineva aici</span>' : ""}</div></section>`;
+  const total = S.cars.reduce((n, c) => n + (c.seats || 0), 0), seated = S.cars.reduce((n, c) => n + ridersOf(c).length, 0);
+  return `<div class="board-top"><h1 class="h1">Mașinile</h1><button class="btn sec sm" data-board="0">Gata</button></div>
+    <p class="muted">${pick ? `<b>${esc(pick.name)}</b> e selectat. Atinge mașina în care îl pui.` : "Trage un om pe o mașină. Pe telefon poți și să atingi omul, apoi mașina."}</p>
+    <div class="board-stats"><span><b>${seated}</b> / ${total} locuri ocupate</span><span><b>${pool.length}</b> fără loc</span></div>
+    <div class="board">
+      ${zone("pool", "Fără loc", plural(pool.length, "om", "oameni"), pool)}
+      ${S.cars.map(c => { const f = freeOf(c), r = ridersOf(c), d = byId(c.owner);
+        const seats = Array.from({ length: f }, () => '<span class="slot">liber</span>').join("");
+        return zone(c.id, `Mașina lui ${esc(nameOf(c.owner))}`, `${[c.from_city, c.when_text].filter(Boolean).map(esc).join(", ") || "&nbsp;"}`, r,
+          (d ? `<span class="dnd driver">${avatar(d)}<span>${esc(shortName(d))} <i>șofer</i></span></span>` : ""), !f) .replace("</section>", `<div class="zone-foot">${seats}${f ? "" : '<span class="small muted">Plină</span>'}</div></section>`);
+      }).join("")}
+      ${zone("own", "Pe cont propriu", plural(own.length, "om", "oameni"), own)}
+    </div>
+    ${!S.cars.length ? '<div class="block empty"><b>Nicio mașină încă</b>Șoferii își adaugă mașina din Transport.</div>' : ""}`;
+}
+async function moveTo(pid, zoneId){
+  const p = byId(pid); if (!p) return;
+  if (zoneId === "pool" && !carOf(pid) && !ownWay(p)) return;
+  if (zoneId === "own" && ownWay(p) && !carOf(pid)) return;
+  if (zoneId !== "pool" && zoneId !== "own"){
+    const c = S.cars.find(x => x.id === zoneId); if (!c) return;
+    if (p.ride === c.id) return;
+    if (!freeOf(c)){ toast("Mașina e plină.", true); return; }
+  }
+  const patch = zoneId === "pool" ? { ride: null, own_transport: false } : zoneId === "own" ? { ride: null, own_transport: true } : { ride: zoneId, own_transport: false };
+  Object.assign(p, patch); S.pick = null; render();
+  const where = zoneId === "pool" ? "fără loc" : zoneId === "own" ? "pe cont propriu" : `la ${nameOf(S.cars.find(x => x.id === zoneId)?.owner)}`;
+  await upd(pid, patch, `${shortName(p)}: ${where}`);
+}
+/* pointer-based drag so it works with a finger as well as a mouse */
+(function(){
+  let drag = null;
+  const zoneAt = (x, y) => document.elementFromPoint(x, y)?.closest("[data-zone]");
+  document.addEventListener("pointerdown", e => {
+    const el = e.target.closest("[data-dnd]"); if (!el || e.button > 0) return;
+    drag = { id: el.dataset.dnd, el, x: e.clientX, y: e.clientY, on: false, ghost: null, over: null };
+  });
+  document.addEventListener("pointermove", e => {
+    if (!drag) return;
+    if (!drag.on){
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 8) return;
+      drag.on = true; S.pick = null;
+      const g = drag.el.cloneNode(true); g.classList.add("ghost"); document.body.appendChild(g); drag.ghost = g;
+      drag.el.classList.add("dragging"); document.body.classList.add("is-dragging");
+    }
+    e.preventDefault();
+    drag.ghost.style.transform = `translate(${e.clientX - 30}px, ${e.clientY - 22}px)`;
+    const z = zoneAt(e.clientX, e.clientY);
+    if (z !== drag.over){ drag.over?.classList.remove("over"); z?.classList.add("over"); drag.over = z; }
+    const edge = 70; if (e.clientY < edge) window.scrollBy(0, -12); else if (e.clientY > innerHeight - edge) window.scrollBy(0, 12);
+  }, { passive: false });
+  const end = e => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.on) return;
+    d.ghost?.remove(); d.el.classList.remove("dragging"); document.body.classList.remove("is-dragging"); d.over?.classList.remove("over");
+    const z = zoneAt(e.clientX, e.clientY);
+    window.__xccSuppressClick = Date.now();
+    if (z) moveTo(d.id, z.dataset.zone);
+  };
+  document.addEventListener("pointerup", end);
+  document.addEventListener("pointercancel", e => { if (drag?.on){ drag.ghost?.remove(); drag.el.classList.remove("dragging"); document.body.classList.remove("is-dragging"); drag.over?.classList.remove("over"); } drag = null; });
+})();
+
+/* ---------- team: shared gear + tents ---------- */
+const tentsOf = tid => S.tents.filter(t => t.team === tid);
+const tentOf = id => { const t = byId(id)?.tent; return S.tents.find(x => x.id === t) || null; };
+const inTent = tent => people().filter(p => p.tent === tent.id);
+const tentFree = tent => Math.max(0, (tent.places || 0) - inTent(tent).length);
+const tentItem = () => teamItems().find(i => /cort/i.test(i.name));
+function pageTeam(){
+  const my = teamOf(S.uid);
+  if (isAdmin() && !S.teamView && S.teams.length) S.teamView = my?.id || S.teams[0].id;
+  const tm = isAdmin() ? S.teams.find(t => t.id === S.teamView) || my : my;
+  const picker = isAdmin() && S.teams.length > 1 ? `<div class="chips" role="group" aria-label="Alege echipa">${S.teams.map(t => `<button class="chip" data-teamview="${esc(t.id)}" aria-pressed="${tm?.id === t.id}">${esc(t.name)}${my?.id === t.id ? " (a mea)" : ""}</button>`).join("")}</div>` : "";
+  if (!tm) return `<h1 class="h1">Echipa</h1><div class="block empty"><b>Încă nu ești într-o echipă</b>Clau te pune în echipă după lista de la 4M. Până atunci, bifează la Echipament ce ai tu.</div>`;
+  const mine = my?.id === tm.id, mem = membersOf(tm.id), away = noAccount(tm.id), total = mem.length + away.length;
+  const req = teamReq(), covered = req.filter(i => teamHas(tm.id, i)).length;
+  const tents = tentsOf(tm.id), places = tents.reduce((n, t) => n + (t.places || 0), 0), noTent = mem.filter(p => !tents.some(t => t.id === p.tent));
+  const tItem = tentItem();
+  const gearRow = it => {
+    const by = mem.filter(x => has(x, it.id)), me = mine && has(S.me, it.id), ok = by.length > 0;
+    const isTent = tItem && it.id === tItem.id;
+    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : "Nimeni n-a adăugat un cort încă") : ok ? `Aduce ${by.map(shortName).join(", ")}` : (isOpt(it) ? "Opțional" : "Nu aduce nimeni încă");
+    const good = teamHas(tm.id, it);
+    return `<div class="tg-row ${good ? "ok" : isOpt(it) ? "" : "miss"}">
+      <span class="tg-ic" aria-hidden="true">${good ? "✓" : isOpt(it) ? "–" : "!"}</span>
+      <span class="t"><b>${esc(it.name)}</b><span>${esc(sub)}</span></span>
+      ${mine && !isTent ? `<button class="btn ${me || ok ? "sec" : "ink"} sm" data-bring="${esc(it.id)}" aria-pressed="${me}">${me ? "Aduc eu ✓" : "Aduc eu"}</button>` : ""}
+      ${mine && isTent ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
+  };
+  const tentCard = t => {
+    const who = inTent(t), f = tentFree(t), own = byId(t.owner), meIn = S.me?.tent === t.id, canEdit = t.owner === S.uid || isAdmin();
+    return `<div class="block car tent">
+      <div class="block-head"><h3 class="h3">Cortul lui ${esc(shortName(own))}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plin</span>'}</div>
+      ${t.label ? `<p class="muted small">${esc(t.label)}</p>` : ""}
+      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}</button>`).join("")}${Array.from({ length: f }, () => '<span class="seat free">loc liber</span>').join("")}</div>
+      ${(mine && !meIn && f) || meIn || canEdit ? `<div class="row">${mine && !meIn && f ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn sec sm" data-tent-edit="${esc(t.id)}">Editează</button>` : ""}</div>` : ""}</div>`;
+  };
+  return `<h1 class="h1">${esc(tm.name)}</h1>${picker}
+    <div class="block stack">
+      <div class="team-people">${mem.map(x => `<button class="chip link" data-person="${esc(x.id)}">${esc(shortName(x))}</button>`).join("")}${away.map(r => `<span class="chip ghostchip" title="Încă fără cont">${esc(r.name)}</span>`).join("")}</div>
+      ${away.length ? `<p class="small muted">Cei cu gri nu și-au făcut încă cont în aplicație.</p>` : ""}
+      <div class="prog">${covered === req.length ? '<span class="done-badge">✓ Echipa are tot echipamentul comun</span>' : `<div class="big alarm">${req.length - covered}<small>${req.length - covered === 1 ? "lucru de echipă lipsește" : "lucruri de echipă lipsesc"} din ${req.length}</small></div>`}
+      <div class="bar ${covered === req.length ? "full" : ""}"><i style="width:${req.length ? covered / req.length * 100 : 0}%"></i></div></div>
+    </div>
+    <section class="section"><div class="group-title"><h2 class="h2">Echipament comun</h2><span class="count muted small">${covered}/${req.length}</span></div>
+      <p class="small muted">Se aduce o dată pentru toată echipa. ${mine ? "Apasă „Aduc eu” la ce iei tu, ca să nu vină toți cu același lucru." : ""}</p>
+      <div class="list">${teamItems().sort((a, b) => (isOpt(a) ? 1 : 0) - (isOpt(b) ? 1 : 0)).map(gearRow).join("")}</div></section>
+    <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni</span></div>
+      ${tents.length ? tents.map(tentCard).join("") : `<div class="block empty"><b>Niciun cort încă</b>${mine ? "Ai cort? Adaugă-l și ceilalți își aleg locul." : "Membrii echipei își adaugă corturile aici."}</div>`}
+      ${mine ? `<button class="btn ${tents.length ? "sec" : ""}" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
+      ${tents.length && noTent.length ? `<p class="small"><b>Fără loc la cort:</b> ${esc(noTent.map(shortName).join(", "))}${away.length ? ` <span class="muted">(plus ${away.length} fără cont)</span>` : ""}</p>` : ""}
+      ${places && places < total ? `<p class="small" style="color:var(--need)">Mai trebuie ${plural(total - places, "loc", "locuri")} la cort.</p>` : ""}
+    </section>`;
+}
+
 function pageTransport(){
+  if (S.board && isAdmin()) return pageBoard();
   const p = S.me, mine = carOf(S.uid), owned = S.cars.find(c => c.owner === S.uid);
   const free = S.cars.reduce((n, c) => n + freeOf(c), 0), waiting = noRide(), own = people().filter(ownWay);
   const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}</button>`;
@@ -807,7 +1015,7 @@ function pageTransport(){
       <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")}. Alege o mașină de mai jos.` : "Nu sunt locuri libere acum. Ești pe lista „Fără loc” și Clau te ajută să găsești unul."}</p>
       <div class="pair-btns"><button class="btn" data-car-new>Am mașină</button><button class="btn sec" data-ownway="1">Vin pe cont propriu</button></div></div>`;
   const others = S.cars.filter(c => c.id !== mine?.id);
-  return `<h1 class="h1">Transport</h1>${myBlock}
+  return `<h1 class="h1">Transport</h1>${placesBlock()}${myBlock}
     ${others.length ? `<section class="section"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
       ${others.map(c => { const f = freeOf(c), canJoin = !owned && f > 0, canEdit = isAdmin() && c.owner !== S.uid;
         return `<div class="block car">
@@ -819,7 +1027,7 @@ function pageTransport(){
     <section class="section"><div class="group-title"><h2 class="h2">Fără loc</h2><span class="count muted small">${waiting.length}</span></div>
       ${waiting.length ? `<div class="chips">${waiting.slice(0, 14).map(x => personBtn(x, x.id === S.uid ? "need" : "")).join("")}${waiting.length > 14 ? `<span class="chip">+${waiting.length - 14}</span>` : ""}</div>` : '<p class="muted">Toată lumea are loc.</p>'}
       ${own.length ? `<p class="small muted">Pe cont propriu: ${esc(own.map(shortName).join(", "))}</p>` : ""}
-      ${isAdmin() && people().length && S.cars.length ? `<button class="btn sec sm" data-assign style="align-self:flex-start">Repartizează oamenii</button>` : ""}</section>`;
+      ${isAdmin() && people().length && S.cars.length ? `<button class="btn ink" data-board="1">Organizează mașinile</button>` : ""}</section>`;
 }
 
 function groupList(){ return people().filter(p => S.groupTeam === "all" || (S.groupTeam === "none" ? !teamOf(p.id) : p.team === S.groupTeam)); }
@@ -894,6 +1102,8 @@ function summaryText(){
   if (S.teams.length){ L.push("", "ECHIPE");
     for (const t of S.teams){ const m = membersOf(t.id), g = teamGaps(t.id); L.push(`${t.name}: ${m.map(p => p.name).join(", ") || "—"}${g.length ? ` (lipsesc: ${g.map(i => i.name).join(", ")})` : ""}`); }
     const nt = people().filter(p => !teamOf(p.id)); if (nt.length) L.push(`Fără echipă: ${nt.map(p => p.name).join(", ")}`); }
+  if (S.cfg.event_name) L.push(`Locație: ${S.cfg.event_name}${S.cfg.event_maps ? ` ${S.cfg.event_maps}` : ""}`);
+  if (S.cfg.food_name) L.push(`Restaurant: ${S.cfg.food_name}${S.cfg.food_maps ? ` ${S.cfg.food_maps}` : ""}`);
   L.push("", "MAȘINI");
   for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"}${c.from_city ? `, din ${c.from_city}` : ""}${c.when_text ? `, ${c.when_text}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
   if (!S.cars.length) L.push("—");
@@ -935,10 +1145,12 @@ function pageAdmin(){
       ${rej.length ? `<section class="section"><h2 class="h3">Respinși sau scoși</h2><div class="list">${rej.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-approve="${esc(p.id)}">Aprobă totuși</button></div>`).join("")}</div></section>` : ""}`;
   }
   if (t === "teams"){
-    body = `<p class="muted">După ce primim listele de la 4M, creează echipele și alege echipa fiecăruia mai jos.</p>
+    body = `<p class="muted">Cine își face cont și are numele pe lista de la 4M intră singur în echipa lui când îl aprobi. Restul îi pui mai jos.</p>
       ${S.teams.map(tm => { const mem = membersOf(tm.id), gaps = teamGaps(tm.id);
         return `<div class="block stack"><div class="block-head"><h2 class="h3">${esc(tm.name)} · ${mem.length}</h2><button class="btn sec sm" data-team-edit="${esc(tm.id)}">Redenumește</button></div>
-          ${gaps.length ? `<p class="small" style="color:var(--need)">Lipsesc: ${esc(gaps.map(i => i.name).join(", "))}</p>` : mem.length ? '<span class="chip ready" style="align-self:flex-start">Are tot echipamentul comun</span>' : ""}</div>`; }).join("")}
+          ${mem.length ? `<p class="small">${esc(mem.map(x => x.name).join(", "))}</p>` : ""}
+          ${noAccount(tm.id).length ? `<p class="small muted">Încă fără cont: ${esc(noAccount(tm.id).map(r => r.name).join(", "))}</p>` : ""}
+          ${gaps.length ? `<p class="small" style="color:var(--need)">Echipament comun lipsă: ${esc(gaps.map(i => i.name).join(", "))}</p>` : mem.length ? '<span class="chip ready" style="align-self:flex-start">Are tot echipamentul comun</span>' : ""}</div>`; }).join("")}
       <form class="row" id="addTeam"><input class="input" id="teamNameNew" placeholder="ex. Echipa 3" maxlength="40" style="flex:1;min-width:0" aria-label="Numele echipei noi"><button class="btn" type="submit">Creează</button></form>
       ${S.teams.length ? `<section class="section"><h2 class="h2">Cine în ce echipă</h2><div class="list">${[...people()].sort((a, b) => (teamOf(a.id) ? 1 : 0) - (teamOf(b.id) ? 1 : 0)).map(p => `<div class="person" style="cursor:default;flex-wrap:wrap">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span>
           <span class="teamchips">${S.teams.map((tm, i) => `<button data-setteam="${esc(p.id)}" data-tid="${esc(tm.id)}" aria-pressed="${p.team === tm.id}" aria-label="${esc(tm.name)}">${i + 1}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}" aria-label="Fără echipă">–</button></span></div>`).join("")}</div>
@@ -962,6 +1174,12 @@ function pageAdmin(){
         ${S.cfg.hero_url ? `<img class="thumb" src="${esc(S.cfg.hero_url)}" alt="Poza actuală">` : '<p class="muted small">Acum e ilustrația implicită. Pune o poză de-a voastră din aventură.</p>'}
         <div class="row"><label class="btn sec sm" for="heroFile">Alege o poză</label><input type="file" id="heroFile" accept="image/*" hidden>
           ${S.cfg.hero_url ? '<button class="btn ghost sm" data-hero-clear>Revino la ilustrație</button>' : ""}</div></div>
+      <form class="block stack" id="placesForm"><h2 class="h3">Locații</h2><p class="muted small">Apar la Transport, cu buton spre hartă. Linkul e opțional: îl iei din Google Maps › Distribuie › Copiază linkul.</p>
+        <label class="field"><span>Locul evenimentului</span><input class="input" id="ev-n" value="${esc(S.cfg.event_name || "")}" maxlength="80" placeholder="ex. Cabana Padiș"></label>
+        <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="ev-u" value="${esc(S.cfg.event_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
+        <label class="field"><span>Restaurant</span><input class="input" id="fd-n" value="${esc(S.cfg.food_name || "")}" maxlength="80" placeholder="ex. Restaurant …, Beiuș"></label>
+        <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="fd-u" value="${esc(S.cfg.food_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
+        <button class="btn sec" type="submit">Salvează locațiile</button></form>
       <form class="block stack" id="dateForm"><h2 class="h3">Data plecării</h2><p class="muted small">Apare pe Acasă, cu numărătoarea inversă și intervalul de 4 zile.</p>
         <div class="row"><input class="input" type="date" id="startDate" value="${esc(S.cfg.start_date || "")}" style="flex:1;min-width:0"><button class="btn sec" type="submit">Salvează</button></div></form>
       <div class="block stack"><h2 class="h3">Golește toate bifele</h2><p class="muted small">Pentru o ediție nouă. Șterge bifele, notele și cererile tuturor. Oamenii, mașinile și lista rămân.</p>
@@ -1033,6 +1251,14 @@ function sheetHtml(){
       <button class="btn" type="submit">${c.id ? "Salvează" : "Adaugă mașina"}</button>
       ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>${riders.length ? `<p class="small muted">Dacă o ștergi, ${esc(riders.map(shortName).join(", "))} ${riders.length === 1 ? "rămâne" : "rămân"} fără loc.</p>` : ""}` : ""}</form>`;
   }
+  if (kind === "tent"){
+    const t = data || { places: 2 }, n = t.id ? inTent(t).length : 1;
+    return head(t.id ? "Cortul" : "Am cort", t.id ? "" : "Ceilalți din echipă își aleg loc în el.") + `<form class="stack" id="tentForm">
+      <div class="field"><span>Câte persoane încap (cu tine)</span><div class="stepper"><button type="button" data-tstep="-1" aria-label="Mai puține">−</button><output id="tf-places" data-min="${Math.max(1, n)}">${Math.max(t.places || 2, n)}</output><button type="button" data-tstep="1" aria-label="Mai multe">+</button></div></div>
+      <label class="field"><span>Notă (opțional)</span><input class="input" id="tf-label" value="${esc(t.label || "")}" maxlength="40" placeholder="ex. cort de 3, fără prelată"></label>
+      <button class="btn" type="submit">${t.id ? "Salvează" : "Adaugă cortul"}</button>
+      ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">Șterge cortul</button>` : ""}</form>`;
+  }
   if (kind === "assign"){
     const riders = people().filter(p => !isDriver(p.id));
     return head("Repartizează", "Alege mașina fiecăruia. Șoferii nu apar aici.") + `<div>${[...riders].sort((a, b) => (carOf(a.id) ? 1 : 0) - (carOf(b.id) ? 1 : 0)).map(p => `<div class="check-row" style="cursor:default"><span>${esc(p.name)}</span>
@@ -1093,12 +1319,12 @@ function renderSheet(first){
 }
 
 /* ---------- render ---------- */
-function navBadges(){ const m = missingOf(S.me).length; return { gear: m ? (m > 9 ? "9+" : m) : "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "!", admin: pending().length || "" }; }
+function navBadges(){ const m = missingOf(S.me).length; const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { team: tg || "", gear: m ? (m > 9 ? "9+" : m) : "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "!", admin: pending().length || "" }; }
 function renderChrome(inApp){
   document.body.classList.toggle("noapp", !inApp);
   if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; $("avatarBtn").innerHTML = ""; return; }
   const b = navBadges();
-  const items = [["home", "Acasă", "band"], ["gear", "Echipament", "dot"], ["transport", "Transport", "tri"], ["group", "Grupul", "cross"]];
+  const items = [["home", "Acasă", "band"], ["gear", "Echipament", "dot"], ["team", "Echipa", "vband"], ["transport", "Transport", "tri"], ["group", "Grupul", "cross"]];
   if (isAdmin()) items.push(["admin", "Admin", "key"]);
   $("tabbar").innerHTML = items.map(([k, l, m]) => `<button class="tab" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}><span class="ic">${marker(m)}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</span>${l}</button>`).join("");
   $("rail").innerHTML = `<a class="brand" href="#" data-go="home">${marker("band")}XCC</a>`
@@ -1119,7 +1345,7 @@ function render(){
   else if (!approved()) html = pagePending();
   else {
     if (S.page === "admin" && !isAdmin()) S.page = "home";
-    html = { home: pageHome, gear: pageGear, transport: pageTransport, group: pageGroup, admin: pageAdmin }[S.page]();
+    html = { home: pageHome, gear: pageGear, team: pageTeam, transport: pageTransport, group: pageGroup, admin: pageAdmin }[S.page]();
   }
   // don't wipe a field the person is typing in
   const a = document.activeElement, typing = a && $("page").contains(a) && (a.tagName === "INPUT" || a.tagName === "TEXTAREA") ? a.id : null;
@@ -1145,6 +1371,13 @@ function setItem(itemId, patch, quiet){
   S.me.items = { ...(S.me.items || {}), [itemId]: val };
   if (!quiet) render();
   return write(() => sb.rpc("set_item", { item_id: itemId, val }));
+}
+async function approve(p, quiet){
+  if (!p) return false;
+  const m = !p.team && rosterMatch(p), team = m && S.teams.find(t => t.id === m.team);
+  const ok = await upd(p.id, { status: "approved", ...(team ? { team: team.id } : {}) }, quiet ? "" : `${firstName(p.name)} e în grup${team ? `, în ${team.name}` : ""}`);
+  if (ok && m && m.profile !== p.id) await sb.from("roster").update({ profile: p.id }).eq("id", m.id);
+  return !!ok;
 }
 const upd = (id, v, msg) => write(() => sb.from("profiles").update(v).eq("id", id), msg);
 const setRide = (uid, carId, msg) => write(() => sb.from("profiles").update({ ride: carId || null }).eq("id", uid), msg);
@@ -1212,12 +1445,22 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-ownway]"))){ const on = b.dataset.ownway === "1"; await busy(b, () => upd(S.uid, { own_transport: on, ...(on ? { ride: null } : {}) }, on ? "Notat: vii pe cont propriu" : "Gata, alege un loc")); return; }
   if ((b = q("[data-unseat]"))){ await setRide(b.dataset.unseat, null, `${nameOf(b.dataset.unseat)} nu mai e în mașină`); return; }
   if ((b = q("[data-car-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
-  if (q("[data-assign]")){ openSheet("assign"); return; }
+  if ((b = q("[data-teamview]"))){ S.teamView = b.dataset.teamview; render(); return; }
+  if ((b = q("[data-bring]"))){ const id = b.dataset.bring, on = !has(S.me, id); setItem(id, { ok: on }); toast(on ? "Notat: aduci tu" : "Nu mai aduci"); return; }
+  if (q("[data-tent-new]")){ if (S.tents.some(t => t.owner === S.uid)){ toast("Ai deja un cort. Îl poți edita.", true); return; } openSheet("tent", null); return; }
+  if ((b = q("[data-tent-edit]"))){ openSheet("tent", { ...S.tents.find(t => t.id === b.dataset.tentEdit) }); return; }
+  if ((b = q("[data-tstep]"))){ const o = $("tf-places"); o.textContent = Math.max(Number(o.dataset.min) || 1, Math.min(8, Number(o.textContent) + Number(b.dataset.tstep))); return; }
+  if ((b = q("[data-tent-join]"))){ const t = S.tents.find(x => x.id === b.dataset.tentJoin); if (!t || !tentFree(t)){ toast("Cortul e plin.", true); return; } S.me.tent = t.id; render(); await upd(S.uid, { tent: t.id }, `Dormi în cortul lui ${nameOf(t.owner)}`); return; }
+  if (q("[data-tent-leave]")){ S.me.tent = null; render(); await upd(S.uid, { tent: null }, "Ai ieșit din cort"); return; }
+  if ((b = q("[data-tent-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("tents").delete().eq("id", b.dataset.tentDel), "Cortul a fost șters")) closeSheet(); return; }
+  if ((b = q("[data-board]"))){ S.board = b.dataset.board === "1"; S.pick = null; render(); window.scrollTo({ top: 0 }); return; }
+  if ((b = q("[data-dnd]"))){ if (Date.now() - (window.__xccSuppressClick || 0) < 300) return; S.pick = S.pick === b.dataset.dnd ? null : b.dataset.dnd; render(); return; }
+  if ((b = q("[data-zone]")) && S.pick){ moveTo(S.pick, b.dataset.zone); return; }
   // admin
   if ((b = q("[data-copy]"))){ await copyText(b.dataset.copy, "Mesaj copiat"); return; }
   if (q("[data-copy-summary]")){ await copyText(summaryText(), "Rezumat copiat"); return; }
-  if ((b = q("[data-approve]"))){ const p = byId(b.dataset.approve); await busy(b, () => upd(b.dataset.approve, { status: "approved" }, `${firstName(p?.name)} e în grup`)); return; }
-  if ((b = q("[data-approve-all]"))){ if (!arm(b, `Apasă încă o dată: aprobi ${pending().length}`)) return; await busy(b, async () => { let ok = 0; for (const p of pending()){ const r = await sb.from("profiles").update({ status: "approved" }).eq("id", p.id); if (!r.error) ok++; } toast(plural(ok, "om aprobat", "oameni aprobați")); scheduleReload(100); }); return; }
+  if ((b = q("[data-approve]"))){ const p = byId(b.dataset.approve); await busy(b, () => approve(p)); return; }
+  if ((b = q("[data-approve-all]"))){ if (!arm(b, `Apasă încă o dată: aprobi ${pending().length}`)) return; await busy(b, async () => { let ok = 0; for (const p of pending()){ if (await approve(p, true)) ok++; } toast(plural(ok, "om aprobat", "oameni aprobați")); scheduleReload(100); }); return; }
   if ((b = q("[data-reject]"))){
     const p = byId(b.dataset.reject); if (!arm(b, "Apasă încă o dată ca să confirmi")) return;
     const car = S.cars.find(c => c.owner === p?.id);
@@ -1305,6 +1548,16 @@ document.addEventListener("submit", async e => {
     }
     if (id === "addTeam"){ const n = v("teamNameNew"); if (n && await write(() => sb.from("teams").insert({ name: n }), `${n} a fost creată`)) $("teamNameNew").value = ""; }
     if (id === "teamForm"){ const n = v("tn"); if (n && await write(() => sb.from("teams").update({ name: n }).eq("id", S.sheet.data), "Salvat")) closeSheet(); }
+    if (id === "tentForm"){
+      const t = S.sheet?.data, data = { places: Math.max(1, Math.min(8, Number($("tf-places").textContent) || 2)), label: v("tf-label") };
+      if (t?.id){ if (await write(() => sb.from("tents").update(data).eq("id", t.id), "Cortul a fost salvat")) closeSheet(); }
+      else {
+        const team = teamOf(S.uid); if (!team){ toast("Nu ești într-o echipă.", true); return; }
+        const r = await write(() => sb.from("tents").insert({ ...data, team: team.id, owner: S.uid }).select().single());
+        if (r?.data){ await upd(S.uid, { tent: r.data.id }, "Cortul tău e pe listă"); const ti = tentItem(); if (ti && !has(S.me, ti.id)) setItem(ti.id, { ok: true }, true); closeSheet(); }
+      }
+    }
+    if (id === "placesForm"){ await write(() => sb.from("config").update({ event_name: v("ev-n"), event_maps: v("ev-u"), food_name: v("fd-n"), food_maps: v("fd-u") }).eq("id", 1), "Locațiile au fost salvate"); }
     if (id === "dateForm"){ await write(() => sb.from("config").update({ start_date: $("startDate").value || null }).eq("id", 1), "Data a fost salvată"); }
     if (id === "itemForm"){
       const itId = e.target.dataset.id, name = v("in"), cat = $("ic").value;
