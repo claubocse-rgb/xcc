@@ -957,7 +957,7 @@ function pageTeam(){
   const gearRow = it => {
     const by = mem.filter(x => has(x, it.id)), me = mine && has(S.me, it.id), ok = by.length > 0;
     const isTent = tItem && it.id === tItem.id;
-    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : "Nimeni n-a adăugat un cort încă") : ok ? `Aduce ${by.map(shortName).join(", ")}` : (isOpt(it) ? "Opțional" : "Nu aduce nimeni încă");
+    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : ok ? `Aduce ${by.map(shortName).join(", ")}. Adăugați corturile mai jos, ca să vă împărțiți locurile.` : "Nimeni n-a adăugat un cort încă") : ok ? `Aduce ${by.map(shortName).join(", ")}` : (isOpt(it) ? "Opțional" : "Nu aduce nimeni încă");
     const good = teamHas(tm.id, it);
     return `<div class="tg-row ${good ? "ok" : isOpt(it) ? "" : "miss"}">
       <span class="tg-ic" aria-hidden="true">${good ? "✓" : isOpt(it) ? "–" : "!"}</span>
