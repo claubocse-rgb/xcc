@@ -405,6 +405,11 @@ body.is-dragging{cursor:grabbing;user-select:none}
 .tg-row.ok .tg-ic{background:var(--ready);color:#fff}
 .tg-row.miss .tg-ic{background:var(--need);color:#fff}
 .tg-row.miss .t span{color:var(--need)}
+.seat.free.pick{cursor:pointer;color:var(--text);border-color:var(--text);font-weight:600;background:transparent;font:inherit;font-size:14px}
+.seat.free.pick:hover{background:var(--line)}
+.step .st .mk{width:20px;height:20px}
+a.step.doc{text-decoration:none;color:inherit;border:2px solid var(--text)}
+.st.ink-st{background:var(--text);color:var(--surface);font-weight:800}
 
 </style>
 </head>
@@ -549,7 +554,7 @@ async function write(fn, okMsg){
   } catch(e){
     console.error(e);
     const m = e?.message || "";
-    toast(/plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator/i.test(m) ? m
+    toast(/Mașina e plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator|Cortul|cort\.|echip|Persoana|Doar cel/.test(m) ? m
       : /fetch|network|Failed/i.test(m) ? "Nu s-a salvat: nu ai internet." : "Nu s-a salvat. Încearcă din nou.", true);
     lastSnap = ""; scheduleReload(400);
     return false;
@@ -785,6 +790,7 @@ function pageHome(){
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
     ${nOffer ? `<button class="block step" data-go="group" data-tab="give"><span class="st help">${nOffer}</span><span class="t"><b>Vezi ce au alții de dat</b><span>${plural(nOffer, "lucru pus", "lucruri puse")} la dispoziție de grup</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}
+    ${S.cfg.doc_url ? `<a class="block step doc" href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener" download><span class="st ink-st">↓</span><span class="t"><b>${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}</b><span>Descarc-o, printeaz-o, completeaz-o și semneaz-o. O ai la tine la XCC.</span></span><span class="chev" aria-hidden="true">›</span></a>` : ""}
     <div class="warnline">${WARN}<span>Fără echipamentul obligatoriu nu poți participa. Organizatorul nu asigură nimic din listă.</span></div>
     ${canHelp.length ? `<div class="section"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 5).map(i => {
       const who = seekersOf(i.id, S.uid);
@@ -845,6 +851,7 @@ function pageGear(){
   const optVis = filt(opt);
   const optDone = opt.filter(i => has(p, i.id) || st(p, i.id).skip).length;
   return `<h1 class="h1">Echipament</h1>${seg}
+    <button class="block step" data-go="team"><span class="st help">${marker("vband")}</span><span class="t"><b>Echipamentul de echipă e la „Echipa”</b><span>Corturi, busolă, brichetă, fierăstrău, arzător: acolo apeși „Aduc eu”.</span></span><span class="chev" aria-hidden="true">›</span></button>
     <div class="block prog">
       ${missN === 0 && req.length ? `<span class="done-badge">✓ Ai tot ce e obligatoriu</span>` : `<div class="big alarm">${missN}<small>${missN === 1 ? "lipsește" : "lipsesc"} · ${haveReq} din ${req.length} bifate</small></div>`}
       <div class="bar ${missN === 0 ? "full" : ""}"><i style="width:${req.length ? haveReq / req.length * 100 : 0}%"></i></div>
@@ -963,15 +970,16 @@ function pageTeam(){
       <span class="tg-ic" aria-hidden="true">${good ? "✓" : isOpt(it) ? "–" : "!"}</span>
       <span class="t"><b>${esc(it.name)}</b><span>${esc(sub)}</span></span>
       ${mine && !isTent ? `<button class="btn ${me || ok ? "sec" : "ink"} sm" data-bring="${esc(it.id)}" aria-pressed="${me}">${me ? "Aduc eu ✓" : "Aduc eu"}</button>` : ""}
-      ${mine && isTent ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
+      ${mine && isTent && !S.tents.some(t => t.owner === S.uid) ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
   };
   const tentCard = t => {
     const who = inTent(t), f = tentFree(t), own = byId(t.owner), meIn = S.me?.tent === t.id, canEdit = t.owner === S.uid || isAdmin();
     return `<div class="block car tent">
       <div class="block-head"><h3 class="h3">Cortul lui ${esc(shortName(own))}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plin</span>'}</div>
+      ${t.auto ? `<p class="small">${t.owner === S.uid ? "<b>Câte persoane încap în cortul tău?</b> Am pus 2 până confirmi." : `Locuri estimate: 2, până confirmă ${esc(shortName(own))}.`}</p>` : ""}
       ${t.label ? `<p class="muted small">${esc(t.label)}</p>` : ""}
-      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}</button>`).join("")}${Array.from({ length: f }, () => '<span class="seat free">loc liber</span>').join("")}</div>
-      ${(mine && !meIn && f) || meIn || canEdit ? `<div class="row">${mine && !meIn && f ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn sec sm" data-tent-edit="${esc(t.id)}">Editează</button>` : ""}</div>` : ""}</div>`;
+      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}</button>`).join("")}${Array.from({ length: f }, () => canEdit ? `<button class="seat free pick" data-tent-slot="${esc(t.id)}">+ loc liber</button>` : mine && !S.me?.tent ? `<button class="seat free pick" data-tent-join="${esc(t.id)}">+ loc liber</button>` : '<span class="seat free">loc liber</span>').join("")}</div>
+      ${(mine && !meIn && f && !S.tents.some(x => x.owner === S.uid)) || (meIn && t.owner !== S.uid) || canEdit ? `<div class="row">${mine && !meIn && f && !S.tents.some(x => x.owner === S.uid) ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn ${t.auto && t.owner === S.uid ? "ink" : "sec"} sm" data-tent-edit="${esc(t.id)}">${t.auto && t.owner === S.uid ? "Spune câte locuri are" : "Editează"}</button>` : ""}</div>` : ""}</div>`;
   };
   return `<h1 class="h1">${esc(tm.name)}</h1>${picker}
     <div class="block stack">
@@ -985,7 +993,7 @@ function pageTeam(){
       <div class="list">${teamItems().sort((a, b) => (isOpt(a) ? 1 : 0) - (isOpt(b) ? 1 : 0)).map(gearRow).join("")}</div></section>
     <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni</span></div>
       ${tents.length ? tents.map(tentCard).join("") : `<div class="block empty"><b>Niciun cort încă</b>${mine ? "Ai cort? Adaugă-l și ceilalți își aleg locul." : "Membrii echipei își adaugă corturile aici."}</div>`}
-      ${mine ? `<button class="btn ${tents.length ? "sec" : ""}" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
+      ${mine && !S.tents.some(t => t.owner === S.uid) ? `<button class="btn ${tents.length ? "sec" : ""}" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
       ${tents.length && noTent.length ? `<p class="small"><b>Fără loc la cort:</b> ${esc(noTent.map(shortName).join(", "))}${away.length ? ` <span class="muted">(plus ${away.length} fără cont)</span>` : ""}</p>` : ""}
       ${places && places < total ? `<p class="small" style="color:var(--need)">Mai trebuie ${plural(total - places, "loc", "locuri")} la cort.</p>` : ""}
     </section>`;
@@ -1174,6 +1182,11 @@ function pageAdmin(){
         ${S.cfg.hero_url ? `<img class="thumb" src="${esc(S.cfg.hero_url)}" alt="Poza actuală">` : '<p class="muted small">Acum e ilustrația implicită. Pune o poză de-a voastră din aventură.</p>'}
         <div class="row"><label class="btn sec sm" for="heroFile">Alege o poză</label><input type="file" id="heroFile" accept="image/*" hidden>
           ${S.cfg.hero_url ? '<button class="btn ghost sm" data-hero-clear>Revino la ilustrație</button>' : ""}</div></div>
+      <div class="block stack"><h2 class="h3">Document de descărcat</h2><p class="muted small">Apare pe Acasă cu buton de descărcare (ex. declarația pe propria răspundere). PDF, Word sau poză, maxim 10 MB.</p>
+        ${S.cfg.doc_url ? `<p class="small">Acum: <a href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener">${esc(S.cfg.doc_name || "document")}</a></p>` : ""}
+        <label class="field"><span>Titlul de pe Acasă</span><input class="input" id="docName" value="${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}" maxlength="80"></label>
+        <div class="row"><label class="btn sec sm" for="docFile">${S.cfg.doc_url ? "Înlocuiește fișierul" : "Alege fișierul"}</label><input type="file" id="docFile" accept=".pdf,.doc,.docx,image/*" hidden>
+          ${S.cfg.doc_url ? '<button class="btn ghost sm" data-doc-clear>Scoate documentul</button>' : ""}</div></div>
       <form class="block stack" id="placesForm"><h2 class="h3">Locații</h2><p class="muted small">Apar la Transport, cu buton spre hartă. Linkul e opțional: îl iei din Google Maps › Distribuie › Copiază linkul.</p>
         <label class="field"><span>Locul evenimentului</span><input class="input" id="ev-n" value="${esc(S.cfg.event_name || "")}" maxlength="80" placeholder="ex. Cabana Padiș"></label>
         <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="ev-u" value="${esc(S.cfg.event_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
@@ -1257,7 +1270,15 @@ function sheetHtml(){
       <div class="field"><span>Câte persoane încap (cu tine)</span><div class="stepper"><button type="button" data-tstep="-1" aria-label="Mai puține">−</button><output id="tf-places" data-min="${Math.max(1, n)}">${Math.max(t.places || 2, n)}</output><button type="button" data-tstep="1" aria-label="Mai multe">+</button></div></div>
       <label class="field"><span>Notă (opțional)</span><input class="input" id="tf-label" value="${esc(t.label || "")}" maxlength="40" placeholder="ex. cort de 3, fără prelată"></label>
       <button class="btn" type="submit">${t.id ? "Salvează" : "Adaugă cortul"}</button>
-      ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">Șterge cortul</button>` : ""}</form>`;
+      ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">Nu mai aduc cort</button><p class="small muted">Se scoate și bifa „Corturi” de la echipament.</p>` : ""}</form>`;
+  }
+  if (kind === "tentpick"){
+    const t = S.tents.find(x => x.id === data); if (!t) return head("Cort");
+    const free = membersOf(t.team).filter(p => !S.tents.some(x => x.id === p.tent)), inside = inTent(t).filter(p => p.id !== t.owner), f = tentFree(t);
+    return head(`Cortul lui ${esc(nameOf(t.owner))}`, f ? `Alege pe cine iei. ${plural(f, "loc liber", "locuri libere")}.` : "Cortul e plin.") + `
+      ${f ? (free.length ? `<div class="list">${free.map(p => `<button class="person" data-tent-put="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : '<div class="empty">Toți din echipă au deja loc la un cort.</div>') : ""}
+      ${inside.length ? `<section class="section"><h3 class="h3">În cort</h3><div class="list">${inside.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-tent-out="${esc(p.id)}">Scoate</button></div>`).join("")}</div></section>` : ""}
+      <button class="btn block-w" data-close style="margin-top:12px">Gata</button>`;
   }
   if (kind === "assign"){
     const riders = people().filter(p => !isDriver(p.id));
@@ -1448,11 +1469,20 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-teamview]"))){ S.teamView = b.dataset.teamview; render(); return; }
   if ((b = q("[data-bring]"))){ const id = b.dataset.bring, on = !has(S.me, id); setItem(id, { ok: on }); toast(on ? "Notat: aduci tu" : "Nu mai aduci"); return; }
   if (q("[data-tent-new]")){ if (S.tents.some(t => t.owner === S.uid)){ toast("Ai deja un cort. Îl poți edita.", true); return; } openSheet("tent", null); return; }
+  if ((b = q("[data-tent-slot]"))){ openSheet("tentpick", b.dataset.tentSlot); return; }
+  if ((b = q("[data-tent-put]")) || (b = q("[data-tent-out]"))){
+    const put = !!b.dataset.tentPut, pid = b.dataset.tentPut || b.dataset.tentOut, tid = S.sheet?.data, p = byId(pid);
+    if (p) p.tent = put ? tid : null; renderSheet(false); render();
+    await write(() => sb.rpc("tent_place", { tent_id: tid, person: pid, put }), put ? `${shortName(p)} doarme în cortul ăsta` : `${shortName(p)} a ieșit din cort`);
+    if (put && S.sheet && !tentFree(S.tents.find(x => x.id === tid) || {})) closeSheet();
+    return;
+  }
   if ((b = q("[data-tent-edit]"))){ openSheet("tent", { ...S.tents.find(t => t.id === b.dataset.tentEdit) }); return; }
   if ((b = q("[data-tstep]"))){ const o = $("tf-places"); o.textContent = Math.max(Number(o.dataset.min) || 1, Math.min(8, Number(o.textContent) + Number(b.dataset.tstep))); return; }
   if ((b = q("[data-tent-join]"))){ const t = S.tents.find(x => x.id === b.dataset.tentJoin); if (!t || !tentFree(t)){ toast("Cortul e plin.", true); return; } S.me.tent = t.id; render(); await upd(S.uid, { tent: t.id }, `Dormi în cortul lui ${nameOf(t.owner)}`); return; }
   if (q("[data-tent-leave]")){ S.me.tent = null; render(); await upd(S.uid, { tent: null }, "Ai ieșit din cort"); return; }
-  if ((b = q("[data-tent-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("tents").delete().eq("id", b.dataset.tentDel), "Cortul a fost șters")) closeSheet(); return; }
+  if ((b = q("[data-tent-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; const tt = S.tents.find(x => x.id === b.dataset.tentDel), ti = tentItem();
+    if (await write(() => sb.from("tents").delete().eq("id", b.dataset.tentDel), "Cortul a fost șters")){ if (tt?.owner === S.uid && ti && has(S.me, ti.id)) setItem(ti.id, { ok: false }, true); closeSheet(); } return; }
   if ((b = q("[data-board]"))){ S.board = b.dataset.board === "1"; S.pick = null; render(); window.scrollTo({ top: 0 }); return; }
   if ((b = q("[data-dnd]"))){ if (Date.now() - (window.__xccSuppressClick || 0) < 300) return; S.pick = S.pick === b.dataset.dnd ? null : b.dataset.dnd; render(); return; }
   if ((b = q("[data-zone]")) && S.pick){ moveTo(S.pick, b.dataset.zone); return; }
@@ -1476,6 +1506,7 @@ document.addEventListener("click", async e => {
   if (q("[data-item-new]")){ openSheet("item-edit", null); return; }
   if ((b = q("[data-item-edit]"))){ openSheet("item-edit", b.dataset.itemEdit); return; }
   if ((b = q("[data-item-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("items").delete().eq("id", b.dataset.itemDel), "Obiectul a fost șters")) closeSheet(); return; }
+  if ((b = q("[data-doc-clear]"))){ if (!arm(b)) return; await write(() => sb.from("config").update({ doc_url: "" }).eq("id", 1), "Documentul a fost scos"); return; }
   if ((b = q("[data-hero-clear]"))){ if (!arm(b)) return; await write(() => sb.from("config").update({ hero_url: "" }).eq("id", 1), "Ilustrația e înapoi"); return; }
   if ((b = q("[data-reset-all]"))){
     if (!arm(b, "Sigur? Apasă încă o dată: se golesc bifele tuturor")) return;
@@ -1492,6 +1523,18 @@ document.addEventListener("focusout", e => { if (e.target.id === "noteText") sav
 document.addEventListener("change", async e => {
   const t = e.target;
   if (t.dataset.assignSel !== undefined){ await setRide(t.dataset.assignSel, t.value, "Salvat"); return; }
+  if (t.id === "docFile" && t.files?.[0]){
+    const f = t.files[0];
+    if (f.size > 10e6){ toast("Fișierul e prea mare. Maxim 10 MB.", true); return; }
+    toast("Se încarcă documentul…");
+    const ext = (f.name.split(".").pop() || "pdf").toLowerCase().replace(/[^a-z0-9]/g, "") || "pdf";
+    const path = `docs/declaratie-${Date.now()}.${ext}`;
+    const up = await sb.storage.from("media").upload(path, f, { contentType: f.type || "application/octet-stream", upsert: false });
+    if (up.error){ toast("Documentul nu s-a încărcat. Încearcă din nou.", true); return; }
+    const url = sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+    await write(() => sb.from("config").update({ doc_url: url, doc_name: ($("docName")?.value || "").trim() || "Declarația pe propria răspundere" }).eq("id", 1), "Documentul e pe Acasă");
+    return;
+  }
   if (t.id === "heroFile" && t.files?.[0]){
     const f = t.files[0];
     if (f.size > 8e6){ toast("Poza e prea mare. Maxim 8 MB.", true); return; }
@@ -1549,7 +1592,7 @@ document.addEventListener("submit", async e => {
     if (id === "addTeam"){ const n = v("teamNameNew"); if (n && await write(() => sb.from("teams").insert({ name: n }), `${n} a fost creată`)) $("teamNameNew").value = ""; }
     if (id === "teamForm"){ const n = v("tn"); if (n && await write(() => sb.from("teams").update({ name: n }).eq("id", S.sheet.data), "Salvat")) closeSheet(); }
     if (id === "tentForm"){
-      const t = S.sheet?.data, data = { places: Math.max(1, Math.min(8, Number($("tf-places").textContent) || 2)), label: v("tf-label") };
+      const t = S.sheet?.data, data = { places: Math.max(1, Math.min(8, Number($("tf-places").textContent) || 2)), label: v("tf-label"), auto: false };
       if (t?.id){ if (await write(() => sb.from("tents").update(data).eq("id", t.id), "Cortul a fost salvat")) closeSheet(); }
       else {
         const team = teamOf(S.uid); if (!team){ toast("Nu ești într-o echipă.", true); return; }

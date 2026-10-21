@@ -263,3 +263,9 @@ do $$ begin
   begin alter publication supabase_realtime add table public.roster; exception when others then null; end;
   begin alter publication supabase_realtime add table public.tents; exception when others then null; end;
 end $$;
+
+-- migration (v5): tent sync with the "Corturi" item, tent placement, downloadable document
+alter table public.tents add column if not exists auto boolean not null default false;
+alter table public.config add column if not exists doc_url text not null default '' check (char_length(doc_url) <= 500);
+alter table public.config add column if not exists doc_name text not null default '' check (char_length(doc_name) <= 80);
+-- functions public.sync_tent() (trigger on profiles) and public.tent_place(uuid, uuid, boolean): see Supabase SQL editor history
