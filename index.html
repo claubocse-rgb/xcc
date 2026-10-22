@@ -417,6 +417,109 @@ a.step.doc{text-decoration:none;color:inherit;border:2px solid var(--text)}
 .qty button:hover{background:var(--line)}
 .qty b{min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
 
+/* ===== round-2 review fixes ===== */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.touch-only{display:none}
+@media (pointer:coarse){.touch-only{display:inline}}
+/* hero: smaller while onboarding */
+.hero.sm{min-height:clamp(130px,30vw,190px)}
+.hero.sm h1{font-size:clamp(2rem,8.5vw,3rem)}
+/* welcome: light card */
+.welcome{background:var(--surface);color:var(--text);border-color:var(--line);box-shadow:inset 4px 0 0 var(--accent)}
+.welcome .muted{color:var(--muted)}
+/* departure card */
+.depart{box-shadow:inset 4px 0 0 var(--accent)}
+.kicker{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.car-route.big{font-size:1rem;color:var(--text)}
+.car-route a{color:var(--accent);font-weight:700;text-decoration:none}
+.mycar .car-route a{color:#FF6B70}
+.pnote{display:block;font-size:.84rem;color:var(--muted);font-weight:500;margin-top:2px}
+/* one-line link rows */
+.linkrow{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 14px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.linkrow .mk{width:22px;height:22px;flex:none}
+.linkrow span:not(.chev){flex:1}
+/* gear rows: quieter options, visible "Caut" */
+.it-more{color:var(--ctrl);font-size:1rem;width:44px}
+.it.on .it-name{color:var(--muted)}
+.it-ask{flex:none;align-self:center;min-height:36px;padding:0 12px;margin-right:2px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);font:600 .85rem var(--font-b);cursor:pointer;position:relative}
+.it-ask::after{content:"";position:absolute;inset:-4px}
+.it-ask.on{background:var(--need);border-color:var(--need);color:#fff}
+/* chips: bigger touch targets */
+.chip.link{min-height:36px;padding:4px 12px;position:relative}
+.chip.link::after{content:"";position:absolute;inset:-4px}
+.chip.ready{background:color-mix(in srgb,var(--ready) 14%,transparent);color:var(--ready)}
+.chip.est{background:transparent;border:1px dashed var(--line-2);color:var(--muted)}
+/* touch targets 44px */
+.btn.sm{min-height:44px}
+.seat{min-height:44px}
+.teamchips button{min-height:44px;min-width:44px}
+.qty{height:44px}
+.qty button{width:44px;height:44px}
+.qty output{min-width:22px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+.stepper button{width:44px;height:44px}
+/* team rows */
+.tg-row{flex-wrap:wrap}
+.tg-row .t{flex:1 1 160px}
+.tg-row.warn .tg-ic{background:#B7791F;color:#fff}
+.tg-row.warn .t span{color:#9A6212}
+.person.off{opacity:.6;cursor:default}
+/* nav badges: dot for status */
+.tab .dot.pip,.rail .nav .dot.pip{min-width:10px;width:10px;height:10px;padding:0;top:-3px;left:19px}
+.rail .nav .dot.pip{margin-left:auto}
+/* admin request rows */
+.person.req{flex-wrap:wrap;cursor:default}
+.person.req .t{flex:1 1 150px}
+.req-btns{flex:1 1 100%;margin-top:4px}
+details.block > summary{cursor:pointer;list-style:none;min-height:28px}
+details.block > summary::-webkit-details-marker{display:none}
+details.block > summary::after{content:" ›";color:var(--muted)}
+.seg.tight{overflow-x:auto;scrollbar-width:none}
+.seg.tight button{flex:1 0 auto;padding:0 10px}
+/* avatars visible on dark surfaces */
+.av{box-shadow:0 0 0 1px var(--line-2)}
+/* board */
+.board-top .row{gap:8px}
+.zone-head{display:flex;flex-direction:column;gap:2px}
+.drop-here{align-self:flex-start;margin-top:6px}
+.dnd i{font-style:normal;font-weight:400;opacity:.7;font-size:13px}
+.board{padding-bottom:calc(var(--tabbar-h) + 24px)}
+@media (min-width:960px){
+  body.noapp{--topbar-h:56px}
+  body.noapp .topbar{display:block}
+  body:not(.noapp) .page:has(.board){max-width:1100px}
+  .board{grid-template-columns:280px 1fr 1fr;align-items:start;padding-bottom:24px}
+  .board > [data-zone="pool"]{position:sticky;top:24px;grid-row:span 50}
+  .rail .nav[aria-current="page"]{color:#fff}
+}
+/* dark mode contrast */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .tg-row.ok .tg-ic,:root:not([data-theme="light"]) .tg-row.miss .tg-ic,:root:not([data-theme="light"]) .tg-row.warn .tg-ic{color:#111}
+  :root:not([data-theme="light"]) .place .go,:root:not([data-theme="light"]) .car-route a{color:#FF6B70}
+  :root:not([data-theme="light"]) .tg-row.warn .t span{color:#E0A341}
+}
+.board-top{flex-wrap:wrap;row-gap:8px}
+.board-top .row{display:flex;flex-direction:row;flex-wrap:nowrap}
+
+/* item icons */
+.gi{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
+.it-main .gi{align-self:center;margin:0 -4px 0 -4px}
+.it.on .gi{color:var(--ctrl)}
+.tg-row .gi{align-self:center}
+.give-head{align-items:center}
+.give-head .gi{margin-right:-2px}
+/* team tag on people in cars */
+.ttag{font-size:11px;font-weight:700;line-height:1;padding:3px 6px;border-radius:5px;background:var(--line);color:var(--muted);margin-left:2px;font-variant-numeric:tabular-nums}
+.mycar .ttag{background:#3F3F46;color:#D4D4D8}
+.dnd.driver .ttag{background:#3F3F46;color:#D4D4D8}
+.tg-row{flex-wrap:nowrap}
+.tg-row .t{flex:1 1 0;min-width:0}
+.gi{color:var(--text);opacity:.62}
+.it.on .gi{opacity:.4}
+@media (max-width:370px){.tg-row .gi{display:none}}
+.mycar .car-route.big{color:#E4E4E7}
+.mycar .car-route.big b{color:#fff}
+@media (max-width:380px){.seg button{font-size:.84rem;padding:0 4px}}
+
 </style>
 </head>
 <body class="noapp">
@@ -499,7 +602,8 @@ function shortName(p){
 }
 const nameOf = id => shortName(byId(id));
 const norm = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/@.*/, "").split(/[^a-z]+/).filter(Boolean);
-const noAccount = tid => S.roster.filter(r => r.team === tid && byId(r.profile)?.status !== "approved");
+const nameFits = (p, r) => { const pt = norm(p?.name), rt = norm(r?.name); return pt.length > 0 && pt.every(t => rt.includes(t)) && pt.some(t => t.length >= 3); };
+const noAccount = tid => S.roster.filter(r => r.team === tid && byId(r.profile)?.status !== "approved" && !people().some(p => p.team === tid && nameFits(p, r)));
 /* a roster line (from 4M's list) that fits a new account's name, if exactly one does */
 function rosterMatch(p){
   const pt = norm(p?.name); if (!pt.length) return null;
@@ -509,7 +613,7 @@ function rosterMatch(p){
 /* the tent line counts as covered when the team's tents have a place for everyone */
 function teamHas(tid, it){
   const m = membersOf(tid), ti = /cort/i.test(it.name) ? S.tents.filter(t => t.team === tid) : [];
-  if (ti.length) return ti.reduce((n, t) => n + (t.places || 0), 0) >= m.length + noAccount(tid).length;
+  if (ti.length) return !ti.some(t => t.auto) && m.every(p => ti.some(t => t.id === p.tent)) && ti.reduce((n, t) => n + (t.places || 0), 0) >= m.length + noAccount(tid).length;
   return teamCount(tid, it) >= teamNeed(it);
 }
 function teamGaps(tid){ return teamReq().filter(i => !teamHas(tid, i)); }
@@ -570,14 +674,19 @@ async function write(fn, okMsg){
   }
 }
 /* two-tap confirm; a second tap within 500 ms (double-tap) doesn't count */
+/* two-tap confirm; a second tap within 500 ms (double-tap) doesn't count. State lives in S, so a redraw in between doesn't reset it */
+const armKey = b => [...b.attributes].filter(x => x.name.startsWith("data-") && x.name !== "data-armed").map(x => x.name + "=" + x.value).join("&");
 function arm(b, label){
-  const now = Date.now();
-  if (b.dataset.armed && now - Number(b.dataset.armedAt) > 500) return true;
-  if (b.dataset.armed) return false;
-  b.dataset.armed = "1"; b.dataset.armedAt = now;
-  const old = b.innerHTML; b.textContent = label || "Apasă încă o dată ca să confirmi"; b.classList.add("armed");
-  setTimeout(() => { if (b.isConnected){ delete b.dataset.armed; b.innerHTML = old; b.classList.remove("armed"); } }, 4000);
+  const now = Date.now(), k = armKey(b), a = S.armed;
+  if (a && a.k === k && now - a.t < 4000){ if (now - a.t > 500){ S.armed = null; return true; } return false; }
+  S.armed = { k, t: now, label: label || "Apasă încă o dată ca să confirmi" };
+  applyArmed();
+  setTimeout(() => { if (S.armed && S.armed.k === k && Date.now() - S.armed.t >= 3990){ S.armed = null; render(); } }, 4000);
   return false;
+}
+function applyArmed(){
+  const a = S.armed; if (!a || Date.now() - a.t > 4000) return;
+  for (const el of document.querySelectorAll("#page button, #sheetBody button")){ if (armKey(el) === a.k){ el.textContent = a.label; el.classList.add("armed"); el.dataset.armed = "1"; } }
 }
 async function busy(btn, fn){
   if (!btn) return fn();
@@ -672,7 +781,7 @@ function heroArt(){
 function daysLeft(){
   if (!S.cfg.start_date) return null;
   const d = new Date(S.cfg.start_date + "T00:00:00"), n = new Date();
-  return Math.ceil((d - new Date(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5);
+  return Math.round((d - new Date(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5);
 }
 /* "5–8 noiembrie 2026" (or "30 octombrie – 2 noiembrie 2026" across months) */
 function dateRange(iso, days){
@@ -685,12 +794,57 @@ function dateRange(iso, days){
 function hero(compact){
   const dl = daysLeft();
   const when = S.cfg.start_date ? dateRange(S.cfg.start_date, 3) : "Noiembrie 2026";
-  return `<section class="hero">${heroArt()}<div class="txt">
+  return `<section class="hero ${compact ? "sm" : ""}">${heroArt()}<div class="txt">
     ${dl !== null && dl > 0 ? `<span class="count-pill"><b>${dl}</b>${dl === 1 ? "zi până la start" : "zile până la start"}</span>` : dl === 0 ? `<span class="count-pill"><b>Azi</b>plecăm</span>` : ""}
     <h1>Xtreme Character Challenge</h1>
     ${compact ? "" : `<p>${esc(when)}</p>`}</div></section>`;
 }
 const personBtn = (p, cls = "") => p ? `<button class="chip link ${cls}" data-person="${esc(p.id)}">${esc(shortName(p))}</button>` : "";
+/* small line icons next to gear items (matched by name, first match wins) */
+const ICONS = [
+  [/scur[țt]i|tricou/i, '<path d="M8 4h8l5 4-3 3-2-1v10H8V10l-2 1-3-3z"/>'],
+  [/dormit/i, '<rect x="7" y="3" width="10" height="18" rx="5"/><path d="M7 9h10"/>'],
+  [/hus[ăa]|pelerin|poncho/i, '<path d="M3 12a9 9 0 0 1 18 0z"/><path d="M12 12v6a2 2 0 0 0 4 0"/>'],
+  [/rucsac/i, '<path d="M9 6a3 3 0 0 1 6 0"/><rect x="5" y="6" width="14" height="15" rx="3"/><path d="M9 13h6v4H9z"/>'],
+  [/frontal/i, '<circle cx="9" cy="12" r="3"/><path d="M3 9a7 7 0 0 1 12 0M3 15a7 7 0 0 0 12 0"/><path d="M15 12h6M16 8l4-2M16 16l4 2"/>'],
+  [/igien/i, '<rect x="7" y="10" width="10" height="11" rx="2"/><path d="M10 10V7h4v3M12 4v3"/>'],
+  [/biblie/i, '<path d="M6 4h11a1 1 0 0 1 1 1v15H8a2 2 0 0 1-2-2z"/><path d="M12 8v6M10 10h4"/>'],
+  [/folie|urgen/i, '<rect x="4" y="5" width="16" height="14" rx="1"/><path d="M4 10h16M4 14h16"/>'],
+  [/lop[ăa][țt]ic/i, '<path d="M12 3v9"/><path d="M8 12h8l-1 6a3 3 0 0 1-6 0z"/>'],
+  [/crem|uv/i, '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>'],
+  [/cort/i, '<path d="M3 20L12 4l9 16z"/><path d="M9 20l3-5 3 5"/>'],
+  [/busol/i, '<circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-4 1 2-5z"/>'],
+  [/brichet/i, '<rect x="7" y="10" width="10" height="11" rx="2"/><path d="M12 7c1.6-1.5 1.2-3 0-4.5-1.2 1.5-1.6 3 0 4.5z"/>'],
+  [/fier[ăa]str/i, '<path d="M3 15h13l5-5H8z"/><path d="M6 15v2M9 15v2M12 15v2M3 15v-3"/>'],
+  [/arz[ăa]tor|butel|primus/i, '<rect x="8" y="10" width="8" height="11" rx="3"/><path d="M10 10V8h4v2"/><path d="M12 6c1.2-1 1-2.5 0-3.5-1 1-1.2 2.5 0 3.5z"/>'],
+  [/geac|jachet/i, '<path d="M8 3l4 3 4-3 4 4-2 3v11H6V10L4 7z"/><path d="M12 6v15"/>'],
+  [/pantalon/i, '<path d="M7 3h10l1 18h-4l-2-11-2 11H6z"/>'],
+  [/bocanc|ghete|adida|înc[ăa]l[țt]/i, '<path d="M6 3h5v8l7 3a2 2 0 0 1 2 2v3H6z"/><path d="M6 19h14"/>'],
+  [/polar|strat|bluz/i, '<path d="M8 4h8l5 4-3 3-2-1v10H8V10l-2 1-3-3z"/><path d="M10 4a2 2 0 0 0 4 0"/>'],
+  [/lenjerie/i, '<path d="M5 7h14l-1 11h-4l-2-6-2 6H6z"/>'],
+  [/buff|c[ăa]ciul/i, '<path d="M5 17a7 7 0 0 1 14 0z"/><path d="M4 17h16v3H4z"/><circle cx="12" cy="7" r="1.5"/>'],
+  [/m[ăa]nu[șs]/i, '<path d="M7 21v-8l-2-3 1.5-1L9 11V5h2v6V4h2v7V5h2v7l2-2 1.5 1L16 17v4z"/>'],
+  [/[șs]osete/i, '<path d="M9 3h6v9l3 3a3 3 0 0 1-4 4l-5-5z"/>'],
+  [/izopren|saltea/i, '<rect x="3" y="8" width="18" height="8" rx="4"/><circle cx="7" cy="12" r="2"/>'],
+  [/tac[âa]m|cu[țt]it|furculi|lingur/i, '<path d="M8 3v18M6 3v5a2 2 0 0 0 4 0V3M16 21V3c2.5 2 2.5 7 0 9"/>'],
+  [/oal[ăa]/i, '<path d="M5 9h14v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M3 9h18M10 6h4"/>'],
+  [/can[ăa]/i, '<path d="M5 8h11v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/>'],
+  [/ap[ăa]\b|litri/i, '<path d="M10 3h4v3l2 3v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9l2-3z"/><path d="M8 13h8"/>'],
+  [/prosop/i, '<rect x="6" y="3" width="12" height="18" rx="1"/><path d="M6 16h12"/>'],
+  [/ochelari/i, '<circle cx="7" cy="14" r="3"/><circle cx="17" cy="14" r="3"/><path d="M10 14h4M4 14l1-5M20 14l-1-5"/>'],
+  [/be[țt]e/i, '<path d="M8 3L6 21M16 3l2 18M6 6h3M15 6h3"/>'],
+  [/briceag/i, '<path d="M3 15l12-8 3 3-8 6z"/><path d="M15 7l5-3"/>'],
+  [/pern[ăa]/i, '<rect x="3" y="7" width="18" height="10" rx="4"/>'],
+  [/dopuri/i, '<ellipse cx="9" cy="14" rx="3" ry="5"/><ellipse cx="16" cy="11" rx="3" ry="5"/>'],
+  [/paraz[ăa]pez/i, '<path d="M8 3h8v14l3 3H5l3-3z"/><path d="M8 8h8M8 12h8"/>'],
+  [/coard|frânghie/i, '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/>'],
+];
+function itemIcon(it){
+  const hit = ICONS.find(([re]) => re.test(it?.name || ""));
+  return `<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${hit ? hit[1] : '<path d="M4 9l8-5 8 5v10H4z"/><path d="M9 19v-6h6v6"/>'}</svg>`;
+}
+/* short team label for mixed cars: "Echipa 228" -> "228" */
+const teamTag = id => { const t = teamOf(id); return t ? t.name.replace(/^echipa\s*/i, "") : ""; };
 function itemRow(it, kind){
   const s = st(S.me, it.id), on = s.ok, leaving = S.leaving[it.id];
   const chips = [];
@@ -699,18 +853,18 @@ function itemRow(it, kind){
     if (others.length) chips.push(`<span class="chip ok">Aduce ${esc(others.map(shortName).join(", "))}</span>`);
   }
   if (s.need){
-    chips.push('<span class="chip need">Am nevoie</span>');
     const l = lendersOf(it.id, S.uid);
     if (l.length) chips.push(`<span class="chip lend">Are în plus:</span>${l.map(p => personBtn(p, "lend")).join("")}`);
   }
-  if (s.lend && kind !== "team") chips.push('<span class="chip lend">Am de dat</span>');
+  if (s.lend && kind !== "team") chips.push('<span class="chip lend">Am în plus</span>');
   if (s.skip) chips.push('<span class="chip skip">Nu iau</span>');
   return `<div class="it ${on ? "on" : ""} ${s.skip ? "skip" : ""} ${leaving ? "leaving" : ""}" data-row="${esc(it.id)}">
     <button class="it-main" data-toggle="${esc(it.id)}" aria-pressed="${on}">
-      <span class="box">${CHECK}</span>
+      <span class="box">${CHECK}</span>${itemIcon(it)}
       <span class="it-body"><span class="it-name">${esc(it.name)}</span>
         ${s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span>
     </button>
+    ${!on && !s.skip && kind !== "team" ? `<button class="it-ask ${s.need ? "on" : ""}" data-want="${s.need ? 0 : 1}" data-id="${esc(it.id)}" aria-pressed="${s.need}">${s.need ? "Caut ✓" : "Caut"}</button>` : ""}
     <button class="it-more" data-more="${esc(it.id)}" aria-label="Opțiuni pentru ${esc(it.name)}">•••</button>
   </div>${chips.length ? `<div class="it-chips">${chips.join("")}</div>` : ""}`;
 }
@@ -769,42 +923,47 @@ function pagePending(){
 
 /* ---------- pages ---------- */
 function pageHome(){
-  const p = S.me, miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid);
+  const p = S.me, miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid), dl = daysLeft();
+  const ticked = Object.values(p.items || {}).some(x => x && (x.ok || x.need || x.lend || x.skip));
   const steps = [];
-  if (isAdmin() && pending().length) steps.push({ go: "admin", tab: "requests", cls: "todo", ic: pending().length, t: `${plural(pending().length, "cerere nouă", "cereri noi")} de aprobat`, s: pending().map(x => x.name).join(", ") });
+  /* 1. gear first: it decides whether you can take part */
   steps.push(miss.length
-    ? { go: "gear", cls: "todo", ic: miss.length, t: miss.length === reqItems().length ? "Începe cu lista de echipament" : `Îți ${miss.length === 1 ? "lipsește un lucru obligatoriu" : `lipsesc ${miss.length} lucruri obligatorii`}`, s: miss.slice(0, 3).map(i => i.name).join(", ") + (miss.length > 3 ? "…" : "") }
+    ? { go: "gear", cls: "todo", ic: miss.length, t: !ticked ? "Începe cu lista de echipament" : `Îți ${miss.length === 1 ? "lipsește un lucru obligatoriu" : `lipsesc ${miss.length} lucruri obligatorii`}`, s: !ticked ? "Bifează ce ai. Fără echipamentul obligatoriu nu poți participa." : `Fără ele nu poți participa: ${miss.slice(0, 3).map(i => i.name).join(", ")}${miss.length > 3 ? "…" : ""}` }
     : { go: "gear", cls: "ready", ic: "✓", t: "Ai tot echipamentul obligatoriu", s: optItems().some(i => !has(p, i.id) && !st(p, i.id).skip) ? "Mai ai de hotărât câteva opționale." : "Ești gata de drum." });
-  const found = S.items.filter(i => st(p, i.id).need && lendersOf(i.id, S.uid).length);
-  if (found.length) steps.push({ go: "gear", cls: "help", ic: found.length, t: found.length === 1 ? `Cineva are în plus: ${found[0].name}` : `Cineva are în plus ${found.length} lucruri pe care le cauți`, s: found.map(i => `${i.name}: ${lendersOf(i.id, S.uid).map(shortName).join(", ")}`).join(" · ") });
+  /* 2. things you can borrow (only once you started ticking) */
+  const asked = S.items.filter(i => st(p, i.id).need && lendersOf(i.id, S.uid).length);
+  const canBorrow = ticked ? othersExtra().filter(i => !isOpt(i) && !has(p, i.id) && !st(p, i.id).need) : [];
+  if (asked.length) steps.push({ go: "group", tab: "give", cls: "help", ic: asked.length, t: asked.length === 1 ? `Ai cerut ${asked[0].name} și îl are cineva` : `Ai cerut ${asked.length} lucruri și le are cineva`, s: asked.map(i => `${i.name}: ${lendersOf(i.id, S.uid).map(shortName).join(", ")}`).join(" · ") });
+  else if (canBorrow.length) steps.push({ go: "group", tab: "give", cls: "help", ic: canBorrow.length, t: `Poți împrumuta: ${canBorrow.slice(0, 2).map(i => i.name).join(", ")}${canBorrow.length > 2 ? "…" : ""}`, s: "Le are cineva în plus. Apasă „Îl vreau”." });
+  if (isAdmin() && pending().length) steps.push({ go: "admin", tab: "requests", cls: "todo", ic: pending().length, t: `${plural(pending().length, "cerere nouă", "cereri noi")} de aprobat`, s: pending().map(x => x.name).join(", ") });
   steps.push(car
-    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? "Conduci" : `Mergi cu ${nameOf(car.owner)}`, s: [car.from_city && `din ${car.from_city}`, car.when_text].filter(Boolean).join(", ") || "Detalii la Transport" }
+    ? { go: "transport", cls: "done", ic: "✓", t: car.owner === S.uid ? "Conduci" : `Mergi cu ${nameOf(car.owner)}`, s: [departWhen(car), car.meet_point || car.from_city].filter(Boolean).join(" · ") || "Detalii la Transport" }
     : ownWay(p) ? { go: "transport", cls: "done", ic: "✓", t: "Vii pe cont propriu", s: "Dacă se schimbă ceva, alege un loc la Transport." }
     : { go: "transport", cls: "todo", ic: "!", t: "Încă n-ai loc într-o mașină", s: S.cars.length ? `${plural(S.cars.reduce((n, c) => n + freeOf(c), 0), "loc liber", "locuri libere")} acum` : "Ai mașină? Adaug-o." });
-  if (!team) steps.push({ go: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Le facem după ce primim listele de la 4M." });
+  if (!team) steps.push({ go: "team", cls: "wait", ic: "", t: "Aștepți repartizarea pe echipe", s: "Clau te pune în echipă după lista de la 4M." });
   else { const gaps = teamGaps(team.id);
-    steps.push(gaps.length ? { go: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru" : `lipsesc ${gaps.length} lucruri`} de echipă`, s: gaps.map(i => i.name).join(", ") }
+    steps.push(gaps.length ? { go: "team", cls: "todo", ic: gaps.length, t: `${team.name}: ${gaps.length === 1 ? "lipsește un lucru comun" : `lipsesc ${gaps.length} lucruri comune`}`, s: gaps.map(i => i.name.replace(/\s*\(.*?\)/g, "")).join(", ") }
       : { go: "team", cls: "done", ic: "✓", t: `Ești în ${team.name}`, s: "Echipa are tot echipamentul comun." }); }
-  const othersOffer = othersExtra().filter(i => !isOpt(i) && !has(p, i.id) && !st(p, i.id).need);
-  if (othersOffer.length) steps.splice(1, 0, { go: "group", tab: "give", cls: "help", ic: othersOffer.length, t: othersOffer.length === 1 ? `Cineva are în plus: ${othersOffer[0].name}` : `${othersOffer.length} lucruri care îți lipsesc le are cineva în plus`, s: othersOffer.slice(0, 3).map(i => i.name).join(", ") + (othersOffer.length > 3 ? "…" : "") });
   const nOffer = othersExtra().length;
   const canHelp = S.items.filter(i => st(p, i.id).lend && seekersOf(i.id, S.uid).length);
   const myExtra = S.items.filter(i => st(p, i.id).lend);
-  const welcome = !lsGet("xcc-welcome") ? `<div class="block welcome stack"><h2 class="h2">Bine ai venit în grup</h2>
-      <ol><li>Bifează ce ai din lista obligatorie.</li><li>Ia-ți loc într-o mașină sau adaugă-ți mașina.</li><li>Ce ai în plus trece la „De dat”.</li></ol>
-      <p class="muted small">Ce bifezi vede tot grupul, ca să ne ajutăm între noi.</p>
+  const welcome = !ticked && !lsGet("xcc-welcome") ? `<div class="block welcome stack"><h2 class="h3">Bine ai venit în grup</h2>
+      <ol><li>Bifează ce ai din lista obligatorie.</li><li>Ia-ți loc într-o mașină sau adaugă-ți mașina.</li><li>La Echipa: ce aduci pentru echipă și în ce cort dormi.</li><li>Ce ai în plus trece la „De dat”.</li></ol>
       <button class="btn sec sm" data-welcome style="align-self:flex-start">Am înțeles</button></div>` : "";
-  return `${hero()}${welcome}
+  /* last two weeks: departure first */
+  const depart = dl !== null && dl <= 14 && dl >= 0 && car ? `<div class="block depart stack"><span class="kicker">Plecarea ta</span>
+      <h2 class="h3">${car.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(car.owner))}`}</h2>${carInfo(car, true)}</div>` : "";
+  const doc = S.cfg.doc_url ? `<a class="block step doc" href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener" download><span class="st ink-st">↓</span><span class="t"><b>${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}</b><span>Descarcă, printează și semnează. O ai la tine la XCC.</span></span><span class="chev" aria-hidden="true">›</span></a>` : "";
+  return `${hero(!!welcome)}${depart}${welcome}
     <div class="section"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
-    ${nOffer ? `<button class="block step" data-go="group" data-tab="give"><span class="st help">${nOffer}</span><span class="t"><b>Vezi ce au alții de dat</b><span>${plural(nOffer, "lucru pus", "lucruri puse")} la dispoziție de grup</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}
-    ${S.cfg.doc_url ? `<a class="block step doc" href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener" download><span class="st ink-st">↓</span><span class="t"><b>${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}</b><span>Descarc-o, printeaz-o, completeaz-o și semneaz-o. O ai la tine la XCC.</span></span><span class="chev" aria-hidden="true">›</span></a>` : ""}
-    <div class="warnline">${WARN}<span>Fără echipamentul obligatoriu nu poți participa. Organizatorul nu asigură nimic din listă.</span></div>
+    ${doc}
     ${canHelp.length ? `<div class="section"><h2 class="h2">Poți ajuta</h2><div class="list">${canHelp.slice(0, 5).map(i => {
       const who = seekersOf(i.id, S.uid);
-      return `<div class="need-card"><b>${esc(i.name)}</b><span class="chips"><span class="chip need">Caută:</span>${who.map(x => personBtn(x, "need")).join("")}</span></div>`; }).join("")}</div></div>`
-      : `<button class="block step" data-go="gear" data-tab="extra"><span class="st help">+</span><span class="t"><b>${myExtra.length ? `Ai ${plural(myExtra.length, "lucru", "lucruri")} de dat` : "Ai echipament în plus?"}</b><span>${myExtra.length ? "Nimeni nu le caută acum. Apar aici când cineva le cere." : "Trece-l la „De dat”, ca să-l găsească cine are nevoie."}</span></span><span class="chev" aria-hidden="true">›</span></button>`}
+      return `<div class="need-card"><b>${esc(i.name)}</b><span class="chips"><span class="small muted">Caută:</span>${who.map(x => personBtn(x, "need")).join("")}</span></div>`; }).join("")}</div></div>` : ""}
+    ${nOffer ? `<button class="block step" data-go="group" data-tab="give"><span class="st help">${nOffer}</span><span class="t"><b>Vezi ce au alții de dat</b><span>${plural(nOffer, "lucru", "lucruri")} la „De dat”</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}
+    ${!canHelp.length ? `<button class="block step" data-go="gear" data-tab="extra"><span class="st help">+</span><span class="t"><b>${myExtra.length ? `Ai ${plural(myExtra.length, "lucru", "lucruri")} în plus` : "Ai echipament în plus?"}</b><span>${myExtra.length ? "Nimeni nu le caută acum. Apar aici când cineva le cere." : "Trece-l la „De dat”, ca să-l găsească cine are nevoie."}</span></span><span class="chev" aria-hidden="true">›</span></button>` : ""}
     <p class="small muted"><a href="https://www.4mro.ro/regulament-xcc" target="_blank" rel="noopener">Regulamentul XCC pe 4mro.ro</a></p>`;
 }
 
@@ -817,7 +976,7 @@ function pageGear(){
     const row = it => {
       const s = st(p, it.id), seekers = seekersOf(it.id, S.uid);
       return `<div class="it lendrow ${s.lend ? "on" : ""}">
-        <button class="it-main" data-extra="${esc(it.id)}" aria-pressed="${s.lend}"><span class="box">${CHECK}</span>
+        <button class="it-main" data-extra="${esc(it.id)}" aria-pressed="${s.lend}"><span class="box">${CHECK}</span>${itemIcon(it)}
           <span class="it-body"><span class="it-name">${esc(it.name)}</span>
           ${s.lend && s.note ? `<span class="note-inline">${esc(s.note)}</span>` : ""}</span></button>
         <button class="it-more" data-more="${esc(it.id)}" aria-label="Opțiuni pentru ${esc(it.name)}">•••</button></div>
@@ -827,9 +986,9 @@ function pageGear(){
     const groups = {};
     for (const it of list.filter(i => !sought.includes(i))) (groups[groupOf(it)] ??= []).push(it);
     return `<h1 class="h1">Echipament</h1>${seg}
-      <div class="block stack"><p><b>Ce ai în plus și poți da altcuiva.</b></p>
-        <p class="muted small">Bifează aici doar lucrurile pe care le ai în plus, nu pe cele pe care le iei tu. Din ••• adaugi o notă, de exemplu mărimea.</p>
-        ${nExtra ? `<span class="chip lend" style="align-self:flex-start">Ai ${plural(nExtra, "lucru", "lucruri")} de dat</span>` : ""}</div>
+      <div class="block stack"><p><b>Ai ceva în plus, de care nu ai nevoie? Apasă pe el.</b></p>
+        <p class="muted small">Doar lucrurile în plus, nu pe cele pe care le iei tu. Din ••• adaugi o notă, de exemplu mărimea.</p>
+        ${nExtra ? `<span class="chip lend" style="align-self:flex-start">Ai ${plural(nExtra, "lucru", "lucruri")} în plus</span>` : ""}</div>
       ${sought.length ? `<section class="section"><div class="group-title"><h2 class="h2">Le caută cineva</h2></div><div class="list">${sought.map(row).join("")}</div></section>` : ""}
       ${Object.entries(groups).map(([g, l]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div><div class="list">${l.map(row).join("")}</div></section>`).join("")}`;
   }
@@ -843,7 +1002,7 @@ function pageGear(){
           ${noAccount(team.id).length ? `<p class="small muted">Încă fără cont în aplicație: ${esc(noAccount(team.id).map(r => r.name).join(", "))}</p>` : ""}
           <div class="prog">${covered === needed ? '<span class="done-badge">✓ Echipa are tot ce e comun</span>' : `<div class="big alarm">${needed - covered}<small>lipsesc din ${needed} obligatorii</small></div>`}<div class="bar ${covered === needed ? "full" : ""}"><i style="width:${needed ? covered / needed * 100 : 0}%"></i></div></div>`
         : `<p><b>Încă nu ești într-o echipă.</b></p><p class="muted">Echipele le facem după ce primim listele de la 4M. Până atunci, bifează ce ai putea aduce tu.</p>`}
-        <p class="small muted">Se aduc pentru toată echipa. Bifează doar ce aduci tu, ca să nu vină toți cu același lucru. Uită-te la cantitate (ex. 2–3 butelii).</p>
+        <p class="small muted">Se aduc pentru toată echipa. Bifează doar ce aduci tu, ca să nu vină toți cu același lucru.</p>
       </div>
       <div class="list">${sorted.map(i => itemRow(i, "team")).join("") || '<div class="empty">Nimic pe listă.</div>'}</div>`;
   }
@@ -860,11 +1019,11 @@ function pageGear(){
   const optVis = filt(opt);
   const optDone = opt.filter(i => has(p, i.id) || st(p, i.id).skip).length;
   return `<h1 class="h1">Echipament</h1>${seg}
-    <button class="block step" data-go="team"><span class="st help">${marker("vband")}</span><span class="t"><b>Echipamentul de echipă e la „Echipa”</b><span>Corturi, busolă, brichetă, fierăstrău, arzător: acolo apeși „Aduc eu”.</span></span><span class="chev" aria-hidden="true">›</span></button>
+    <button class="linkrow" data-go="team">${marker("vband")}<span>Corturi, busolă, arzător… sunt la <b>Echipa</b></span><span class="chev" aria-hidden="true">›</span></button>
     <div class="block prog">
       ${missN === 0 && req.length ? `<span class="done-badge">✓ Ai tot ce e obligatoriu</span>` : `<div class="big alarm">${missN}<small>${missN === 1 ? "lipsește" : "lipsesc"} · ${haveReq} din ${req.length} bifate</small></div>`}
       <div class="bar ${missN === 0 ? "full" : ""}"><i style="width:${req.length ? haveReq / req.length * 100 : 0}%"></i></div>
-      <div class="row"><span class="small muted">Apasă pe un rând ca să-l bifezi. Din ••• ceri ce-ți lipsește.</span><span class="spacer"></span>
+      <div class="row"><span class="small muted">Apasă pe rând dacă îl ai. Apasă „Caut” dacă îți lipsește.</span><span class="spacer"></span>
         <button class="chip" data-missing aria-pressed="${S.onlyMissing}">Doar ce-mi lipsește</button></div>
     </div>
     ${sections}
@@ -874,11 +1033,12 @@ function pageGear(){
 }
 
 /* where we go: event + restaurant (set by admin in Settings) */
-function mapsUrl(name, url){ return url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`; }
+const safeUrl = u => /^https?:\/\//i.test(String(u || "").trim()) ? String(u).trim() : "";
+function mapsUrl(name, url){ return safeUrl(url) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`; }
 function placesBlock(){
-  const c = S.cfg, rows = [["Locul evenimentului", c.event_name, c.event_maps, "tri"], ["Restaurant", c.food_name, c.food_maps, "dot"]].filter(r => r[1] || r[2]);
+  const c = S.cfg, rows = [["Locul evenimentului", c.event_name, c.event_maps, "tri", c.event_note], ["Restaurant", c.food_name, c.food_maps, "dot", c.food_note]].filter(r => r[1] || r[2]);
   if (!rows.length) return isAdmin() ? `<button class="block step" data-go="admin" data-tab="settings"><span class="st wait"></span><span class="t"><b>Adaugă locațiile</b><span>Locul evenimentului și restaurantul apar aici, cu link spre hartă.</span></span><span class="chev" aria-hidden="true">›</span></button>` : "";
-  return `<div class="block stack places"><h2 class="h3">Unde mergem</h2>${rows.map(([l, n, u, m]) => `<a class="place" href="${esc(mapsUrl(n, u))}" target="_blank" rel="noopener">${marker(m)}<span class="t"><small>${l}</small><b>${esc(n || "Vezi pe hartă")}</b></span><span class="go">Hartă ›</span></a>`).join("")}</div>`;
+  return `<div class="block stack places"><h2 class="h3">Unde mergem</h2>${rows.map(([l, n, u, m, note]) => `<a class="place" href="${esc(mapsUrl(n, u))}" target="_blank" rel="noopener">${marker(m)}<span class="t"><small>${l}</small><b>${esc(n || "Vezi pe hartă")}</b>${note ? `<span class="pnote">${esc(note)}</span>` : ""}</span><span class="go">Hartă ›</span></a>`).join("")}</div>`;
 }
 
 /* admin board: drag people onto cars (or tap a person, then tap a car) */
@@ -886,20 +1046,21 @@ function pageBoard(){
   const pool = people().filter(p => !isDriver(p.id) && !carOf(p.id) && !ownWay(p));
   const own = people().filter(p => !isDriver(p.id) && ownWay(p) && !carOf(p.id));
   const pick = S.pick ? byId(S.pick) : null;
-  const chip = p => `<button class="dnd ${S.pick === p.id ? "picked" : ""}" data-dnd="${esc(p.id)}" aria-pressed="${S.pick === p.id}">${avatar(p)}<span>${esc(shortName(p))}</span></button>`;
+  const chip = p => `<button class="dnd ${S.pick === p.id ? "picked" : ""}" data-dnd="${esc(p.id)}" aria-pressed="${S.pick === p.id}">${avatar(p)}<span>${esc(shortName(p))}${p.city ? ` <i>${esc(p.city)}</i>` : ""}</span>${teamTag(p.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(p.id))}</span>` : ""}</button>`;
   const zone = (id, title, sub, people, extra = "", full = false) => `<section class="zone ${full ? "full" : ""} ${pick && !full ? "can" : ""}" data-zone="${esc(id)}">
-      <div class="zone-head"><b>${title}</b><span class="small muted">${sub}</span></div>
+      <div class="zone-head"><b>${title}</b><span class="small muted">${sub}</span>${pick && !full && !people.some(x => x.id === pick.id) ? `<button class="btn sec sm drop-here" data-dropzone="${esc(id)}">Pune-l aici</button>` : ""}</div>
       <div class="zone-body">${extra}${people.map(chip).join("")}${!people.length && !extra ? '<span class="small muted">Trage pe cineva aici</span>' : ""}</div></section>`;
-  const total = S.cars.reduce((n, c) => n + (c.seats || 0), 0), seated = S.cars.reduce((n, c) => n + ridersOf(c).length, 0);
-  return `<div class="board-top"><h1 class="h1">Mașinile</h1><button class="btn sec sm" data-board="0">Gata</button></div>
-    <p class="muted">${pick ? `<b>${esc(pick.name)}</b> e selectat. Atinge mașina în care îl pui.` : "Trage un om pe o mașină. Pe telefon poți și să atingi omul, apoi mașina."}</p>
-    <div class="board-stats"><span><b>${seated}</b> / ${total} locuri ocupate</span><span><b>${pool.length}</b> fără loc</span></div>
+  const freeAll = S.cars.reduce((n, c) => n + freeOf(c), 0), seated = S.cars.reduce((n, c) => n + ridersOf(c).length, 0);
+  return `<div class="board-top"><h1 class="h1">Mașinile</h1><div class="row"><button class="btn sec sm" data-copy-cars>Copiază lista</button><button class="btn sm" data-board="0">Gata</button></div></div>
+    <p class="muted" aria-live="polite">${pick ? `<b>${esc(pick.name)}</b> e selectat. Atinge mașina în care îl pui.` : `Trage un om pe o mașină<span class="touch-only">, sau atinge omul, apoi mașina</span>.`}</p>
+    ${S.teams.length > 1 ? '<p class="small muted">Poți pune în aceeași mașină oameni din echipe diferite. Eticheta arată echipa fiecăruia.</p>' : ""}
+    <div class="board-stats"><span><b>${plural(seated, "pasager", "pasageri")}</b></span><span><b>${plural(freeAll, "loc liber", "locuri libere")}</b></span><span><b>${pool.length}</b> fără loc</span></div>
     <div class="board">
       ${zone("pool", "Fără loc", plural(pool.length, "om", "oameni"), pool)}
       ${S.cars.map(c => { const f = freeOf(c), r = ridersOf(c), d = byId(c.owner);
         const seats = Array.from({ length: f }, () => '<span class="slot">liber</span>').join("");
-        return zone(c.id, `Mașina lui ${esc(nameOf(c.owner))}`, `${[c.from_city, c.when_text].filter(Boolean).map(esc).join(", ") || "&nbsp;"}`, r,
-          (d ? `<span class="dnd driver">${avatar(d)}<span>${esc(shortName(d))} <i>șofer</i></span></span>` : ""), !f) .replace("</section>", `<div class="zone-foot">${seats}${f ? "" : '<span class="small muted">Plină</span>'}</div></section>`);
+        return zone(c.id, `Mașina lui ${esc(nameOf(c.owner))}`, `${[departWhen(c), c.from_city].filter(Boolean).map(esc).join(" · ") || "&nbsp;"}`, r,
+          (d ? `<span class="dnd driver">${avatar(d)}<span>${esc(shortName(d))} <i>șofer</i></span>${teamTag(d.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(d.id))}</span>` : ""}</span>` : ""), !f) .replace("</section>", `<div class="zone-foot">${seats}${f ? "" : '<span class="small muted">Plină</span>'}</div></section>`);
       }).join("")}
       ${zone("own", "Pe cont propriu", plural(own.length, "om", "oameni"), own)}
     </div>
@@ -907,8 +1068,7 @@ function pageBoard(){
 }
 async function moveTo(pid, zoneId){
   const p = byId(pid); if (!p) return;
-  if (zoneId === "pool" && !carOf(pid) && !ownWay(p)) return;
-  if (zoneId === "own" && ownWay(p) && !carOf(pid)) return;
+  if ((zoneId === "pool" && !carOf(pid) && !ownWay(p)) || (zoneId === "own" && ownWay(p) && !carOf(pid)) || p.ride === zoneId){ S.pick = null; render(); return; }
   if (zoneId !== "pool" && zoneId !== "own"){
     const c = S.cars.find(x => x.id === zoneId); if (!c) return;
     if (p.ride === c.id) return;
@@ -916,6 +1076,7 @@ async function moveTo(pid, zoneId){
   }
   const patch = zoneId === "pool" ? { ride: null, own_transport: false } : zoneId === "own" ? { ride: null, own_transport: true } : { ride: zoneId, own_transport: false };
   Object.assign(p, patch); S.pick = null; render();
+  document.querySelector(`[data-dnd="${CSS.escape(pid)}"]`)?.focus({ preventScroll: true });
   const where = zoneId === "pool" ? "fără loc" : zoneId === "own" ? "pe cont propriu" : `la ${nameOf(S.cars.find(x => x.id === zoneId)?.owner)}`;
   await upd(pid, patch, `${shortName(p)}: ${where}`);
 }
@@ -939,7 +1100,7 @@ async function moveTo(pid, zoneId){
     drag.ghost.style.transform = `translate(${e.clientX - 30}px, ${e.clientY - 22}px)`;
     const z = zoneAt(e.clientX, e.clientY);
     if (z !== drag.over){ drag.over?.classList.remove("over"); z?.classList.add("over"); drag.over = z; }
-    const edge = 70; if (e.clientY < edge) window.scrollBy(0, -12); else if (e.clientY > innerHeight - edge) window.scrollBy(0, 12);
+    drag.y = e.clientY; if (!drag.raf){ const tick = () => { if (!drag?.on){ return; } const edge = 80; if (drag.y < edge) window.scrollBy(0, -14); else if (drag.y > innerHeight - edge) window.scrollBy(0, 14); drag.raf = requestAnimationFrame(tick); }; drag.raf = requestAnimationFrame(tick); }
   }, { passive: false });
   const end = e => {
     if (!drag) return;
@@ -965,89 +1126,127 @@ function pageTeam(){
   if (isAdmin() && !S.teamView && S.teams.length) S.teamView = my?.id || S.teams[0].id;
   const tm = isAdmin() ? S.teams.find(t => t.id === S.teamView) || my : my;
   const picker = isAdmin() && S.teams.length > 1 ? `<div class="chips" role="group" aria-label="Alege echipa">${S.teams.map(t => `<button class="chip" data-teamview="${esc(t.id)}" aria-pressed="${tm?.id === t.id}">${esc(t.name)}${my?.id === t.id ? " (a mea)" : ""}</button>`).join("")}</div>` : "";
-  if (!tm) return `<h1 class="h1">Echipa</h1><div class="block empty"><b>Încă nu ești într-o echipă</b>Clau te pune în echipă după lista de la 4M. Până atunci, bifează la Echipament ce ai tu.</div>`;
+  if (!tm){
+    /* no team yet: show what a team brings and how tents work, read-only */
+    return `<h1 class="h1">Echipa</h1>
+      <div class="block stack"><p><b>Încă nu ești într-o echipă.</b></p>
+        <p class="muted">Clau te pune în echipa ta după lista de la 4M. Până atunci, uite ce se aduce pe echipă, ca să știi ce poți lua tu.</p></div>
+      <section class="section"><div class="group-title"><h2 class="h2">Echipament comun</h2></div>
+        <div class="list">${teamItems().map(it => `<div class="tg-row"><span class="tg-ic" aria-hidden="true">${isOpt(it) ? "–" : "•"}</span>${itemIcon(it)}<span class="t"><b>${esc(it.name)}</b><span>${isOpt(it) ? "Opțional" : `Minim ${teamNeed(it)} pe echipă`}</span></span></div>`).join("")}</div></section>
+      <div class="block stack"><h2 class="h3">Corturi</h2><p class="muted small">Ai cort? După repartizare apeși „Am cort” și spui câte persoane încap. N-ai? Apeși „Dorm aici” la cortul cuiva din echipă.</p></div>
+      <button class="btn sec" data-go="gear" style="align-self:flex-start">Mergi la echipamentul tău</button>`;
+  }
   const mine = my?.id === tm.id, mem = membersOf(tm.id), away = noAccount(tm.id), total = mem.length + away.length;
   const req = teamReq(), covered = req.filter(i => teamHas(tm.id, i)).length;
-  const tents = tentsOf(tm.id), places = tents.reduce((n, t) => n + (t.places || 0), 0), noTent = mem.filter(p => !tents.some(t => t.id === p.tent));
+  const tents = tentsOf(tm.id), places = tents.reduce((n, t) => n + (t.places || 0), 0), est = tents.filter(t => t.auto).reduce((n, t) => n + (t.places || 0), 0);
+  const noTent = mem.filter(p => !tents.some(t => t.id === p.tent)), short = Math.max(0, total - places);
+  const iOwn = S.tents.some(t => t.owner === S.uid);
   const tItem = tentItem();
   const gearRow = it => {
     const by = mem.filter(x => has(x, it.id)), me = mine && has(S.me, it.id), ok = by.length > 0;
     const isTent = tItem && it.id === tItem.id;
     const good = teamHas(tm.id, it), cnt = teamCount(tm.id, it), need = teamNeed(it), myQ = st(S.me, it.id).qty;
     const who = by.map(x => shortName(x) + (st(x, it.id).qty > 1 ? ` ×${st(x, it.id).qty}` : "")).join(", ");
-    const sub = isTent ? (tents.length ? `${plural(tents.length, "cort", "corturi")}, ${places} locuri pentru ${total} oameni` : ok ? `Aduce ${by.map(shortName).join(", ")}. Adăugați corturile mai jos, ca să vă împărțiți locurile.` : "Nimeni n-a adăugat un cort încă") : ok ? `${cnt} din minim ${need}: ${who}` : (isOpt(it) ? "Opțional" : `Trebuie minim ${need}. Nu aduce nimeni încă`);
-    return `<div class="tg-row ${good ? "ok" : isOpt(it) ? "" : "miss"}">
-      <span class="tg-ic" aria-hidden="true">${good ? "✓" : isOpt(it) ? "–" : "!"}</span>
-      <span class="t"><b>${esc(it.name)}</b><span>${esc(sub)}</span></span>
-      ${!isTent && cnt ? `<span class="tg-count ${good ? "" : "low"}" aria-label="${cnt} aduse">${cnt}</span>` : ""}
-      ${mine && !isTent ? (me ? `<span class="qty" role="group" aria-label="Câte aduci"><button data-qty="-1" data-id="${esc(it.id)}" aria-label="${myQ === 1 ? "Nu mai aduc" : "Mai puține"}">${myQ === 1 ? "✕" : "−"}</button><b>${myQ}</b><button data-qty="1" data-id="${esc(it.id)}" aria-label="Mai multe">+</button></span>`
-        : `<button class="btn ${ok ? "sec" : "ink"} sm" data-bring="${esc(it.id)}" aria-pressed="false">Aduc eu</button>`) : ""}
-      ${mine && isTent && !S.tents.some(t => t.owner === S.uid) ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
+    const sub = isTent
+      ? (tents.length ? `${plural(tents.length, "cort", "corturi")} · ${places} locuri${est ? ` (${est} estimate)` : ""} · ${total} oameni${short ? ` · lipsesc ${short}` : ""}` : "Nimeni n-a adăugat un cort încă")
+      : ok ? (need > 1 ? `${cnt} din minim ${need}: ${who}` : `Aduce ${who}`) : (isOpt(it) ? "Opțional" : "Nimeni încă");
+    const state = good ? "ok" : isOpt(it) && !ok ? "" : isTent && tents.length ? "warn" : "miss";
+    return `<div class="tg-row ${state}">
+      <span class="tg-ic" aria-hidden="true">${good ? "✓" : state === "" ? "–" : "!"}</span>
+      ${itemIcon(it)}<span class="t"><b>${esc(it.name)}</b><span>${esc(sub)}</span></span>
+      ${!isTent && cnt && !me && need > 1 ? `<span class="tg-count ${good ? "" : "low"}" aria-label="${cnt} aduse">${cnt}</span>` : ""}
+      ${mine && !isTent ? (me ? `<span class="qty" role="group" aria-label="Câte bucăți aduci"><button data-qty="-1" data-id="${esc(it.id)}" aria-label="${myQ === 1 ? "Nu mai aduc" : "Mai puține"}">−</button><output aria-live="polite">${myQ}</output><button data-qty="1" data-id="${esc(it.id)}" aria-label="Mai multe">+</button></span>`
+        : `<button class="btn sec sm" data-bring="${esc(it.id)}">Aduc eu</button>`) : ""}
+      ${mine && isTent && !iOwn ? `<button class="btn sec sm" data-tent-new>Am cort</button>` : ""}</div>`;
   };
   const tentCard = t => {
     const who = inTent(t), f = tentFree(t), own = byId(t.owner), meIn = S.me?.tent === t.id, canEdit = t.owner === S.uid || isAdmin();
+    const pickable = canEdit && (mem.some(p => !tents.some(x => x.id === p.tent)) || away.length);
+    const slot = () => canEdit && pickable ? `<button class="seat free pick" data-tent-slot="${esc(t.id)}">+ loc liber</button>`
+      : mine && !S.me?.tent ? `<button class="seat free pick" data-tent-join="${esc(t.id)}">+ loc liber</button>` : `<span class="seat free">loc liber</span>`;
+    const canJoin = mine && !meIn && f && !iOwn;
     return `<div class="block car tent">
-      <div class="block-head"><h3 class="h3">Cortul lui ${esc(shortName(own))}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plin</span>'}</div>
+      <div class="block-head"><h3 class="h3">Cortul lui ${esc(shortName(own))}</h3>${f ? `<span class="chip ${t.auto ? "est" : "ready"}">${t.auto ? `~${plural(f, "loc", "locuri")} (estimat)` : plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plin</span>'}</div>
       ${t.auto ? `<p class="small">${t.owner === S.uid ? "<b>Câte persoane încap în cortul tău?</b> Am pus 2 până confirmi." : `Locuri estimate: 2, până confirmă ${esc(shortName(own))}.`}</p>` : ""}
       ${t.label ? `<p class="muted small">${esc(t.label)}</p>` : ""}
-      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}</button>`).join("")}${Array.from({ length: f }, () => canEdit ? `<button class="seat free pick" data-tent-slot="${esc(t.id)}">+ loc liber</button>` : mine && !S.me?.tent ? `<button class="seat free pick" data-tent-join="${esc(t.id)}">+ loc liber</button>` : '<span class="seat free">loc liber</span>').join("")}</div>
-      ${(mine && !meIn && f && !S.tents.some(x => x.owner === S.uid)) || (meIn && t.owner !== S.uid) || canEdit ? `<div class="row">${mine && !meIn && f && !S.tents.some(x => x.owner === S.uid) ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn ${t.auto && t.owner === S.uid ? "ink" : "sec"} sm" data-tent-edit="${esc(t.id)}">${t.auto && t.owner === S.uid ? "Spune câte locuri are" : "Editează"}</button>` : ""}</div>` : ""}</div>`;
+      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${x.id === t.owner ? ' <span class="role">al lui</span>' : ""}</button>`).join("")}${Array.from({ length: f }, slot).join("")}</div>
+      ${canJoin || (meIn && t.owner !== S.uid) || canEdit ? `<div class="row">${canJoin ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn ${t.auto && t.owner === S.uid ? "" : "sec"} sm" data-tent-edit="${esc(t.id)}">${t.auto && t.owner === S.uid ? "Spune câte locuri are" : "Editează"}</button>` : ""}</div>` : ""}</div>`;
   };
   return `<h1 class="h1">${esc(tm.name)}</h1>${picker}
     <div class="block stack">
-      <div class="team-people">${mem.map(x => `<button class="chip link" data-person="${esc(x.id)}">${esc(shortName(x))}</button>`).join("")}${away.map(r => `<span class="chip ghostchip" title="Încă fără cont">${esc(r.name)}</span>`).join("")}</div>
-      ${away.length ? `<p class="small muted">Cei cu gri nu și-au făcut încă cont în aplicație.</p>` : ""}
-      <div class="prog">${covered === req.length ? '<span class="done-badge">✓ Echipa are tot echipamentul comun</span>' : `<div class="big alarm">${req.length - covered}<small>${req.length - covered === 1 ? "lucru de echipă lipsește" : "lucruri de echipă lipsesc"} din ${req.length}</small></div>`}
+      <div class="team-people">${mem.map(x => `<button class="chip link" data-person="${esc(x.id)}">${esc(shortName(x))}</button>`).join("")}${away.map(r => `<span class="chip ghostchip">${esc(r.name)}</span>`).join("")}</div>
+      ${away.length ? `<p class="small muted">Cei cu gri n-au cont încă.</p>` : ""}
+      <div class="prog">${covered === req.length ? '<span class="done-badge">✓ Echipa are tot echipamentul comun</span>' : `<div class="big alarm">${req.length - covered}<small>${req.length - covered === 1 ? "lucru comun lipsește" : "lucruri comune lipsesc"} din ${req.length}</small></div>`}
       <div class="bar ${covered === req.length ? "full" : ""}"><i style="width:${req.length ? covered / req.length * 100 : 0}%"></i></div></div>
     </div>
     <section class="section"><div class="group-title"><h2 class="h2">Echipament comun</h2><span class="count muted small">${covered}/${req.length}</span></div>
-      <p class="small muted">Se aduce pentru toată echipa. ${mine ? "Apasă „Aduc eu” la ce iei tu. Cu + și − spui câte bucăți aduci (ex. câte butelii)." : ""}</p>
+      <p class="small muted">Se aduce pentru toată echipa. ${mine ? "Apasă „Aduc eu” la ce iei tu. Cu + și − spui câte bucăți aduci." : ""}</p>
       <div class="list">${teamItems().sort((a, b) => (isOpt(a) ? 1 : 0) - (isOpt(b) ? 1 : 0)).map(gearRow).join("")}</div></section>
-    <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni</span></div>
+    <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni${short ? ` · <b style="color:var(--need)">lipsesc ${short}</b>` : ""}</span></div>
       ${tents.length ? tents.map(tentCard).join("") : `<div class="block empty"><b>Niciun cort încă</b>${mine ? "Ai cort? Adaugă-l și ceilalți își aleg locul." : "Membrii echipei își adaugă corturile aici."}</div>`}
-      ${mine && !S.tents.some(t => t.owner === S.uid) ? `<button class="btn ${tents.length ? "sec" : ""}" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
-      ${tents.length && noTent.length ? `<p class="small"><b>Fără loc la cort:</b> ${esc(noTent.map(shortName).join(", "))}${away.length ? ` <span class="muted">(plus ${away.length} fără cont)</span>` : ""}</p>` : ""}
-      ${places && places < total ? `<p class="small" style="color:var(--need)">Mai trebuie ${plural(total - places, "loc", "locuri")} la cort.</p>` : ""}
+      ${mine && !iOwn ? `<button class="btn sec" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
+      ${noTent.length || away.length ? `<p class="small"><b>Fără loc la cort:</b> ${esc([...noTent.map(shortName), ...away.map(r => r.name + " (fără cont)")].join(", "))}</p>` : tents.length ? '<p class="small">Toată echipa are loc la cort.</p>' : ""}
     </section>`;
 }
 
+/* departure details of a car: "Jo 5 nov, 14:00" etc. */
+const ZILE = ["Du", "Lu", "Ma", "Mi", "Jo", "Vi", "Sâ"];
+/* the event day and the two days before it, as [iso, "Jo 5 nov"] */
+function departDays(){
+  const base = new Date((S.cfg.start_date || "2026-11-05") + "T00:00:00"), out = [];
+  for (let k = -2; k <= 0; k++){ const d = new Date(base); d.setDate(base.getDate() + k); const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; out.push([iso, `${ZILE[d.getDay()]} ${d.getDate()} ${d.toLocaleDateString("ro-RO", { month: "long" })}`]); }
+  return out;
+}
+function departWhen(c){
+  if (c?.depart_date){ const d = new Date(c.depart_date + "T00:00:00"); const t = `${ZILE[d.getDay()]} ${d.getDate()} ${d.toLocaleDateString("ro-RO", { month: "short" }).replace(".", "")}`; return c.depart_time ? `${t}, ${String(c.depart_time).slice(0, 5)}` : t; }
+  return c?.when_text || "";
+}
+function carInfo(c, big){
+  const when = departWhen(c), where = [c.meet_point, c.from_city].filter(Boolean).join(", ");
+  const map = safeUrl(c.meet_maps) || (c.meet_point ? mapsUrl(where) : "");
+  const line = [when && `<b>${esc(when)}</b>`, where && esc(where)].filter(Boolean).join(" · ");
+  return `${line || map ? `<p class="car-route ${big ? "big" : ""}">${line}${map ? `${line ? " · " : ""}<a href="${esc(map)}" target="_blank" rel="noopener">Hartă ›</a>` : ""}</p>` : `<p class="small muted">${c.owner === S.uid ? "N-ai pus încă ora și locul de plecare." : "Șoferul n-a pus încă ora și locul de plecare."}</p>`}
+    ${c.label ? `<p class="small muted">Mașina: ${esc(c.label)}</p>` : ""}${c.back_text ? `<p class="small muted">Întoarcere: ${esc(c.back_text)}</p>` : ""}${c.note ? `<p class="small muted">${esc(c.note)}</p>` : ""}`;
+}
 function pageTransport(){
   if (S.board && isAdmin()) return pageBoard();
   const p = S.me, mine = carOf(S.uid), owned = S.cars.find(c => c.owner === S.uid);
   const free = S.cars.reduce((n, c) => n + freeOf(c), 0), waiting = noRide(), own = people().filter(ownWay);
-  const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}</button>`;
-  const seats = c => {
+  const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}${teamTag(x.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(x.id))}</span>` : ""}</button>`;
+  const seats = (c, withFree) => {
     const out = [byId(c.owner) ? seat(byId(c.owner), "șofer") : ""];
     for (const r of ridersOf(c)) out.push(seat(r));
-    for (let i = 0; i < freeOf(c); i++) out.push('<span class="seat free">loc liber</span>');
+    if (withFree) for (let i = 0; i < freeOf(c); i++) out.push('<span class="seat free">loc liber</span>');
     return `<div class="seats">${out.join("")}</div>`;
   };
-  const route = c => { const parts = [c.from_city && `Din <b>${esc(c.from_city)}</b>`, c.when_text && esc(c.when_text)].filter(Boolean); return parts.length ? `<p class="car-route">${parts.join(", ")}</p>` : ""; };
   let myBlock;
   if (mine) myBlock = `<div class="block mycar car">
       <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(mine.owner))}`}</h2></div>
-      ${route(mine)}${seats(mine)}${mine.note ? `<p class="muted small">${esc(mine.note)}</p>` : ""}
-      <div class="row">${mine.owner === S.uid ? `<button class="btn sec sm" data-car-edit="${esc(mine.id)}">Editează mașina</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`;
+      ${carInfo(mine, true)}${seats(mine, true)}
+      <div class="row">${mine.owner === S.uid ? `<button class="btn ${mine.depart_date || mine.when_text ? "sec" : ""} sm" data-car-edit="${esc(mine.id)}">${mine.depart_date || mine.when_text ? "Editează mașina" : "Pune ora și locul de plecare"}</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`;
   else if (ownWay(p)) myBlock = `<div class="block stack"><h2 class="h2">Vii pe cont propriu</h2>
       <p class="muted">Nu apari la „Fără loc”. Dacă ai totuși nevoie de loc, schimbă mai jos.</p>
       <div class="row"><button class="btn sec sm" data-ownway="0">Am nevoie de loc</button></div></div>`;
   else myBlock = `<div class="block stack"><h2 class="h2">Încă n-ai loc</h2>
-      <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")}. Alege o mașină de mai jos.` : "Nu sunt locuri libere acum. Ești pe lista „Fără loc” și Clau te ajută să găsești unul."}</p>
-      <div class="pair-btns"><button class="btn" data-car-new>Am mașină</button><button class="btn sec" data-ownway="1">Vin pe cont propriu</button></div></div>`;
+      <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")} în mașini.` : "Nu sunt locuri libere acum. Ești pe lista „Fără loc” și Clau te ajută să găsești unul."}</p>
+      ${free ? `<button class="btn" data-scroll="cars">Alege un loc ↓</button>` : ""}
+      <form class="row" id="cityForm"><label class="sr-only" for="myCity">De unde pleci?</label><input class="input" id="myCity" value="${esc(p.city || "")}" maxlength="40" placeholder="De unde pleci? (oraș)" style="flex:1;min-width:0"><button class="btn sec sm" type="submit">Salvează</button></form>
+      <div class="pair-btns"><button class="btn sec" data-car-new>Am mașină</button><button class="btn sec" data-ownway="1">Vin pe cont propriu</button></div></div>`;
   const others = S.cars.filter(c => c.id !== mine?.id);
-  return `<h1 class="h1">Transport</h1>${placesBlock()}${myBlock}
-    ${others.length ? `<section class="section"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
+  return `<h1 class="h1">Transport</h1>${myBlock}
+    ${others.length ? `<section class="section" id="cars"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
       ${others.map(c => { const f = freeOf(c), canJoin = !owned && f > 0, canEdit = isAdmin() && c.owner !== S.uid;
         return `<div class="block car">
-        <div class="block-head"><h3 class="h3">Mașina lui ${esc(nameOf(c.owner))}</h3>${f ? `<span class="chip ok">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plină</span>'}</div>
-        ${route(c)}${seats(c)}${c.note ? `<p class="muted small">${esc(c.note)}</p>` : ""}
+        <div class="block-head"><h3 class="h3">Mașina lui ${esc(nameOf(c.owner))}</h3>${f ? `<span class="chip ready">${plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plină</span>'}</div>
+        ${carInfo(c)}${seats(c, false)}
         ${canJoin || canEdit ? `<div class="row">${canJoin ? `<button class="btn ${mine ? "sec" : ""} sm" data-join="${esc(c.id)}">${mine ? "Mută-mă aici" : "Iau un loc"}</button>` : ""}${canEdit ? `<button class="btn sec sm" data-car-edit="${esc(c.id)}">Editează</button>` : ""}</div>` : ""}
       </div>`; }).join("")}</section>` : (mine ? "" : '<div class="block empty"><b>Nicio mașină încă</b>Cine are mașină o adaugă cu „Am mașină”.</div>')}
     ${!owned && mine ? `<button class="btn sec" data-car-new style="align-self:flex-start">Am și eu mașină</button>` : ""}
     <section class="section"><div class="group-title"><h2 class="h2">Fără loc</h2><span class="count muted small">${waiting.length}</span></div>
-      ${waiting.length ? `<div class="chips">${waiting.slice(0, 14).map(x => personBtn(x, x.id === S.uid ? "need" : "")).join("")}${waiting.length > 14 ? `<span class="chip">+${waiting.length - 14}</span>` : ""}</div>` : '<p class="muted">Toată lumea are loc.</p>'}
+      ${waiting.length ? `<div class="chips">${[...waiting].sort((a, b) => (a.city || "~").localeCompare(b.city || "~")).slice(0, 20).map(x => `<button class="chip link ${x.id === S.uid ? "need" : ""}" data-person="${esc(x.id)}">${esc(shortName(x))}${x.city ? ` · ${esc(x.city)}` : ""}</button>`).join("")}${waiting.length > 20 ? `<span class="chip">+${waiting.length - 20}</span>` : ""}</div>` : '<p class="muted">Toată lumea are loc.</p>'}
       ${own.length ? `<p class="small muted">Pe cont propriu: ${esc(own.map(shortName).join(", "))}</p>` : ""}
-      ${isAdmin() && people().length && S.cars.length ? `<button class="btn ink" data-board="1">Organizează mașinile</button>` : ""}</section>`;
+      ${isAdmin() && people().length && S.cars.length ? `<button class="btn ink" data-board="1">Organizează mașinile</button>` : ""}</section>
+    ${placesBlock()}`;
 }
 
 function groupList(){ return people().filter(p => S.groupTeam === "all" || (S.groupTeam === "none" ? !teamOf(p.id) : p.team === S.groupTeam)); }
@@ -1056,7 +1255,7 @@ function pageGroup(){
   const seg = `<div class="seg" role="tablist">
     <button role="tab" data-grtab="people" aria-selected="${t === "people"}">Oameni</button>
     <button role="tab" data-grtab="give" aria-selected="${t === "give"}">De dat</button>
-    <button role="tab" data-grtab="needs" aria-selected="${t === "needs"}">Caută</button>
+    <button role="tab" data-grtab="needs" aria-selected="${t === "needs"}">Se caută</button>
     <button role="tab" data-grtab="items" aria-selected="${t === "items"}">Obiecte</button></div>`;
   const filter = S.teams.length ? `<div class="chips" role="group" aria-label="Arată doar o echipă">
     ${[["all", "Toți"], ...S.teams.map(x => [x.id, x.name]), ["none", "Fără echipă"]].map(([v, l]) => `<button class="chip" data-team-filter="${esc(v)}" aria-pressed="${S.groupTeam === v}">${esc(l)}</button>`).join("")}</div>` : "";
@@ -1071,7 +1270,7 @@ function pageGroup(){
     for (const r of rows) (groups[groupOf(r.i)] ??= []).push(r);
     const card = ({ i, by }) => { const s = st(S.me, i.id);
       return `<div class="give-card ${s.need ? "wanted" : ""}">
-        <div class="give-head"><b>${esc(i.name)}</b>${!isOpt(i) && !s.ok ? '<span class="chip need">Îți lipsește</span>' : ""}</div>
+        <div class="give-head">${itemIcon(i)}<b>${esc(i.name)}</b>${!isOpt(i) && !s.ok ? '<span class="chip need">Îți lipsește</span>' : ""}</div>
         <ul class="givers">${by.map(p => `<li><button class="chip link lend" data-person="${esc(p.id)}">${avatar(p)}${esc(shortName(p))}</button>${st(p, i.id).note ? `<span class="give-note">${esc(st(p, i.id).note)}</span>` : ""}</li>`).join("")}</ul>
         ${s.need ? '<div class="give-act"><span class="small">Ai cerut. Vorbiți pe grupul de WhatsApp.</span><button class="btn ghost sm" data-want="0" data-id="' + esc(i.id) + '">Anulează</button></div>'
           : s.ok ? '<div class="give-act"><span class="small muted">Îl ai deja.</span></div>'
@@ -1087,11 +1286,11 @@ function pageGroup(){
     body = rows.length ? `<p class="muted">Cine caută ceva și cine are în plus. Vorbiți pe grupul de WhatsApp.</p><div class="list">${rows.map(r => `<div class="need-card"><b>${esc(r.i.name)}</b>
         <div class="pair"><span class="k">Caută</span><span class="chips">${r.need.map(p => personBtn(p, "need")).join("")}</span>
         <span class="k">Are în plus</span><span class="chips">${r.lend.length ? r.lend.map(p => personBtn(p, "lend")).join("") : '<span class="muted small">nimeni încă</span>'}</span></div></div>`).join("")}</div>`
-      : '<div class="block empty"><b>Nimeni nu caută nimic</b>Când cineva apasă „Am nevoie” la un obiect, apare aici.</div>';
+      : '<div class="block empty"><b>Nimeni nu caută nimic</b>Când cineva apasă „Caut” la un obiect, apare aici.</div>';
   } else {
     const n = list.length;
     const groups = {};
-    for (const it of S.items) (groups[isTeam(it) ? "De echipă" : groupOf(it)] ??= []).push(it);
+    for (const it of S.items) (groups[isTeam(it) ? "Comun (echipă)" : groupOf(it)] ??= []).push(it);
     body = n ? Object.entries(groups).map(([g, its]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div><div class="list">${its.map(i => {
       if (isTeam(i) && S.teams.length){
         const lines = S.teams.map(tm => { const b = membersOf(tm.id).filter(p => has(p, i.id)); return `<span class="small ${b.length ? "" : "muted"}">${esc(tm.name)}: ${b.length ? `aduce ${esc(b.map(shortName).join(", "))}` : (isOpt(i) ? "nimeni" : '<b style="color:var(--need)">nimeni încă</b>')}</span>`; }).join("");
@@ -1115,22 +1314,28 @@ function peopleRows(list, req){
     || '<div class="empty">Nimeni cu numele ăsta.</div>';
 }
 
+function carsText(){
+  const L = ["MAȘINI XCC"];
+  for (const c of S.cars){ const r = ridersOf(c); L.push("", `${byId(c.owner)?.name || "?"}${c.label ? ` (${c.label})` : ""}`, [departWhen(c), [c.meet_point, c.from_city].filter(Boolean).join(", ")].filter(Boolean).join(" · ") || "ora și locul: de stabilit", `Pasageri: ${r.map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); if (c.meet_maps) L.push(c.meet_maps); }
+  const nr = noRide(); if (nr.length) L.push("", `Fără loc: ${nr.map(p => p.name + (p.city ? ` (${p.city})` : "")).join(", ")}`);
+  return L.join("\n");
+}
 /* plain-text summary for WhatsApp / 4M */
 function summaryText(){
-  const L = [];
+  const L = [], nm = i => i.name.replace(/\s*\(.*?\)/g, "");
   L.push(`XCC ${S.cfg.start_date ? dateRange(S.cfg.start_date, 3) : "2026"} — ${plural(people().length, "om", "oameni")}`);
+  if (S.cfg.event_name) L.push(`Locație: ${S.cfg.event_name}${S.cfg.event_note ? ` — ${S.cfg.event_note}` : ""}${S.cfg.event_maps ? ` ${S.cfg.event_maps}` : ""}`);
+  if (S.cfg.food_name) L.push(`Restaurant: ${S.cfg.food_name}${S.cfg.food_note ? ` — ${S.cfg.food_note}` : ""}${S.cfg.food_maps ? ` ${S.cfg.food_maps}` : ""}`);
   if (S.teams.length){ L.push("", "ECHIPE");
-    for (const t of S.teams){ const m = membersOf(t.id), g = teamGaps(t.id); L.push(`${t.name}: ${m.map(p => p.name).join(", ") || "—"}${g.length ? ` (lipsesc: ${g.map(i => i.name).join(", ")})` : ""}`); }
+    for (const t of S.teams){ const m = membersOf(t.id), g = teamGaps(t.id); L.push(`${t.name}: ${m.map(p => p.name).join(", ") || "—"}${g.length ? ` (lipsesc: ${g.map(nm).join(", ")})` : ""}`); }
     const nt = people().filter(p => !teamOf(p.id)); if (nt.length) L.push(`Fără echipă: ${nt.map(p => p.name).join(", ")}`); }
-  if (S.cfg.event_name) L.push(`Locație: ${S.cfg.event_name}${S.cfg.event_maps ? ` ${S.cfg.event_maps}` : ""}`);
-  if (S.cfg.food_name) L.push(`Restaurant: ${S.cfg.food_name}${S.cfg.food_maps ? ` ${S.cfg.food_maps}` : ""}`);
   L.push("", "MAȘINI");
-  for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"}${c.from_city ? `, din ${c.from_city}` : ""}${c.when_text ? `, ${c.when_text}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
+  for (const c of S.cars){ L.push(`${byId(c.owner)?.name || "?"}${departWhen(c) ? `, ${departWhen(c)}` : ""}${c.meet_point || c.from_city ? `, ${[c.meet_point, c.from_city].filter(Boolean).join(", ")}` : ""}: ${ridersOf(c).map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); }
   if (!S.cars.length) L.push("—");
   const nr = noRide(); if (nr.length) L.push(`Fără loc: ${nr.map(p => p.name).join(", ")}`);
   const own = people().filter(ownWay); if (own.length) L.push(`Pe cont propriu: ${own.map(p => p.name).join(", ")}`);
   const notReady = people().filter(p => missingOf(p).length);
-  if (notReady.length){ L.push("", "LE LIPSEȘTE (obligatoriu)"); for (const p of notReady){ const m = missingOf(p); L.push(`${p.name}: ${m.length > 6 ? `${m.length} lucruri` : m.map(i => i.name).join(", ")}`); } }
+  if (notReady.length){ L.push("", "ÎNCĂ LE LIPSEȘTE"); for (const p of notReady){ const m = missingOf(p); L.push(`${p.name}: ${m.length > 6 ? `${m.length} lucruri` : m.map(nm).join(", ")}`); } }
   return L.join("\n");
 }
 
@@ -1142,15 +1347,16 @@ function pageAdmin(){
   let body = "";
   if (t === "requests"){
     const invite = `Hai în aplicația noastră pentru XCC! Îți faci cont aici și te aprob: ${INVITE}`;
-    body = `<div class="block stack"><h2 class="h3">Invită oameni</h2>
+    const inv = `<h2 class="h3">Invită oameni</h2>
         <div class="linkbox" id="linkBox">${esc(INVITE)}</div>
         <div class="pair-btns"><button class="btn sm" data-copy="${esc(invite)}">Copiază mesajul</button>
           <a class="btn sec sm" href="https://wa.me/?text=${encodeURIComponent(invite)}" target="_blank" rel="noopener">Trimite pe WhatsApp</a></div>
-        <p class="small muted">Linkul deschide direct formularul de cont nou. Cei care se înscriu apar mai jos și nu văd nimic până nu îi aprobi.</p></div>
-      ${pending().length ? `${pending().length > 1 ? `<button class="btn ink" data-approve-all>Aprobă toți (${pending().length})</button>` : ""}
-        <div class="list">${pending().map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>s-a înscris ${new Date(p.created_at).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })}</span></span>
-          <span class="row" style="flex:none;gap:8px"><button class="btn ink sm" data-approve="${esc(p.id)}">Aprobă</button><button class="btn sec sm" data-reject="${esc(p.id)}">Respinge</button></span></div>`).join("")}</div>`
-        : '<div class="block empty"><b>Nicio cerere nouă</b>Trimite linkul de mai sus și cererile apar aici.</div>'}`;
+        <p class="small muted">Linkul deschide direct formularul de cont nou. Cei care se înscriu apar aici și nu văd nimic până nu îi aprobi.</p>`;
+    body = pending().length ? `${pending().length > 1 ? `<button class="btn ink" data-approve-all>Aprobă toți (${pending().length})</button>` : ""}
+        <div class="list">${pending().map(p => `<div class="person req">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>s-a înscris ${new Date(p.created_at).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })}${rosterMatch(p) ? ` · pe lista ${esc(S.teams.find(x => x.id === rosterMatch(p).team)?.name || "")}` : ""}</span></span>
+          <span class="pair-btns req-btns"><button class="btn ink sm" data-approve="${esc(p.id)}">Aprobă</button><button class="btn sec sm" data-reject="${esc(p.id)}">Respinge</button></span></div>`).join("")}</div>
+        <details class="block"><summary><b>Invită oameni</b></summary><div class="stack" style="margin-top:12px">${inv}</div></details>`
+      : `<div class="block empty"><b>Nicio cerere nouă</b>Trimite linkul de mai jos și cererile apar aici.</div><div class="block stack">${inv}</div>`;
   }
   if (t === "people"){
     const all = people(), notReady = all.filter(p => missingOf(p).length), noSeat = noRide(), noTeam = all.filter(p => !teamOf(p.id));
@@ -1161,7 +1367,7 @@ function pageAdmin(){
       ${f !== "all" ? `<button class="btn ghost sm" data-afilter="all" style="align-self:flex-start">Arată toți (${all.length})</button>` : ""}
       <div class="list">${shown.map(p => { const m = missingOf(p).length, car = carOf(p.id);
         return `<button class="person" data-aperson="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.role === "admin" ? ' <span class="chip">admin</span>' : ""}</b>
-          <span>${esc(teamOf(p.id)?.name || "fără echipă")} · ${m ? `îi lipsesc ${m}` : "gata"} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : ownWay(p) ? "pe cont propriu" : "fără loc"}</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("") || '<div class="empty">Nimeni aici.</div>'}</div>
+          <span>${esc(teamOf(p.id)?.name || "fără echipă")} · ${m ? `${m} lipsă` : "gata"} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : ownWay(p) ? "pe cont propriu" : "fără loc"}</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("") || '<div class="empty">Nimeni aici.</div>'}</div>
       ${rej.length ? `<section class="section"><h2 class="h3">Respinși sau scoși</h2><div class="list">${rej.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-approve="${esc(p.id)}">Aprobă totuși</button></div>`).join("")}</div></section>` : ""}`;
   }
   if (t === "teams"){
@@ -1169,17 +1375,16 @@ function pageAdmin(){
       ${S.teams.map(tm => { const mem = membersOf(tm.id), gaps = teamGaps(tm.id);
         return `<div class="block stack"><div class="block-head"><h2 class="h3">${esc(tm.name)} · ${mem.length}</h2><button class="btn sec sm" data-team-edit="${esc(tm.id)}">Redenumește</button></div>
           ${mem.length ? `<p class="small">${esc(mem.map(x => x.name).join(", "))}</p>` : ""}
-          ${noAccount(tm.id).length ? `<p class="small muted">Încă fără cont: ${esc(noAccount(tm.id).map(r => r.name).join(", "))}</p>` : ""}
+          ${noAccount(tm.id).length ? `<p class="small muted">Fără cont încă: ${esc(noAccount(tm.id).map(r => r.name).join(", "))}</p>` : ""}
           ${gaps.length ? `<p class="small" style="color:var(--need)">Echipament comun lipsă: ${esc(gaps.map(i => i.name).join(", "))}</p>` : mem.length ? '<span class="chip ready" style="align-self:flex-start">Are tot echipamentul comun</span>' : ""}</div>`; }).join("")}
       <form class="row" id="addTeam"><input class="input" id="teamNameNew" placeholder="ex. Echipa 3" maxlength="40" style="flex:1;min-width:0" aria-label="Numele echipei noi"><button class="btn" type="submit">Creează</button></form>
-      ${S.teams.length ? `<section class="section"><h2 class="h2">Cine în ce echipă</h2><div class="list">${[...people()].sort((a, b) => (teamOf(a.id) ? 1 : 0) - (teamOf(b.id) ? 1 : 0)).map(p => `<div class="person" style="cursor:default;flex-wrap:wrap">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span>
-          <span class="teamchips">${S.teams.map((tm, i) => `<button data-setteam="${esc(p.id)}" data-tid="${esc(tm.id)}" aria-pressed="${p.team === tm.id}" aria-label="${esc(tm.name)}">${i + 1}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}" aria-label="Fără echipă">–</button></span></div>`).join("")}</div>
-          <p class="small muted">Numerele sunt echipele în ordinea de mai sus: ${S.teams.map((tm, i) => `${i + 1} = ${esc(tm.name)}`).join(", ")}.</p></section>` : ""}`;
+      ${S.teams.length ? `<section class="section"><h2 class="h2">Cine în ce echipă</h2><p class="small muted">Apasă pe echipa fiecăruia.</p><div class="list">${[...people()].sort((a, b) => (teamOf(a.id) ? 1 : 0) - (teamOf(b.id) ? 1 : 0)).map(p => `<div class="person" style="cursor:default;flex-wrap:wrap">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span>
+          <span class="teamchips">${S.teams.map((tm, i) => `<button data-setteam="${esc(p.id)}" data-tid="${esc(tm.id)}" aria-pressed="${p.team === tm.id}" aria-label="${esc(tm.name)}">${esc(tm.name.replace(/^echipa\s*/i, "") || String(i + 1))}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}" >fără</button></span></div>`).join("")}</div></section>` : ""}`;
   }
   if (t === "list"){
     const q = S.listQ.trim().toLowerCase(), all = people().length;
     const groups = {};
-    for (const it of S.items.filter(i => !q || i.name.toLowerCase().includes(q))) (groups[isTeam(it) ? "De echipă" : groupOf(it)] ??= []).push(it);
+    for (const it of S.items.filter(i => !q || i.name.toLowerCase().includes(q))) (groups[isTeam(it) ? "Comun (echipă)" : groupOf(it)] ??= []).push(it);
     body = `<div class="row"><button class="btn" data-item-new>Adaugă obiect</button></div>
       <input class="input" type="search" id="listQ" placeholder="Caută în listă" value="${esc(S.listQ)}" aria-label="Caută în listă" autocomplete="off">
       <div id="listBody">${Object.entries(groups).map(([g, l]) => `<section class="section"><div class="group-title"><h2 class="h2">${esc(g)}</h2></div>
@@ -1196,13 +1401,15 @@ function pageAdmin(){
           ${S.cfg.hero_url ? '<button class="btn ghost sm" data-hero-clear>Revino la ilustrație</button>' : ""}</div></div>
       <div class="block stack"><h2 class="h3">Document de descărcat</h2><p class="muted small">Apare pe Acasă cu buton de descărcare (ex. declarația pe propria răspundere). PDF, Word sau poză, maxim 10 MB.</p>
         ${S.cfg.doc_url ? `<p class="small">Acum: <a href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener">${esc(S.cfg.doc_name || "document")}</a></p>` : ""}
-        <label class="field"><span>Titlul de pe Acasă</span><input class="input" id="docName" value="${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}" maxlength="80"></label>
+        <div class="field"><label for="docName">Titlul de pe Acasă</label><div class="row"><input class="input" id="docName" value="${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}" maxlength="80" style="flex:1;min-width:0"><button class="btn sec sm" data-doc-title>Salvează titlul</button></div></div>
         <div class="row"><label class="btn sec sm" for="docFile">${S.cfg.doc_url ? "Înlocuiește fișierul" : "Alege fișierul"}</label><input type="file" id="docFile" accept=".pdf,.doc,.docx,image/*" hidden>
           ${S.cfg.doc_url ? '<button class="btn ghost sm" data-doc-clear>Scoate documentul</button>' : ""}</div></div>
       <form class="block stack" id="placesForm"><h2 class="h3">Locații</h2><p class="muted small">Apar la Transport, cu buton spre hartă. Linkul e opțional: îl iei din Google Maps › Distribuie › Copiază linkul.</p>
         <label class="field"><span>Locul evenimentului</span><input class="input" id="ev-n" value="${esc(S.cfg.event_name || "")}" maxlength="80" placeholder="ex. Cabana Padiș"></label>
+        <label class="field"><span>Ce facem acolo, la ce oră</span><input class="input" id="ev-t" value="${esc(S.cfg.event_note || "")}" maxlength="80" placeholder="ex. Check-in 4M: joi 20:00"></label>
         <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="ev-u" value="${esc(S.cfg.event_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
         <label class="field"><span>Restaurant</span><input class="input" id="fd-n" value="${esc(S.cfg.food_name || "")}" maxlength="80" placeholder="ex. Restaurant …, Beiuș"></label>
+        <label class="field"><span>Ce facem acolo, la ce oră</span><input class="input" id="fd-t" value="${esc(S.cfg.food_note || "")}" maxlength="80" placeholder="ex. Ne strângem toți, joi 18:00"></label>
         <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="fd-u" value="${esc(S.cfg.food_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
         <button class="btn sec" type="submit">Salvează locațiile</button></form>
       <form class="block stack" id="dateForm"><h2 class="h3">Data plecării</h2><p class="muted small">Apare pe Acasă, cu numărătoarea inversă și intervalul de 4 zile.</p>
@@ -1217,12 +1424,14 @@ function pageAdmin(){
 function openSheet(kind, data){
   if (!S.sheet){ try { history.pushState({ sheet: true }, "", location.href); } catch {} }
   else if (S.sheet.kind === "item") saveNoteDraft();
-  S.sheet = { kind, data }; renderSheet(true);
+  S.lastFocus = document.activeElement; S.sheet = { kind, data }; renderSheet(true);
 }
 function closeSheet(fromHistory){
   if (!S.sheet) return;
   if (S.sheet.kind === "item") saveNoteDraft();
   S.sheet = null; $("sheetWrap").hidden = true; document.body.style.overflow = ""; document.body.classList.remove("sheet-open");
+  for (const id of ["page", "tabbar", "rail"]) { const el = $(id); if (el) el.inert = false; }
+  try { if (S.lastFocus?.isConnected) S.lastFocus.focus({ preventScroll: true }); } catch {}
   if (!fromHistory){ try { if (history.state?.sheet) history.back(); } catch {} }
 }
 function saveNoteDraft(){
@@ -1242,10 +1451,10 @@ function sheetHtml(){
     return head(esc(it.name), esc(team ? "Echipament de echipă" : `${groupOf(it)}${isOpt(it) ? "" : " · obligatoriu"}`)) + `<div>
       ${sw(`data-flagset="ok"`, team ? "Aduc eu" : "Am", "", s.ok)}
       ${isOpt(it) ? sw(`data-flagset="skip"`, "Nu iau", "E opțional, îl poți lăsa acasă.", s.skip) : ""}
-      ${team ? "" : sw(`data-flagset="need"`, "Am nevoie", lenders.length ? `Au în plus: ${esc(lenders.map(shortName).join(", "))}` : "Apare la Grupul › Caută, ca să te ajute cineva.", s.need, "red")}
+      ${team ? "" : sw(`data-flagset="need"`, "Caut", lenders.length ? `Au în plus: ${esc(lenders.map(shortName).join(", "))}` : "Apare la Grupul › Se caută, ca să te ajute cineva.", s.need, "red")}
       ${team ? "" : sw(`data-flagset="lend"`, "Am în plus", "Apare la Grupul › De dat, ca să-l găsească cine îl caută.", s.lend, "blue")}</div>
       <label class="field" style="margin-top:12px"><span>Notă</span><textarea class="input" id="noteText" maxlength="80" placeholder="ex. am doar unul de 35 L">${esc(s.note)}</textarea><small>Se salvează singură.</small></label>
-      <button class="btn block-w" data-close style="margin-top:12px">Gata</button>`;
+      <button class="btn sec block-w" data-close style="margin-top:12px">Gata</button>`;
   }
   if (kind === "person"){
     const p = byId(data); if (!p) return head("Persoană");
@@ -1258,7 +1467,7 @@ function sheetHtml(){
         <div class="prog">${miss.length ? `<div class="big">${req - miss.length}<small>din ${req} obligatorii</small></div>` : '<span class="done-badge">✓ Gata de drum</span>'}<div class="bar ${miss.length ? "" : "full"}"><i style="width:${req ? (req - miss.length) / req * 100 : 0}%"></i></div></div>
         ${sec("Îi lipsește", chipList(miss, ""))}
         ${sec("Caută", chipList(S.items.filter(i => st(p, i.id).need), "need"))}
-        ${sec("Are de dat", chipList(S.items.filter(i => st(p, i.id).lend), "lend"))}
+        ${sec("Are în plus", chipList(S.items.filter(i => st(p, i.id).lend), "lend"))}
         ${sec("Aduce pentru echipă", chipList(teamItems().filter(i => has(p, i.id)), "ok"))}
         ${sec("Transport", car ? `<span>${car.owner === p.id ? "Conduce" : `Merge cu ${esc(nameOf(car.owner))}`}</span>` : ownWay(p) ? "<span>Vine pe cont propriu</span>" : '<span class="chip need" style="align-self:flex-start">Încă fără loc</span>')}
       </div>`;
@@ -1269,9 +1478,14 @@ function sheetHtml(){
     return head(c.id ? "Mașina" : "Am mașină", c.id ? "" : "Ceilalți își iau loc la tine.") + `<form class="stack" id="carForm">
       <div class="field"><span>Locuri libere (fără șofer)</span><div class="stepper"><button type="button" data-step="-1" aria-label="Mai puține locuri">−</button><output id="cf-seats" data-min="${min}">${seats}</output><button type="button" data-step="1" aria-label="Mai multe locuri">+</button></div>
         ${min ? `<small>Ai ${plural(min, "pasager", "pasageri")}, deci minim ${min}.</small>` : ""}</div>
-      <div class="grid2"><label class="field"><span>Pleci din</span><input class="input" id="cf-from" value="${esc(c.from_city || "")}" placeholder="ex. Oradea, la Lotus" maxlength="40"></label>
-        <label class="field"><span>Când</span><input class="input" id="cf-when" value="${esc(c.when_text || "")}" placeholder="ex. joi la 14" maxlength="40"></label></div>
-      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. încap 3 rucsaci mari, ne întoarcem duminică" maxlength="80"></label>
+      <div class="grid2"><label class="field"><span>Ziua plecării</span><select class="input" id="cf-date"><option value="">Alege ziua</option>${[...departDays(), ...(c.depart_date && !departDays().some(([v]) => v === c.depart_date) ? [[c.depart_date, departWhen({ depart_date: c.depart_date })]] : [])].map(([v, l]) => `<option value="${v}" ${c.depart_date === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+        <label class="field"><span>Ora</span><input class="input" type="time" id="cf-time" value="${esc(c.depart_time || "")}"></label></div>
+      <div class="grid2"><label class="field"><span>Orașul</span><input class="input" id="cf-from" value="${esc(c.from_city || "")}" placeholder="ex. Oradea" maxlength="40"></label>
+        <label class="field"><span>Punct de întâlnire</span><input class="input" id="cf-meet" value="${esc(c.meet_point || "")}" placeholder="ex. parcare Lotus" maxlength="60"></label></div>
+      <label class="field"><span>Link hartă (opțional)</span><input class="input" type="url" id="cf-maps" value="${esc(c.meet_maps || "")}" placeholder="https://maps.app.goo.gl/…"></label>
+      <label class="field"><span>Mașina (model, culoare)</span><input class="input" id="cf-label" value="${esc(c.label || "")}" placeholder="ex. Duster gri" maxlength="40"><small>Ca să o găsească ceilalți în parcare.</small></label>
+      <label class="field"><span>Întoarcere</span><input class="input" id="cf-back" value="${esc(c.back_text || "")}" placeholder="ex. duminică după-amiază, tot împreună" maxlength="60"></label>
+      <label class="field"><span>Notă</span><input class="input" id="cf-note" value="${esc(c.note || "")}" placeholder="ex. încap 3 rucsaci mari" maxlength="80"></label>
       ${riders.length ? `<div class="kv"><span>Pasageri</span>${riders.map(r => `<div class="row" style="justify-content:space-between"><span>${esc(r.name)}</span><button type="button" class="btn sec sm" data-unseat="${esc(r.id)}">Scoate</button></div>`).join("")}</div>` : ""}
       <button class="btn" type="submit">${c.id ? "Salvează" : "Adaugă mașina"}</button>
       ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>${riders.length ? `<p class="small muted">Dacă o ștergi, ${esc(riders.map(shortName).join(", "))} ${riders.length === 1 ? "rămâne" : "rămân"} fără loc.</p>` : ""}` : ""}</form>`;
@@ -1280,17 +1494,21 @@ function sheetHtml(){
     const t = data || { places: 2 }, n = t.id ? inTent(t).length : 1;
     return head(t.id ? "Cortul" : "Am cort", t.id ? "" : "Ceilalți din echipă își aleg loc în el.") + `<form class="stack" id="tentForm">
       <div class="field"><span>Câte persoane încap (cu tine)</span><div class="stepper"><button type="button" data-tstep="-1" aria-label="Mai puține">−</button><output id="tf-places" data-min="${Math.max(1, n)}">${Math.max(t.places || 2, n)}</output><button type="button" data-tstep="1" aria-label="Mai multe">+</button></div></div>
+      <p class="small muted" style="margin-top:-6px">Aduci 2 corturi? Pune totalul de locuri și scrie în notă.</p>
       <label class="field"><span>Notă (opțional)</span><input class="input" id="tf-label" value="${esc(t.label || "")}" maxlength="40" placeholder="ex. cort de 3, fără prelată"></label>
       <button class="btn" type="submit">${t.id ? "Salvează" : "Adaugă cortul"}</button>
-      ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">Nu mai aduc cort</button><p class="small muted">Se scoate și bifa „Corturi” de la echipament.</p>` : ""}</form>`;
+      ${t.id && inTent(t).filter(p => p.id !== t.owner).length ? `<div class="field"><span>Predă cortul altcuiva din el</span><div class="chips">${inTent(t).filter(p => p.id !== t.owner).map(p => `<button type="button" class="chip link" data-tent-give="${esc(p.id)}">${esc(shortName(p))}</button>`).join("")}</div></div>` : ""}
+      ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">${t.owner === S.uid ? "Nu mai aduc cort" : "Șterge cortul"}</button>
+        <p class="small muted">${inTent(t).filter(p => p.id !== t.owner).length ? `Dacă îl ștergi, ${esc(inTent(t).filter(p => p.id !== t.owner).map(shortName).join(", "))} ${inTent(t).filter(p => p.id !== t.owner).length === 1 ? "rămâne" : "rămân"} fără loc. ` : ""}Se scoate și bifa „Corturi” a lui ${esc(nameOf(t.owner))}.</p>` : ""}</form>`;
   }
   if (kind === "tentpick"){
     const t = S.tents.find(x => x.id === data); if (!t) return head("Cort");
     const free = membersOf(t.team).filter(p => !S.tents.some(x => x.id === p.tent)), inside = inTent(t).filter(p => p.id !== t.owner), f = tentFree(t);
     return head(`Cortul lui ${esc(nameOf(t.owner))}`, f ? `Alege pe cine iei. ${plural(f, "loc liber", "locuri libere")}.` : "Cortul e plin.") + `
-      ${f ? (free.length ? `<div class="list">${free.map(p => `<button class="person" data-tent-put="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : '<div class="empty">Toți din echipă au deja loc la un cort.</div>') : ""}
+      ${f ? (free.length ? `<div class="list">${free.map(p => `<button class="person" data-tent-put="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : `<div class="empty">Toți cei cu cont au loc.${noAccount(t.team).length ? ` Mai sunt ${noAccount(t.team).length} fără cont.` : ""}</div>`) : ""}
+      ${f && noAccount(t.team).length ? `<div class="list">${noAccount(t.team).map(r => `<div class="person off"><span class="av" aria-hidden="true">?</span><span class="t"><b>${esc(r.name)}</b><span>Își face cont, apoi îl pui aici.</span></span></div>`).join("")}</div>` : ""}
       ${inside.length ? `<section class="section"><h3 class="h3">În cort</h3><div class="list">${inside.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-tent-out="${esc(p.id)}">Scoate</button></div>`).join("")}</div></section>` : ""}
-      <button class="btn block-w" data-close style="margin-top:12px">Gata</button>`;
+      <button class="btn sec block-w" data-close style="margin-top:12px">Gata</button>`;
   }
   if (kind === "assign"){
     const riders = people().filter(p => !isDriver(p.id));
@@ -1314,10 +1532,10 @@ function sheetHtml(){
     const self = p.id === S.uid, car = S.cars.find(c => c.owner === p.id);
     return `<div class="sheet-head">${avatar(p, "lg")}<div style="flex:1"><h2 class="h2">${esc(p.name)}</h2><p class="muted small">${p.role === "admin" ? "Admin" : "Membru"}</p></div><button class="x" data-close aria-label="Închide">✕</button></div>
       <div class="stack"><div class="field"><span>Echipa</span><span class="teamchips">${S.teams.map(t => `<button data-setteam="${esc(p.id)}" data-tid="${esc(t.id)}" aria-pressed="${p.team === t.id}">${esc(t.name)}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}">Fără echipă</button></span>
-        ${S.teams.length ? "" : '<small>Încă nu ai creat echipe (Admin › Echipe).</small>'}</div>
+        ${S.teams.length ? "" : '<small>Creează întâi o echipă (Admin › Echipe).</small>'}</div>
       ${self ? "" : sw(`data-arole="${esc(p.id)}"`, "Admin", "Poate aproba oameni și modifica lista.", p.role === "admin")}
       <button class="btn sec" data-aview="${esc(p.id)}">Vezi ce are bifat</button>
-      <button class="btn danger" data-areset="${esc(p.id)}">Golește bifele lui</button>
+      <button class="btn danger" data-areset="${esc(p.id)}">Golește-i bifele</button>
       ${self ? "" : `<button class="btn danger" data-reject="${esc(p.id)}">Scoate din grup</button>${car && ridersOf(car).length ? `<p class="small muted">Are mașină cu ${plural(ridersOf(car).length, "pasager", "pasageri")}. Dacă îl scoți, mașina se șterge și ei rămân fără loc.</p>` : ""}`}</div>`;
   }
   if (kind === "team-edit"){
@@ -1348,25 +1566,45 @@ function renderSheet(first){
   for (const [id, v] of Object.entries(keep)){ const el = $(id); if (!el) continue; if (el.tagName === "OUTPUT") el.textContent = v; else el.value = v; }
   if (focusId && $(focusId)) $(focusId).focus();
   $("sheetWrap").hidden = false; document.body.style.overflow = "hidden"; document.body.classList.add("sheet-open");
+  const h = body.querySelector(".sheet-head h2"); if (h){ h.id = "sheetTitle"; body.setAttribute("aria-labelledby", "sheetTitle"); }
+  body.setAttribute("role", "dialog"); body.setAttribute("aria-modal", "true");
+  for (const id of ["page", "tabbar", "rail"]) { const el = $(id); if (el) el.inert = true; }
   if (first) setTimeout(() => body.querySelector(".x")?.focus({ preventScroll: true }), 30);
 }
 
 /* ---------- render ---------- */
-function navBadges(){ const m = missingOf(S.me).length; const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { team: tg || "", gear: m ? (m > 9 ? "9+" : m) : "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "!", admin: pending().length || "" }; }
+function navBadges(){ const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { team: tg || "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "•", admin: pending().length || "" }; }
 function renderChrome(inApp){
   document.body.classList.toggle("noapp", !inApp);
   if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; $("avatarBtn").innerHTML = ""; return; }
   const b = navBadges();
   const items = [["home", "Acasă", "band"], ["gear", "Echipament", "dot"], ["team", "Echipa", "vband"], ["transport", "Transport", "tri"], ["group", "Grupul", "cross"]];
   if (isAdmin()) items.push(["admin", "Admin", "key"]);
-  $("tabbar").innerHTML = items.map(([k, l, m]) => `<button class="tab" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}><span class="ic">${marker(m)}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</span>${l}</button>`).join("");
+  $("tabbar").innerHTML = items.map(([k, l, m]) => `<button class="tab" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}><span class="ic">${marker(m)}${b[k] ? `<span class="dot ${b[k] === "•" ? "pip" : ""}">${b[k] === "•" ? "" : b[k]}</span>` : ""}</span>${l}</button>`).join("");
   $("rail").innerHTML = `<a class="brand" href="#" data-go="home">${marker("band")}XCC</a>`
-    + items.map(([k, l, m]) => `<button class="nav" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}>${marker(m)}${l}${b[k] ? `<span class="dot">${b[k]}</span>` : ""}</button>`).join("")
+    + items.map(([k, l, m]) => `<button class="nav" data-go="${k}" ${S.page === k ? 'aria-current="page"' : ""}>${marker(m)}${l}${b[k] ? `<span class="dot ${b[k] === "•" ? "pip" : ""}">${b[k] === "•" ? "" : b[k]}</span>` : ""}</button>`).join("")
     + `<button class="me" data-profile>${avatar(S.me)}<span>${esc(S.me.name)}<small>Contul meu</small></span></button>`;
   $("avatarBtn").innerHTML = avatar(S.me);
 }
 let lastView = "";
 const viewKey = () => [S.uid ? (S.me?.status || "-") : "out", S.recovering, S.authMode, S.page, S.gearTab, S.groupTab, S.adminTab].join("|");
+function focusSig(el){
+  if (!el) return null;
+  const d = [...el.attributes].filter(x => x.name.startsWith("data-")).map(x => [x.name, x.value]);
+  return d.length ? d : (el.id ? [["id", el.id]] : null);
+}
+function findFocus(sig){
+  const sel = sig.map(([k, v]) => k === "id" ? `#${CSS.escape(v)}` : `[${k}="${CSS.escape(v)}"]`).join("");
+  let el = $("page").querySelector(sel); if (el) return el;
+  /* same kind of control whose state value changed (e.g. Caut on/off) */
+  const idv0 = sig.find(([k]) => k === "data-id");
+  if (idv0){ el = $("page").querySelector(sig.filter(([k]) => k !== "data-id").map(([k]) => `[${k}]`).join("") + `[data-id="${CSS.escape(idv0[1])}"]`); if (el) return el; }
+  const br = sig.find(([k]) => k === "data-bring"); if (br){ el = $("page").querySelector(`[data-qty="1"][data-id="${CSS.escape(br[1])}"]`); if (el) return el; }
+  /* the control was swapped (e.g. "Aduc eu" -> stepper): find one that refers to the same thing */
+  for (const [k, v] of sig){ if (!v || k === "data-qty") continue; el = $("page").querySelector(`[data-id="${CSS.escape(v)}"],[data-bring="${CSS.escape(v)}"],[data-toggle="${CSS.escape(v)}"],[data-dnd="${CSS.escape(v)}"]`); if (el) return el; }
+  const idv = sig.find(([k]) => k === "data-id"); if (idv){ el = $("page").querySelector(`[data-bring="${CSS.escape(idv[1])}"],[data-id="${CSS.escape(idv[1])}"]`); if (el) return el; }
+  return null;
+}
 function render(){
   const inApp = !!(S.uid && S.me && approved() && !S.recovering && !S.loadFailed);
   renderChrome(inApp);
@@ -1385,9 +1623,15 @@ function render(){
   if (typing === "q" && $("peopleList") && viewKey() === lastView){ $("peopleList").innerHTML = peopleRows(groupList(), reqItems().length); }
   else if (typing === "listQ" && $("listBody") && viewKey() === lastView){ const tmp = document.createElement("div"); tmp.innerHTML = html; const nb = tmp.querySelector("#listBody"); if (nb) $("listBody").innerHTML = nb.innerHTML; }
   else if (typing && viewKey() === lastView){ /* keep the form as is; it refreshes on the next render */ }
-  else $("page").innerHTML = html;
+  else {
+    /* keep keyboard / screen-reader focus on the same control after the page is redrawn */
+    const fsel = focusSig(a && $("page").contains(a) ? a : null), y = window.scrollY;
+    $("page").innerHTML = html;
+    if (fsel){ const el = findFocus(fsel); if (el){ el.focus({ preventScroll: true }); if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y); } }
+  }
   lastView = viewKey();
   if (S.sheet) renderSheet(false);
+  applyArmed();
 }
 
 /* ---------- writes ---------- */
@@ -1407,7 +1651,7 @@ function setItem(itemId, patch, quiet){
 }
 async function approve(p, quiet){
   if (!p) return false;
-  const m = !p.team && rosterMatch(p), team = m && S.teams.find(t => t.id === m.team);
+  const m = rosterMatch(p), team = !p.team && m && S.teams.find(t => t.id === m.team);
   const ok = await upd(p.id, { status: "approved", ...(team ? { team: team.id } : {}) }, quiet ? "" : `${firstName(p.name)} e în grup${team ? `, în ${team.name}` : ""}`);
   if (ok && m && m.profile !== p.id) await sb.from("roster").update({ profile: p.id }).eq("id", m.id);
   return !!ok;
@@ -1478,6 +1722,7 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-ownway]"))){ const on = b.dataset.ownway === "1"; await busy(b, () => upd(S.uid, { own_transport: on, ...(on ? { ride: null } : {}) }, on ? "Notat: vii pe cont propriu" : "Gata, alege un loc")); return; }
   if ((b = q("[data-unseat]"))){ await setRide(b.dataset.unseat, null, `${nameOf(b.dataset.unseat)} nu mai e în mașină`); return; }
   if ((b = q("[data-car-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
+  if ((b = q("[data-scroll]"))){ $(b.dataset.scroll)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
   if ((b = q("[data-teamview]"))){ S.teamView = b.dataset.teamview; render(); return; }
   if ((b = q("[data-qty]"))){ const id = b.dataset.id, q2 = st(S.me, id).qty + Number(b.dataset.qty);
     if (q2 < 1){ setItem(id, { ok: false, qty: 1 }); toast("Nu mai aduci"); } else setItem(id, { qty: Math.min(9, q2) }); return; }
@@ -1496,7 +1741,14 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-tent-join]"))){ const t = S.tents.find(x => x.id === b.dataset.tentJoin); if (!t || !tentFree(t)){ toast("Cortul e plin.", true); return; } S.me.tent = t.id; render(); await upd(S.uid, { tent: t.id }, `Dormi în cortul lui ${nameOf(t.owner)}`); return; }
   if (q("[data-tent-leave]")){ S.me.tent = null; render(); await upd(S.uid, { tent: null }, "Ai ieșit din cort"); return; }
   if ((b = q("[data-tent-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; const tt = S.tents.find(x => x.id === b.dataset.tentDel), ti = tentItem();
-    if (await write(() => sb.from("tents").delete().eq("id", b.dataset.tentDel), "Cortul a fost șters")){ if (tt?.owner === S.uid && ti && has(S.me, ti.id)) setItem(ti.id, { ok: false }, true); closeSheet(); } return; }
+    if (await write(() => sb.from("tents").delete().eq("id", b.dataset.tentDel), "Cortul a fost șters")){
+      if (tt?.owner === S.uid && ti && has(S.me, ti.id)) setItem(ti.id, { ok: false }, true);
+      else if (tt && isAdmin() && ti){ const o = byId(tt.owner); if (o && has(o, ti.id)){ const items = { ...(o.items || {}), [ti.id]: { ...(o.items?.[ti.id] || {}), ok: false } }; o.items = items; await upd(o.id, { items }); } }
+      closeSheet(); } return; }
+  if ((b = q("[data-tent-give]"))){ const t = S.sheet?.data, to = byId(b.dataset.tentGive); if (!t?.id || !to) return; if (!arm(b, `Apasă încă o dată: îl dai lui ${shortName(to)}`)) return;
+    if (await write(() => sb.from("tents").update({ owner: to.id }).eq("id", t.id), `Cortul e acum al lui ${shortName(to)}`)){ const ti = tentItem(); if (t.owner === S.uid && ti && has(S.me, ti.id)) setItem(ti.id, { ok: false }, true); closeSheet(); } return; }
+  if ((b = q("[data-dropzone]")) && S.pick){ moveTo(S.pick, b.dataset.dropzone); return; }
+  if (q("[data-copy-cars]")){ await copyText(carsText(), "Lista mașinilor e copiată"); return; }
   if ((b = q("[data-board]"))){ S.board = b.dataset.board === "1"; S.pick = null; render(); window.scrollTo({ top: 0 }); return; }
   if ((b = q("[data-dnd]"))){ if (Date.now() - (window.__xccSuppressClick || 0) < 300) return; S.pick = S.pick === b.dataset.dnd ? null : b.dataset.dnd; render(); return; }
   if ((b = q("[data-zone]")) && S.pick){ moveTo(S.pick, b.dataset.zone); return; }
@@ -1513,13 +1765,14 @@ document.addEventListener("click", async e => {
   }
   if ((b = q("[data-aperson]"))){ openSheet("aperson", b.dataset.aperson); return; }
   if ((b = q("[data-arole]"))){ const on = b.getAttribute("aria-checked") !== "true"; if (!arm(b, on ? "Apasă încă o dată: îl faci admin" : "Apasă încă o dată: nu mai e admin")) return; await upd(b.dataset.arole, { role: on ? "admin" : "member" }, on ? "E admin acum" : "Nu mai e admin"); return; }
-  if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, "Bifele lui au fost golite"); return; }
-  if ((b = q("[data-setteam]"))){ const pid = b.dataset.setteam, tid = b.dataset.tid || null, p = byId(pid); if (p) p.team = tid; render(); await upd(pid, { team: tid }, tid ? `${shortName(p)} e în ${S.teams.find(x => x.id === tid)?.name}` : `${shortName(p)} e fără echipă`); return; }
+  if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, `Am golit bifele lui ${nameOf(b.dataset.areset)}`); return; }
+  if ((b = q("[data-setteam]"))){ const pid = b.dataset.setteam, tid = b.dataset.tid || null, p = byId(pid); const owns = S.tents.some(t => t.owner === pid), patch = { team: tid, ...(owns ? {} : { tent: null }) }; if (p) Object.assign(p, patch); render(); await upd(pid, patch, tid ? `${shortName(p)} e în ${S.teams.find(x => x.id === tid)?.name}` : `${shortName(p)} e fără echipă`); return; }
   if ((b = q("[data-team-edit]"))){ openSheet("team-edit", b.dataset.teamEdit); return; }
   if ((b = q("[data-team-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("teams").delete().eq("id", b.dataset.teamDel), "Echipa a fost ștearsă")) closeSheet(); return; }
   if (q("[data-item-new]")){ openSheet("item-edit", null); return; }
   if ((b = q("[data-item-edit]"))){ openSheet("item-edit", b.dataset.itemEdit); return; }
   if ((b = q("[data-item-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("items").delete().eq("id", b.dataset.itemDel), "Obiectul a fost șters")) closeSheet(); return; }
+  if (q("[data-doc-title]")){ await write(() => sb.from("config").update({ doc_name: ($("docName")?.value || "").trim() || "Declarația pe propria răspundere" }).eq("id", 1), "Titlul a fost salvat"); return; }
   if ((b = q("[data-doc-clear]"))){ if (!arm(b)) return; await write(() => sb.from("config").update({ doc_url: "" }).eq("id", 1), "Documentul a fost scos"); return; }
   if ((b = q("[data-hero-clear]"))){ if (!arm(b)) return; await write(() => sb.from("config").update({ hero_url: "" }).eq("id", 1), "Ilustrația e înapoi"); return; }
   if ((b = q("[data-reset-all]"))){
@@ -1596,7 +1849,9 @@ document.addEventListener("submit", async e => {
     }
     if (id === "carForm"){
       const c = S.sheet?.data;
-      const data = { seats: Math.max(0, Math.min(8, Number($("cf-seats").textContent) || 0)), from_city: v("cf-from"), when_text: v("cf-when"), note: v("cf-note") };
+      const data = { seats: Math.max(0, Math.min(8, Number($("cf-seats").textContent) || 0)), from_city: v("cf-from"), note: v("cf-note"), label: v("cf-label"),
+        meet_point: v("cf-meet"), meet_maps: v("cf-maps"), depart_date: $("cf-date").value || null, depart_time: $("cf-time").value || null, back_text: v("cf-back") };
+      if (data.depart_date) data.when_text = "";
       if (c?.id){ if (await write(() => sb.from("cars").update(data).eq("id", c.id), "Mașina a fost salvată")) closeSheet(); }
       else {
         const r = await write(() => sb.from("cars").insert({ ...data, owner: S.uid }).select().single());
@@ -1614,7 +1869,8 @@ document.addEventListener("submit", async e => {
         if (r?.data){ await upd(S.uid, { tent: r.data.id }, "Cortul tău e pe listă"); const ti = tentItem(); if (ti && !has(S.me, ti.id)) setItem(ti.id, { ok: true }, true); closeSheet(); }
       }
     }
-    if (id === "placesForm"){ await write(() => sb.from("config").update({ event_name: v("ev-n"), event_maps: v("ev-u"), food_name: v("fd-n"), food_maps: v("fd-u") }).eq("id", 1), "Locațiile au fost salvate"); }
+    if (id === "cityForm"){ const c = v("myCity"); S.me.city = c; await upd(S.uid, { city: c }, c ? `Notat: pleci din ${c}` : "Șters"); }
+    if (id === "placesForm"){ await write(() => sb.from("config").update({ event_name: v("ev-n"), event_maps: v("ev-u"), food_name: v("fd-n"), food_maps: v("fd-u"), event_note: v("ev-t"), food_note: v("fd-t") }).eq("id", 1), "Locațiile au fost salvate"); }
     if (id === "dateForm"){ await write(() => sb.from("config").update({ start_date: $("startDate").value || null }).eq("id", 1), "Data a fost salvată"); }
     if (id === "itemForm"){
       const itId = e.target.dataset.id, name = v("in"), cat = $("ic").value;

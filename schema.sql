@@ -269,3 +269,18 @@ alter table public.tents add column if not exists auto boolean not null default 
 alter table public.config add column if not exists doc_url text not null default '' check (char_length(doc_url) <= 500);
 alter table public.config add column if not exists doc_name text not null default '' check (char_length(doc_name) <= 80);
 -- functions public.sync_tent() (trigger on profiles) and public.tent_place(uuid, uuid, boolean): see Supabase SQL editor history
+
+-- migration (v6): departure details, rider city, location notes, burner/gas split
+-- XCC v6 (round-2 review) — additive, safe for the current live app
+alter table public.cars add column if not exists meet_point text not null default '' check (char_length(meet_point) <= 60);
+alter table public.cars add column if not exists meet_maps text not null default '' check (char_length(meet_maps) <= 500);
+alter table public.cars add column if not exists depart_date date;
+alter table public.cars add column if not exists depart_time text check (depart_time is null or depart_time ~ '^[0-2][0-9]:[0-5][0-9]');
+alter table public.cars add column if not exists back_text text not null default '' check (char_length(back_text) <= 60);
+alter table public.profiles add column if not exists city text not null default '' check (char_length(city) <= 40);
+alter table public.config add column if not exists event_note text not null default '' check (char_length(event_note) <= 80);
+alter table public.config add column if not exists food_note text not null default '' check (char_length(food_note) <= 80);
+-- split "Arzător + butelii": e05 keeps the ticks as the burner, gas cans become a new item
+update public.items set name = 'Arzător (min. 2/echipă)' where id = 'e05';
+insert into public.items (id, name, cat, ord) values ('e06', 'Butelie de gaz (min. 3/echipă)', 'Echipă obligatoriu', 14.5) on conflict (id) do nothing;
+select (select count(*) from public.items) as items, (select count(*) from public.cars) as cars;
