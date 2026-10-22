@@ -284,3 +284,10 @@ alter table public.config add column if not exists food_note text not null defau
 update public.items set name = 'Arzător (min. 2/echipă)' where id = 'e05';
 insert into public.items (id, name, cat, ord) values ('e06', 'Butelie de gaz (min. 3/echipă)', 'Echipă obligatoriu', 14.5) on conflict (id) do nothing;
 select (select count(*) from public.items) as items, (select count(*) from public.cars) as cars;
+
+-- v7: pickup from home
+-- XCC v7: pickup from home (additive)
+alter table public.profiles add column if not exists pickup boolean not null default false;
+alter table public.profiles add column if not exists pickup_maps text not null default '' check (char_length(pickup_maps) <= 500);
+alter table public.profiles add column if not exists pickup_note text not null default '' check (char_length(pickup_note) <= 60);
+select count(*) as profiles from public.profiles;

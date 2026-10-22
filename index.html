@@ -520,6 +520,27 @@ details.block > summary::after{content:" ›";color:var(--muted)}
 .mycar .car-route.big b{color:#fff}
 @media (max-width:380px){.seg button{font-size:.84rem;padding:0 4px}}
 
+/* pickup from home */
+.pick-toggle{display:flex;gap:12px;align-items:flex-start;cursor:pointer;min-height:44px}
+.pick-toggle input{width:22px;height:22px;margin-top:2px;accent-color:var(--accent);flex:none}
+.pick-toggle span{display:flex;flex-direction:column;gap:2px}
+.pick-toggle small{color:var(--muted);font-size:.84rem}
+.pk-fields{display:flex;flex-direction:column;gap:12px}
+.pk-list{gap:8px}
+.pk-row{display:flex;align-items:center;gap:10px}
+.pk-row .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.pk-row small{color:#A1A1AA;font-size:.82rem}
+.mycar .pk-list > span{color:var(--on-brand-muted)}
+.mycar .pk-row .btn{background:transparent;color:#fff;border-color:#52525B}
+
+/* map picker */
+.pickmap{height:min(58vh,460px);border-radius:var(--r-m);overflow:hidden;border:1px solid var(--line);background:var(--surface-2);margin:4px 0 8px}
+.pickmap .empty{padding:40px 16px;text-align:center}
+.pin span{display:block;width:28px;height:28px;border-radius:50% 50% 50% 0;background:var(--accent);transform:rotate(-45deg);box-shadow:0 2px 6px rgba(0,0,0,.35);border:3px solid #fff}
+.leaflet-container{font:inherit}
+.pk-alt summary{cursor:pointer;color:var(--muted);font-size:.86rem;padding:6px 0}
+.pk-alt input{margin-top:6px}
+
 </style>
 </head>
 <body class="noapp">
@@ -800,6 +821,41 @@ function hero(compact){
     ${compact ? "" : `<p>${esc(when)}</p>`}</div></section>`;
 }
 const personBtn = (p, cls = "") => p ? `<button class="chip link ${cls}" data-person="${esc(p.id)}">${esc(shortName(p))}</button>` : "";
+/* ---------- map picker (Leaflet + OpenStreetMap, loaded only when opened) ---------- */
+const LEAFLET = window.LEAFLET_BASE || "https://unpkg.com/leaflet@1.9.4/dist/";
+let leafletP = null;
+function loadLeaflet(){
+  if (window.L) return Promise.resolve();
+  return leafletP ||= new Promise((ok, bad) => {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = LEAFLET + "leaflet.css"; document.head.appendChild(css);
+    const js = document.createElement("script"); js.src = LEAFLET + "leaflet.js"; js.onload = ok; js.onerror = () => { leafletP = null; bad(); }; document.head.appendChild(js);
+  });
+}
+const mapsLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat.toFixed(6)},${lng.toFixed(6)}`;
+function linkCoords(u){ const m = String(u || "").match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/); return m ? [Number(m[1]), Number(m[2])] : null; }
+let pickMap = null, pickMarker = null, pickPoint = null;
+async function openMapPicker(){
+  pickPoint = linkCoords($("pk-maps")?.value || S.me?.pickup_maps);
+  openSheet("pickmap");
+  try { await loadLeaflet(); } catch { $("pickMap").innerHTML = '<p class="empty">Harta nu s-a încărcat. Verifică internetul sau lipește un link din Google Maps.</p>'; return; }
+  const el = $("pickMap"); if (!el) return;
+  const start = pickPoint || [47.0465, 21.9189];
+  pickMap = L.map(el, { zoomControl: true, attributionControl: true }).setView(start, pickPoint ? 16 : 11);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(pickMap);
+  const icon = L.divIcon({ className: "pin", html: '<span></span>', iconSize: [28, 28], iconAnchor: [14, 28] });
+  const place = (lat, lng) => {
+    pickPoint = [lat, lng];
+    if (pickMarker) pickMarker.setLatLng(pickPoint); else { pickMarker = L.marker(pickPoint, { icon, draggable: true }).addTo(pickMap); pickMarker.on("dragend", () => { const ll = pickMarker.getLatLng(); pickPoint = [ll.lat, ll.lng]; mapHint(); }); }
+    mapHint();
+  };
+  if (pickPoint) place(...pickPoint);
+  pickMap.on("click", e => place(e.latlng.lat, e.latlng.lng));
+  window.__placePin = place;
+  setTimeout(() => pickMap?.invalidateSize(), 200);
+}
+function mapHint(){ const h = $("mapHint"), b = $("mapSave"); if (h) h.textContent = pickPoint ? "Poți trage pinul ca să-l muți mai precis." : "Atinge pe hartă locul unde vrei să fii luat."; if (b) b.disabled = !pickPoint; }
+function closeMapPicker(){ try { pickMap?.remove(); } catch {} pickMap = null; pickMarker = null; }
+
 /* small line icons next to gear items (matched by name, first match wins) */
 const ICONS = [
   [/scur[țt]i|tricou/i, '<path d="M8 4h8l5 4-3 3-2-1v10H8V10l-2 1-3-3z"/>'],
@@ -1046,7 +1102,7 @@ function pageBoard(){
   const pool = people().filter(p => !isDriver(p.id) && !carOf(p.id) && !ownWay(p));
   const own = people().filter(p => !isDriver(p.id) && ownWay(p) && !carOf(p.id));
   const pick = S.pick ? byId(S.pick) : null;
-  const chip = p => `<button class="dnd ${S.pick === p.id ? "picked" : ""}" data-dnd="${esc(p.id)}" aria-pressed="${S.pick === p.id}">${avatar(p)}<span>${esc(shortName(p))}${p.city ? ` <i>${esc(p.city)}</i>` : ""}</span>${teamTag(p.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(p.id))}</span>` : ""}</button>`;
+  const chip = p => `<button class="dnd ${S.pick === p.id ? "picked" : ""}" data-dnd="${esc(p.id)}" aria-pressed="${S.pick === p.id}">${avatar(p)}<span>${esc(shortName(p))}${p.city ? ` <i>${esc(p.city)}</i>` : ""}${p.pickup ? ' <i>· de acasă</i>' : ""}</span>${teamTag(p.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(p.id))}</span>` : ""}</button>`;
   const zone = (id, title, sub, people, extra = "", full = false) => `<section class="zone ${full ? "full" : ""} ${pick && !full ? "can" : ""}" data-zone="${esc(id)}">
       <div class="zone-head"><b>${title}</b><span class="small muted">${sub}</span>${pick && !full && !people.some(x => x.id === pick.id) ? `<button class="btn sec sm drop-here" data-dropzone="${esc(id)}">Pune-l aici</button>` : ""}</div>
       <div class="zone-body">${extra}${people.map(chip).join("")}${!people.length && !extra ? '<span class="small muted">Trage pe cineva aici</span>' : ""}</div></section>`;
@@ -1212,17 +1268,30 @@ function pageTransport(){
   if (S.board && isAdmin()) return pageBoard();
   const p = S.me, mine = carOf(S.uid), owned = S.cars.find(c => c.owner === S.uid);
   const free = S.cars.reduce((n, c) => n + freeOf(c), 0), waiting = noRide(), own = people().filter(ownWay);
-  const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}${teamTag(x.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(x.id))}</span>` : ""}</button>`;
+  const seat = (x, role = "") => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${role ? ` <span class="role">${role}</span>` : ""}${x.pickup && !role ? ' <span class="role" title="Vrea să fie luat de acasă">de acasă</span>' : ""}${teamTag(x.id) && S.teams.length > 1 ? `<span class="ttag">${esc(teamTag(x.id))}</span>` : ""}</button>`;
   const seats = (c, withFree) => {
     const out = [byId(c.owner) ? seat(byId(c.owner), "șofer") : ""];
     for (const r of ridersOf(c)) out.push(seat(r));
     if (withFree) for (let i = 0; i < freeOf(c); i++) out.push('<span class="seat free">loc liber</span>');
     return `<div class="seats">${out.join("")}</div>`;
   };
+  const homeLink = x => safeUrl(x.pickup_maps);
+  const pickupBlock = (!mine || mine.owner !== S.uid) && !ownWay(p) ? `<form class="block stack" id="pickupForm">
+      <label class="pick-toggle"><input type="checkbox" id="pk-on" ${p.pickup ? "checked" : ""}><span><b>Vreau să fiu luat de acasă</b><small>Șoferul vede linkul și te ia de acolo.</small></span></label>
+      <div class="pk-fields" ${p.pickup ? "" : "hidden"}>
+        <div class="field"><span>Locația ta</span>
+          <button type="button" class="btn ${p.pickup_maps ? "sec" : ""}" data-map-open>${p.pickup_maps ? "✓ Locație aleasă · schimb-o pe hartă" : "Alege pe hartă"}</button>
+          <details class="pk-alt"><summary>sau lipește un link din Google Maps</summary><input class="input" type="url" id="pk-maps" value="${esc(p.pickup_maps || "")}" placeholder="https://maps.app.goo.gl/…" inputmode="url" aria-label="Link Google Maps"></details>
+          <small>Îl văd doar cei din grup.</small></div>
+        <label class="field"><span>Detalii (opțional)</span><input class="input" id="pk-note" value="${esc(p.pickup_note || "")}" maxlength="60" placeholder="ex. bloc 3, scara B, sun când ajungi"></label>
+      </div>
+      <button class="btn sec sm" type="submit" style="align-self:flex-start">Salvează</button></form>` : "";
+  const pickups = c => ridersOf(c).filter(x => x.pickup);
+  const pickupList = c => pickups(c).length ? `<div class="kv pk-list"><span>De luat de acasă</span>${pickups(c).map(x => `<div class="pk-row">${avatar(x)}<span class="t"><b>${esc(shortName(x))}</b>${x.pickup_note ? `<small>${esc(x.pickup_note)}</small>` : ""}</span>${homeLink(x) ? `<a class="btn sec sm" href="${esc(homeLink(x))}" target="_blank" rel="noopener">Hartă ›</a>` : '<span class="small muted">fără link încă</span>'}</div>`).join("")}</div>` : "";
   let myBlock;
   if (mine) myBlock = `<div class="block mycar car">
       <div class="block-head"><h2 class="h2">${mine.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(mine.owner))}`}</h2></div>
-      ${carInfo(mine, true)}${seats(mine, true)}
+      ${carInfo(mine, true)}${seats(mine, true)}${mine.owner === S.uid ? pickupList(mine) : ""}
       <div class="row">${mine.owner === S.uid ? `<button class="btn ${mine.depart_date || mine.when_text ? "sec" : ""} sm" data-car-edit="${esc(mine.id)}">${mine.depart_date || mine.when_text ? "Editează mașina" : "Pune ora și locul de plecare"}</button>` : `<button class="btn sec sm" data-leave>Renunț la loc</button>`}</div></div>`;
   else if (ownWay(p)) myBlock = `<div class="block stack"><h2 class="h2">Vii pe cont propriu</h2>
       <p class="muted">Nu apari la „Fără loc”. Dacă ai totuși nevoie de loc, schimbă mai jos.</p>
@@ -1233,7 +1302,7 @@ function pageTransport(){
       <form class="row" id="cityForm"><label class="sr-only" for="myCity">De unde pleci?</label><input class="input" id="myCity" value="${esc(p.city || "")}" maxlength="40" placeholder="De unde pleci? (oraș)" style="flex:1;min-width:0"><button class="btn sec sm" type="submit">Salvează</button></form>
       <div class="pair-btns"><button class="btn sec" data-car-new>Am mașină</button><button class="btn sec" data-ownway="1">Vin pe cont propriu</button></div></div>`;
   const others = S.cars.filter(c => c.id !== mine?.id);
-  return `<h1 class="h1">Transport</h1>${myBlock}
+  return `<h1 class="h1">Transport</h1>${myBlock}${pickupBlock}
     ${others.length ? `<section class="section" id="cars"><div class="group-title"><h2 class="h2">${mine ? "Alte mașini" : "Mașini"}</h2><span class="count muted small">${plural(free, "loc liber", "locuri libere")}</span></div>
       ${others.map(c => { const f = freeOf(c), canJoin = !owned && f > 0, canEdit = isAdmin() && c.owner !== S.uid;
         return `<div class="block car">
@@ -1316,7 +1385,8 @@ function peopleRows(list, req){
 
 function carsText(){
   const L = ["MAȘINI XCC"];
-  for (const c of S.cars){ const r = ridersOf(c); L.push("", `${byId(c.owner)?.name || "?"}${c.label ? ` (${c.label})` : ""}`, [departWhen(c), [c.meet_point, c.from_city].filter(Boolean).join(", ")].filter(Boolean).join(" · ") || "ora și locul: de stabilit", `Pasageri: ${r.map(p => p.name).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); if (c.meet_maps) L.push(c.meet_maps); }
+  for (const c of S.cars){ const r = ridersOf(c); L.push("", `${byId(c.owner)?.name || "?"}${c.label ? ` (${c.label})` : ""}`, [departWhen(c), [c.meet_point, c.from_city].filter(Boolean).join(", ")].filter(Boolean).join(" · ") || "ora și locul: de stabilit", `Pasageri: ${r.map(p => p.name + (p.pickup ? " (de acasă)" : "")).join(", ") || "—"}${freeOf(c) ? ` (+${freeOf(c)} libere)` : ""}`); if (c.meet_maps) L.push(c.meet_maps);
+    for (const x of r.filter(p => p.pickup)) L.push(`  ${x.name}: ${[x.pickup_note, safeUrl(x.pickup_maps)].filter(Boolean).join(" · ") || "fără link"}`); }
   const nr = noRide(); if (nr.length) L.push("", `Fără loc: ${nr.map(p => p.name + (p.city ? ` (${p.city})` : "")).join(", ")}`);
   return L.join("\n");
 }
@@ -1429,6 +1499,7 @@ function openSheet(kind, data){
 function closeSheet(fromHistory){
   if (!S.sheet) return;
   if (S.sheet.kind === "item") saveNoteDraft();
+  if (S.sheet.kind === "pickmap") closeMapPicker();
   S.sheet = null; $("sheetWrap").hidden = true; document.body.style.overflow = ""; document.body.classList.remove("sheet-open");
   for (const id of ["page", "tabbar", "rail"]) { const el = $(id); if (el) el.inert = false; }
   try { if (S.lastFocus?.isConnected) S.lastFocus.focus({ preventScroll: true }); } catch {}
@@ -1501,6 +1572,12 @@ function sheetHtml(){
       ${t.id ? `<button class="btn danger" type="button" data-tent-del="${esc(t.id)}">${t.owner === S.uid ? "Nu mai aduc cort" : "Șterge cortul"}</button>
         <p class="small muted">${inTent(t).filter(p => p.id !== t.owner).length ? `Dacă îl ștergi, ${esc(inTent(t).filter(p => p.id !== t.owner).map(shortName).join(", "))} ${inTent(t).filter(p => p.id !== t.owner).length === 1 ? "rămâne" : "rămân"} fără loc. ` : ""}Se scoate și bifa „Corturi” a lui ${esc(nameOf(t.owner))}.</p>` : ""}</form>`;
   }
+  if (kind === "pickmap"){
+    return head("De unde să te ia", "Atinge harta sau folosește locația ta.") + `
+      <div class="pickmap" id="pickMap" role="application" aria-label="Hartă: atinge locul de unde vrei să fii luat"><p class="empty">Se încarcă harta…</p></div>
+      <p class="small muted" id="mapHint" aria-live="polite">Atinge pe hartă locul unde vrei să fii luat.</p>
+      <div class="pair-btns"><button type="button" class="btn sec" data-locate>📍 Locația mea</button><button type="button" class="btn" id="mapSave" data-map-save ${pickPoint ? "" : "disabled"}>Salvează locul</button></div>`;
+  }
   if (kind === "tentpick"){
     const t = S.tents.find(x => x.id === data); if (!t) return head("Cort");
     const free = membersOf(t.team).filter(p => !S.tents.some(x => x.id === p.tent)), inside = inTent(t).filter(p => p.id !== t.owner), f = tentFree(t);
@@ -1559,6 +1636,7 @@ function sheetHtml(){
 /* re-render keeps whatever the person has typed in the sheet */
 function renderSheet(first){
   if (!S.sheet) return;
+  if (!first && S.sheet.kind === "pickmap") return;
   const body = $("sheetBody"), keep = {};
   if (!first) body.querySelectorAll("input,textarea,select,output").forEach(el => { if (el.id && el.type !== "file") keep[el.id] = el.tagName === "OUTPUT" ? el.textContent : el.value; });
   const focusId = !first && body.contains(document.activeElement) ? document.activeElement.id : null;
@@ -1722,6 +1800,21 @@ document.addEventListener("click", async e => {
   if ((b = q("[data-ownway]"))){ const on = b.dataset.ownway === "1"; await busy(b, () => upd(S.uid, { own_transport: on, ...(on ? { ride: null } : {}) }, on ? "Notat: vii pe cont propriu" : "Gata, alege un loc")); return; }
   if ((b = q("[data-unseat]"))){ await setRide(b.dataset.unseat, null, `${nameOf(b.dataset.unseat)} nu mai e în mașină`); return; }
   if ((b = q("[data-car-del]"))){ if (!arm(b, "Apasă încă o dată ca să ștergi")) return; if (await write(() => sb.from("cars").delete().eq("id", b.dataset.carDel), "Mașina a fost ștearsă")) closeSheet(); return; }
+  if (q("[data-map-open]")){ openMapPicker(); return; }
+  if ((b = q("[data-locate]"))){
+    if (!navigator.geolocation){ toast("Telefonul nu dă locația. Atinge pe hartă.", true); return; }
+    b.disabled = true; b.textContent = "Caut locația…";
+    navigator.geolocation.getCurrentPosition(pos => { b.disabled = false; b.textContent = "📍 Locația mea"; const { latitude: la, longitude: lo } = pos.coords; window.__placePin?.(la, lo); pickMap?.setView([la, lo], 17); },
+      err => { b.disabled = false; b.textContent = "📍 Locația mea"; toast(err.code === 1 ? "Ai refuzat accesul la locație. Atinge pe hartă locul tău." : "Nu am găsit locația. Atinge pe hartă.", true); },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+    return;
+  }
+  if (q("[data-map-save]")){
+    if (!pickPoint) return;
+    const link = mapsLink(pickPoint[0], pickPoint[1]), patch = { pickup: true, pickup_maps: link };
+    Object.assign(S.me, patch); closeSheet();
+    await upd(S.uid, patch, "Gata, șoferul vede de unde să te ia"); render(); return;
+  }
   if ((b = q("[data-scroll]"))){ $(b.dataset.scroll)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
   if ((b = q("[data-teamview]"))){ S.teamView = b.dataset.teamview; render(); return; }
   if ((b = q("[data-qty]"))){ const id = b.dataset.id, q2 = st(S.me, id).qty + Number(b.dataset.qty);
@@ -1786,6 +1879,7 @@ document.addEventListener("input", e => {
   if (e.target.id === "q"){ S.q = e.target.value; render(); }
   if (e.target.id === "listQ"){ S.listQ = e.target.value; render(); }
 });
+document.addEventListener("change", e => { if (e.target.id === "pk-on"){ const f = document.querySelector(".pk-fields"); if (f) f.hidden = !e.target.checked; } });
 document.addEventListener("focusout", e => { if (e.target.id === "noteText") saveNoteDraft(); });
 document.addEventListener("change", async e => {
   const t = e.target;
@@ -1868,6 +1962,13 @@ document.addEventListener("submit", async e => {
         const r = await write(() => sb.from("tents").insert({ ...data, team: team.id, owner: S.uid }).select().single());
         if (r?.data){ await upd(S.uid, { tent: r.data.id }, "Cortul tău e pe listă"); const ti = tentItem(); if (ti && !has(S.me, ti.id)) setItem(ti.id, { ok: true }, true); closeSheet(); }
       }
+    }
+    if (id === "pickupForm"){
+      const on = $("pk-on").checked, url = v("pk-maps");
+      if (on && url && !safeUrl(url)){ toast("Linkul trebuie să înceapă cu https://", true); return; }
+      const patch = { pickup: on, pickup_maps: on ? url : "", pickup_note: on ? v("pk-note") : "" };
+      Object.assign(S.me, patch);
+      await upd(S.uid, patch, on ? (url ? "Șoferul vede de unde să te ia" : "Notat. Adaugă și linkul cu locația.") : "Nu mai ești pe lista de luat de acasă");
     }
     if (id === "cityForm"){ const c = v("myCity"); S.me.city = c; await upd(S.uid, { city: c }, c ? `Notat: pleci din ${c}` : "Șters"); }
     if (id === "placesForm"){ await write(() => sb.from("config").update({ event_name: v("ev-n"), event_maps: v("ev-u"), food_name: v("fd-n"), food_maps: v("fd-u"), event_note: v("ev-t"), food_note: v("fd-t") }).eq("id", 1), "Locațiile au fost salvate"); }
