@@ -291,3 +291,80 @@ alter table public.profiles add column if not exists pickup boolean not null def
 alter table public.profiles add column if not exists pickup_maps text not null default '' check (char_length(pickup_maps) <= 500);
 alter table public.profiles add column if not exists pickup_note text not null default '' check (char_length(pickup_note) <= 60);
 select count(*) as profiles from public.profiles;
+
+-- migration (v8): drivers can take someone out of their car; seats for people on the 4M list without an account
+alter table public.roster add column if not exists ride uuid references public.cars(id) on delete set null;
+
+-- the driver (or the organiser) takes a passenger out of the car
+create or replace function public.unseat(person uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare r uuid;
+begin
+  select ride into r from public.profiles where id = person;
+  if r is null then return; end if;
+  if not (public.is_admin() or exists (select 1 from public.cars where id = r and owner = auth.uid())) then
+    raise exception 'Doar șoferul mașinii poate scoate pe cineva.';
+  end if;
+  if exists (select 1 from public.cars where id = r and owner = person) then
+    raise exception 'Șoferul nu poate fi scos din mașina lui.';
+  end if;
+  update public.profiles set ride = null where id = person;
+end $$;
+
+-- give / take a seat to someone on the 4M list who has no account (car = null takes them out)
+create or replace function public.seat_guest(guest uuid, car uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare cur uuid; cap int; drv uuid; used int;
+begin
+  if not public.is_approved() then raise exception 'Nu ai acces.'; end if;
+  select ride into cur from public.roster where id = guest;
+  if not found then raise exception 'Persoana nu e pe listă.'; end if;
+  if not public.is_admin() then
+    if car is null then
+      if not exists (select 1 from public.cars where id = cur and owner = auth.uid()) then
+        raise exception 'Doar șoferul mașinii sau organizatorul.';
+      end if;
+    else
+      if not exists (select 1 from public.cars where id = car and owner = auth.uid()) then
+        raise exception 'Doar în mașina ta.';
+      end if;
+      if cur is not null and cur <> car and exists (select 1 from public.cars where id = cur) then
+        raise exception 'Are deja loc în altă mașină.';
+      end if;
+    end if;
+  end if;
+  if car is not null and car is distinct from cur then
+    select seats, owner into cap, drv from public.cars where id = car for update;
+    if not found then raise exception 'Mașina nu mai există.'; end if;
+    select (select count(*) from public.profiles p where p.ride = car and p.id <> drv and p.status = 'approved')
+         + (select count(*) from public.roster g where g.ride = car) into used;
+    if used >= cap then raise exception 'Mașina e plină.'; end if;
+  end if;
+  update public.roster set ride = car where id = guest;
+end $$;
+
+-- seats given to people without an account count when someone with an account takes a seat
+-- (separate trigger, runs after guard_profile; guard_profile itself is left as it is)
+create or replace function public.guard_ride_guests() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare cap int; drv uuid; used int;
+begin
+  if new.ride is not null and new.ride is distinct from old.ride then
+    select seats, owner into cap, drv from public.cars where id = new.ride;
+    if drv is distinct from new.id then
+      select (select count(*) from public.profiles p where p.ride = new.ride and p.id <> drv and p.id <> new.id and p.status = 'approved')
+           + (select count(*) from public.roster g where g.ride = new.ride) into used;
+      if used >= cap then raise exception 'Mașina e plină.'; end if;
+    end if;
+  end if;
+  return new;
+end $$;
+drop trigger if exists guard_ride_guests on public.profiles;
+create trigger guard_ride_guests before update on public.profiles
+  for each row execute function public.guard_ride_guests();
+
+revoke all on function public.unseat(uuid) from public, anon;
+revoke all on function public.seat_guest(uuid, uuid) from public, anon;
+grant execute on function public.unseat(uuid) to authenticated;
+grant execute on function public.seat_guest(uuid, uuid) to authenticated;
+select count(*) as roster from public.roster;
