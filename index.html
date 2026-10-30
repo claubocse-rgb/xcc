@@ -543,6 +543,11 @@ details.block > summary::after{content:" ›";color:var(--muted)}
 /* people from the 4M list without an account */
 .seat.guest{border-style:dashed;cursor:default}
 .dnd.guest{border-style:dashed}
+/* declaration notice on Home */
+.block.decl{border:2px solid var(--need, #CF171F)}
+.block.decl .kicker{color:var(--need, #CF171F)}
+.block.step.doc .st.ready{flex:none}
+.block.step.doc a{text-decoration:underline}
 
 </style>
 </head>
@@ -602,6 +607,9 @@ function st(p, id){
 const teamNeed = it => { const m = String(it.name).match(/(\d+)\s*(?:[–-]\s*\d+\s*)?\/\s*echip/i); return m ? Number(m[1]) : 1; };
 const teamCount = (tid, it) => membersOf(tid).filter(p => has(p, it.id)).reduce((n, p) => n + st(p, it.id).qty, 0);
 const has = (p, id) => st(p, id).ok;
+/* "I've signed the declaration" lives in the person's own checklist under a reserved key */
+const DECL = "_decl";
+const declOk = p => !!p?.items?.[DECL]?.ok;
 const carOf = id => { const r = byId(id)?.ride; return S.cars.find(c => c.id === r) || null; };
 const teamOf = id => { const t = byId(id)?.team; return S.teams.find(x => x.id === t) || null; };
 const membersOf = tid => people().filter(p => p.team === tid);
@@ -1000,7 +1008,7 @@ function pagePending(){
 /* ---------- pages ---------- */
 function pageHome(){
   const p = S.me, miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid), dl = daysLeft();
-  const ticked = Object.values(p.items || {}).some(x => x && (x.ok || x.need || x.lend || x.skip));
+  const ticked = Object.entries(p.items || {}).some(([k, x]) => k !== DECL && x && (x.ok || x.need || x.lend || x.skip));
   const steps = [];
   /* 1. gear first: it decides whether you can take part */
   steps.push(miss.length
@@ -1029,8 +1037,15 @@ function pageHome(){
   /* last two weeks: departure first */
   const depart = dl !== null && dl <= 14 && dl >= 0 && car ? `<div class="block depart stack"><span class="kicker">Plecarea ta</span>
       <h2 class="h3">${car.owner === S.uid ? "Conduci" : `Mergi cu ${esc(nameOf(car.owner))}`}</h2>${carInfo(car, true)}</div>` : "";
-  const doc = S.cfg.doc_url ? `<a class="block step doc" href="${esc(S.cfg.doc_url)}" target="_blank" rel="noopener" download><span class="st ink-st">↓</span><span class="t"><b>${esc(S.cfg.doc_name || "Declarația pe propria răspundere")}</b><span>Descarcă, printează și semnează. O ai la tine la XCC.</span></span><span class="chev" aria-hidden="true">›</span></a>` : "";
-  return `${hero(!!welcome)}${depart}${welcome}
+  const docName = esc(S.cfg.doc_name || "Declarația pe propria răspundere"), docLink = esc(S.cfg.doc_url || "");
+  const notSigned = people().filter(x => !declOk(x));
+  const declAdmin = isAdmin() ? `<p class="small muted">Au confirmat ${people().length - notSigned.length} din ${people().length}.${notSigned.length ? ` Nu încă: ${esc(notSigned.map(shortName).join(", "))}` : ""}</p>` : "";
+  const declNotice = S.cfg.doc_url && !declOk(p) ? `<div class="block decl stack" role="region" aria-label="Declarația pe propria răspundere"><span class="kicker">Obligatoriu pentru toți</span>
+      <h2 class="h3">Semnează declarația pe propria răspundere</h2>
+      <p>Printeaz-o, completeaz-o și semneaz-o. O predai la înregistrare, împreună cu buletinul. <b>Fără ea nu poți intra în XCC.</b></p>
+      <div class="pair-btns"><a class="btn" href="${docLink}" target="_blank" rel="noopener">↓ Descarcă declarația</a><button class="btn sec" data-decl="1">Am semnat-o, o am la mine</button></div>${declAdmin}</div>` : "";
+  const doc = S.cfg.doc_url && declOk(p) ? `<div class="block step doc"><span class="st ready">✓</span><span class="t"><b>Declarația e semnată</b><span>Nu uita s-o iei cu tine, împreună cu buletinul. <a href="${docLink}" target="_blank" rel="noopener">${docName}</a></span></span><button class="btn ghost sm" data-decl="0">Anulează</button></div>${declAdmin ? `<div class="block">${declAdmin}</div>` : ""}` : "";
+  return `${hero(!!welcome)}${declNotice}${depart}${welcome}
     <div class="section"><h2 class="h2">Salut, ${esc(firstName(p.name))}</h2>
       <ul class="steps block flush">${steps.map(x => `<li><button class="step" data-go="${x.go}" ${x.tab ? `data-tab="${x.tab}"` : ""}>
         <span class="st ${x.cls}">${x.ic}</span><span class="t"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev" aria-hidden="true">›</span></button></li>`).join("")}</ul></div>
@@ -1458,6 +1473,7 @@ function summaryText(){
   const nr = noRide(); if (nr.length) L.push(`Fără loc: ${nr.map(p => p.name + (p.pickup ? " (de acasă)" : "")).join(", ")}`);
   const gw = guestsNoRide(); if (gw.length) L.push(`Fără cont, fără loc: ${gw.map(g => g.name).join(", ")}`);
   const own = people().filter(ownWay); if (own.length) L.push(`Pe cont propriu: ${own.map(p => p.name).join(", ")}`);
+  if (S.cfg.doc_url){ const ns = people().filter(p => !declOk(p)); L.push("", `DECLARAȚIA: au confirmat ${people().length - ns.length} din ${people().length}${ns.length ? `. Nu încă: ${ns.map(p => p.name).join(", ")}` : ""}`); }
   const notReady = people().filter(p => missingOf(p).length);
   if (notReady.length){ L.push("", "ÎNCĂ LE LIPSEȘTE"); for (const p of notReady){ const m = missingOf(p); L.push(`${p.name}: ${m.length > 6 ? `${m.length} lucruri` : m.map(nm).join(", ")}`); } }
   return L.join("\n");
@@ -1706,7 +1722,7 @@ function renderSheet(first){
 }
 
 /* ---------- render ---------- */
-function navBadges(){ const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { team: tg || "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "•", admin: pending().length || "" }; }
+function navBadges(){ const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { home: S.cfg.doc_url && !declOk(S.me) ? "•" : "", team: tg || "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "•", admin: pending().length || "" }; }
 function renderChrome(inApp){
   document.body.classList.toggle("noapp", !inApp);
   if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; $("avatarBtn").innerHTML = ""; return; }
@@ -1814,6 +1830,7 @@ document.addEventListener("click", async e => {
   }
   if ((b = q("[data-pw]"))){ const i = b.parentElement.querySelector("input"); i.type = i.type === "password" ? "text" : "password"; b.textContent = i.type === "password" ? "Arată" : "Ascunde"; return; }
   if (q("[data-logout]")){ closeSheet(); await sb.auth.signOut(); return; }
+  if ((b = q("[data-decl]"))){ const on = b.dataset.decl === "1"; setItem(DECL, { ok: on }); toast(on ? "Super. Pune-o lângă buletin, să n-o uiți." : "Am anulat. Semneaz-o până plecăm."); return; }
   if (q("[data-welcome]")){ lsSet("xcc-welcome", "1"); render(); return; }
   if ((b = q("[data-resend]"))){
     await busy(b, async () => {
