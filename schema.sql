@@ -368,3 +368,58 @@ revoke all on function public.seat_guest(uuid, uuid) from public, anon;
 grant execute on function public.unseat(uuid) to authenticated;
 grant execute on function public.seat_guest(uuid, uuid) to authenticated;
 select count(*) as roster from public.roster;
+
+-- migration (v10): people on the 4M list without an account can have a tent spot
+alter table public.roster add column if not exists tent uuid references public.tents(id) on delete set null;
+
+-- put / take someone without an account in a tent (tent = null takes them out); organiser or the tent's owner
+create or replace function public.tent_guest(guest uuid, tent uuid) returns void
+language plpgsql security definer set search_path = public as $$
+#variable_conflict use_variable
+declare cur uuid; gteam uuid; cap int; towner uuid; tteam uuid; used int;
+begin
+  if not public.is_approved() then raise exception 'Nu ai acces.'; end if;
+  select r.tent, r.team into cur, gteam from public.roster r where r.id = guest;
+  if not found then raise exception 'Persoana nu e pe listă.'; end if;
+  if tent is null then
+    if cur is null then return; end if;
+    if not (public.is_admin() or exists (select 1 from public.tents t where t.id = cur and t.owner = auth.uid())) then
+      raise exception 'Doar cel care are cortul sau organizatorul.';
+    end if;
+    update public.roster set tent = null where id = guest;
+    return;
+  end if;
+  select t.places, t.owner, t.team into cap, towner, tteam from public.tents t where t.id = tent for update;
+  if not found then raise exception 'Cortul nu mai există.'; end if;
+  if tteam is distinct from gteam then raise exception 'Cortul e al altei echipe.'; end if;
+  if not (public.is_admin() or towner = auth.uid()) then raise exception 'Doar cel care are cortul sau organizatorul.'; end if;
+  if cur is not distinct from tent then return; end if;
+  if cur is not null and exists (select 1 from public.tents t where t.id = cur) and not public.is_admin() and not exists (select 1 from public.tents t where t.id = cur and t.owner = auth.uid()) then
+    raise exception 'E deja în alt cort.';
+  end if;
+  select (select count(*) from public.profiles p where p.tent = tent and p.status = 'approved')
+       + (select count(*) from public.roster g where g.tent = tent) into used;
+  if used >= cap then raise exception 'Cortul e plin.'; end if;
+  update public.roster set tent = tent where id = guest;
+end $$;
+
+-- tent spots held by people without an account count when someone with an account joins a tent
+create or replace function public.guard_tent_guests() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare cap int; used int;
+begin
+  if new.tent is not null and new.tent is distinct from old.tent then
+    select places into cap from public.tents where id = new.tent;
+    select (select count(*) from public.profiles p where p.tent = new.tent and p.id <> new.id and p.status = 'approved')
+         + (select count(*) from public.roster g where g.tent = new.tent) into used;
+    if cap is not null and used >= cap then raise exception 'Cortul e plin.'; end if;
+  end if;
+  return new;
+end $$;
+drop trigger if exists guard_tent_guests on public.profiles;
+create trigger guard_tent_guests before update on public.profiles
+  for each row execute function public.guard_tent_guests();
+
+revoke all on function public.tent_guest(uuid, uuid) from public, anon;
+grant execute on function public.tent_guest(uuid, uuid) to authenticated;
+select count(*) as roster from public.roster;

@@ -1222,7 +1222,10 @@ async function moveTo(pid, zoneId){
 const tentsOf = tid => S.tents.filter(t => t.team === tid);
 const tentOf = id => { const t = byId(id)?.tent; return S.tents.find(x => x.id === t) || null; };
 const inTent = tent => people().filter(p => p.tent === tent.id);
-const tentFree = tent => Math.max(0, (tent.places || 0) - inTent(tent).length);
+/* people on the team's 4M list without an account can have a tent spot too */
+const guestsInTent = tent => noAccount(tent.team).filter(r => r.tent === tent.id);
+const guestNoTent = tid => noAccount(tid).filter(r => !S.tents.some(t => t.id === r.tent));
+const tentFree = tent => Math.max(0, (tent.places || 0) - inTent(tent).length - guestsInTent(tent).length);
 const tentItem = () => teamItems().find(i => /cort/i.test(i.name));
 function pageTeam(){
   const my = teamOf(S.uid);
@@ -1264,7 +1267,7 @@ function pageTeam(){
   };
   const tentCard = t => {
     const who = inTent(t), f = tentFree(t), own = byId(t.owner), meIn = S.me?.tent === t.id, canEdit = t.owner === S.uid || isAdmin();
-    const pickable = canEdit && (mem.some(p => !tents.some(x => x.id === p.tent)) || away.length);
+    const pickable = canEdit && (mem.some(p => !tents.some(x => x.id === p.tent)) || guestNoTent(tm.id).length);
     const slot = () => canEdit && pickable ? `<button class="seat free pick" data-tent-slot="${esc(t.id)}">+ loc liber</button>`
       : mine && !S.me?.tent ? `<button class="seat free pick" data-tent-join="${esc(t.id)}">+ loc liber</button>` : `<span class="seat free">loc liber</span>`;
     const canJoin = mine && !meIn && f && !iOwn;
@@ -1272,7 +1275,7 @@ function pageTeam(){
       <div class="block-head"><h3 class="h3">Cortul lui ${esc(shortName(own))}</h3>${f ? `<span class="chip ${t.auto ? "est" : "ready"}">${t.auto ? `~${plural(f, "loc", "locuri")} (estimat)` : plural(f, "loc liber", "locuri libere")}</span>` : '<span class="chip ghostchip">Plin</span>'}</div>
       ${t.auto ? `<p class="small">${t.owner === S.uid ? "<b>Câte persoane încap în cortul tău?</b> Am pus 2 până confirmi." : `Locuri estimate: 2, până confirmă ${esc(shortName(own))}.`}</p>` : ""}
       ${t.label ? `<p class="muted small">${esc(t.label)}</p>` : ""}
-      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${x.id === t.owner ? ' <span class="role">al lui</span>' : ""}</button>`).join("")}${Array.from({ length: f }, slot).join("")}</div>
+      <div class="seats">${who.map(x => `<button class="seat ${x.id === S.uid ? "me" : ""}" data-person="${esc(x.id)}">${avatar(x)}${esc(shortName(x))}${x.id === t.owner ? ' <span class="role">al lui</span>' : ""}</button>`).join("")}${guestsInTent(t).map(g => `${canEdit ? `<button class="seat guest" data-tent-slot="${esc(t.id)}">` : '<span class="seat guest">'}${avatar(g)}${esc(firstName(g.name))} <span class="role">fără cont</span>${canEdit ? "</button>" : "</span>"}`).join("")}${Array.from({ length: f }, slot).join("")}</div>
       ${canJoin || (meIn && t.owner !== S.uid) || canEdit ? `<div class="row">${canJoin ? `<button class="btn ${S.me?.tent ? "sec" : ""} sm" data-tent-join="${esc(t.id)}">${S.me?.tent ? "Mă mut aici" : "Dorm aici"}</button>` : ""}${meIn && t.owner !== S.uid ? '<button class="btn sec sm" data-tent-leave>Ies din cort</button>' : ""}${canEdit ? `<button class="btn ${t.auto && t.owner === S.uid ? "" : "sec"} sm" data-tent-edit="${esc(t.id)}">${t.auto && t.owner === S.uid ? "Spune câte locuri are" : "Editează"}</button>` : ""}</div>` : ""}</div>`;
   };
   return `<h1 class="h1">${esc(tm.name)}</h1>${picker}
@@ -1288,7 +1291,7 @@ function pageTeam(){
     <section class="section"><div class="group-title"><h2 class="h2">Corturi</h2><span class="count muted small">${places} locuri · ${total} oameni${short ? ` · <b style="color:var(--need)">lipsesc ${short}</b>` : ""}</span></div>
       ${tents.length ? tents.map(tentCard).join("") : `<div class="block empty"><b>Niciun cort încă</b>${mine ? "Ai cort? Adaugă-l și ceilalți își aleg locul." : "Membrii echipei își adaugă corturile aici."}</div>`}
       ${mine && !iOwn ? `<button class="btn sec" data-tent-new style="align-self:flex-start">Am cort</button>` : ""}
-      ${noTent.length || away.length ? `<p class="small"><b>Fără loc la cort:</b> ${esc([...noTent.map(shortName), ...away.map(r => r.name + " (fără cont)")].join(", "))}</p>` : tents.length ? '<p class="small">Toată echipa are loc la cort.</p>' : ""}
+      ${noTent.length || guestNoTent(tm.id).length ? `<p class="small"><b>Fără loc la cort:</b> ${esc([...noTent.map(shortName), ...guestNoTent(tm.id).map(r => r.name + " (fără cont)")].join(", "))}</p>` : tents.length ? '<p class="small">Toată echipa are loc la cort.</p>' : ""}
     </section>`;
 }
 
@@ -1633,7 +1636,7 @@ function sheetHtml(){
       ${c.id ? `<button class="btn danger" type="button" data-car-del="${esc(c.id)}">Șterge mașina</button>${riders.length ? `<p class="small muted">Dacă o ștergi, ${esc(riders.map(shortName).join(", "))} ${riders.length === 1 ? "rămâne" : "rămân"} fără loc.</p>` : ""}` : ""}</form>`;
   }
   if (kind === "tent"){
-    const t = data || { places: 2 }, n = t.id ? inTent(t).length : 1;
+    const t = data || { places: 2 }, n = t.id ? inTent(t).length + guestsInTent(t).length : 1;
     return head(t.id ? "Cortul" : "Am cort", t.id ? "" : "Ceilalți din echipă își aleg loc în el.") + `<form class="stack" id="tentForm">
       <div class="field"><span>Câte persoane încap (cu tine)</span><div class="stepper"><button type="button" data-tstep="-1" aria-label="Mai puține">−</button><output id="tf-places" data-min="${Math.max(1, n)}">${Math.max(t.places || 2, n)}</output><button type="button" data-tstep="1" aria-label="Mai multe">+</button></div></div>
       <p class="small muted" style="margin-top:-6px">Aduci 2 corturi? Pune totalul de locuri și scrie în notă.</p>
@@ -1651,11 +1654,11 @@ function sheetHtml(){
   }
   if (kind === "tentpick"){
     const t = S.tents.find(x => x.id === data); if (!t) return head("Cort");
-    const free = membersOf(t.team).filter(p => !S.tents.some(x => x.id === p.tent)), inside = inTent(t).filter(p => p.id !== t.owner), f = tentFree(t);
+    const free = membersOf(t.team).filter(p => !S.tents.some(x => x.id === p.tent)), inside = inTent(t).filter(p => p.id !== t.owner), gIn = guestsInTent(t), f = tentFree(t);
     return head(`Cortul lui ${esc(nameOf(t.owner))}`, f ? `Alege pe cine iei. ${plural(f, "loc liber", "locuri libere")}.` : "Cortul e plin.") + `
-      ${f ? (free.length ? `<div class="list">${free.map(p => `<button class="person" data-tent-put="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : `<div class="empty">Toți cei cu cont au loc.${noAccount(t.team).length ? ` Mai sunt ${noAccount(t.team).length} fără cont.` : ""}</div>`) : ""}
-      ${f && noAccount(t.team).length ? `<div class="list">${noAccount(t.team).map(r => `<div class="person off"><span class="av" aria-hidden="true">?</span><span class="t"><b>${esc(r.name)}</b><span>Își face cont, apoi îl pui aici.</span></span></div>`).join("")}</div>` : ""}
-      ${inside.length ? `<section class="section"><h3 class="h3">În cort</h3><div class="list">${inside.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-tent-out="${esc(p.id)}">Scoate</button></div>`).join("")}</div></section>` : ""}
+      ${f ? (free.length ? `<div class="list">${free.map(p => `<button class="person" data-tent-put="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : guestNoTent(t.team).length ? "" : `<div class="empty">Toată echipa are loc la cort.</div>`) : ""}
+      ${f && guestNoTent(t.team).length ? `<div class="list">${guestNoTent(t.team).map(r => `<button class="person" data-tent-gput="${esc(r.id)}">${avatar(r)}<span class="t"><b>${esc(r.name)}</b><span>fără cont · încă fără cort</span></span><span class="chev" aria-hidden="true">+</span></button>`).join("")}</div>` : ""}
+      ${inside.length || gIn.length ? `<section class="section"><h3 class="h3">În cort</h3><div class="list">${inside.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-tent-out="${esc(p.id)}">Scoate</button></div>`).join("")}${gIn.map(r => `<div class="person" style="cursor:default">${avatar(r)}<span class="t"><b>${esc(r.name)}</b><span>fără cont</span></span><button class="btn sec sm" data-tent-gout="${esc(r.id)}">Scoate</button></div>`).join("")}</div></section>` : ""}
       <button class="btn sec block-w" data-close style="margin-top:12px">Gata</button>`;
   }
   if (kind === "assign"){
@@ -1801,8 +1804,9 @@ function setItem(itemId, patch, quiet){
 async function approve(p, quiet){
   if (!p) return false;
   const m = rosterMatch(p), team = !p.team && m && S.teams.find(t => t.id === m.team), seat = !p.ride && m?.ride && S.cars.some(c => c.id === m.ride) ? m.ride : null;
-  if (seat) await sb.from("roster").update({ ride: null }).eq("id", m.id);
-  const ok = await upd(p.id, { status: "approved", ...(team ? { team: team.id } : {}), ...(seat ? { ride: seat, own_transport: false } : {}) }, quiet ? "" : `${firstName(p.name)} e în grup${team ? `, în ${team.name}` : ""}`);
+  const tentSpot = m?.tent && S.tents.some(t => t.id === m.tent && t.team === (team ? team.id : p.team)) && !p.tent ? m.tent : null;
+  if (seat || tentSpot) await sb.from("roster").update({ ...(seat ? { ride: null } : {}), ...(tentSpot ? { tent: null } : {}) }).eq("id", m.id);
+  const ok = await upd(p.id, { status: "approved", ...(team ? { team: team.id } : {}), ...(seat ? { ride: seat, own_transport: false } : {}), ...(tentSpot ? { tent: tentSpot } : {}) }, quiet ? "" : `${firstName(p.name)} e în grup${team ? `, în ${team.name}` : ""}`);
   if (ok && m && (m.profile !== p.id || m.ride)) await sb.from("roster").update({ profile: p.id, ride: null }).eq("id", m.id);
   return !!ok;
 }
@@ -1903,6 +1907,14 @@ document.addEventListener("click", async e => {
     const put = !!b.dataset.tentPut, pid = b.dataset.tentPut || b.dataset.tentOut, tid = S.sheet?.data, p = byId(pid);
     if (p) p.tent = put ? tid : null; renderSheet(false); render();
     await write(() => sb.rpc("tent_place", { tent_id: tid, person: pid, put }), put ? `${shortName(p)} doarme în cortul ăsta` : `${shortName(p)} a ieșit din cort`);
+    if (put && S.sheet && !tentFree(S.tents.find(x => x.id === tid) || {})) closeSheet();
+    return;
+  }
+  if ((b = q("[data-tent-gput]")) || (b = q("[data-tent-gout]"))){
+    const put = !!b.dataset.tentGput, rid = b.dataset.tentGput || b.dataset.tentGout, tid = S.sheet?.data, g = S.roster.find(r => r.id === rid);
+    if (!g) return; if (put && !tentFree(S.tents.find(x => x.id === tid) || {})){ toast("Cortul e plin.", true); return; }
+    const was = g.tent; g.tent = put ? tid : null; renderSheet(false); render();
+    if (!(await write(() => sb.rpc("tent_guest", { guest: rid, tent: put ? tid : null }), put ? `${firstName(g.name)} doarme în cortul ăsta` : `${firstName(g.name)} a ieșit din cort`))) g.tent = was;
     if (put && S.sheet && !tentFree(S.tents.find(x => x.id === tid) || {})) closeSheet();
     return;
   }
