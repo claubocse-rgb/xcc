@@ -423,3 +423,28 @@ create trigger guard_tent_guests before update on public.profiles
 revoke all on function public.tent_guest(uuid, uuid) from public, anon;
 grant execute on function public.tent_guest(uuid, uuid) to authenticated;
 select count(*) as roster from public.roster;
+
+-- migration (v11): the organiser can help someone who forgot their password
+-- email of a member (only for the organiser), used to send a reset link
+create or replace function public.admin_user_email(uid uuid) returns text
+language plpgsql security definer set search_path = public, auth as $$
+begin
+  if not public.is_admin() then raise exception 'Doar organizatorul poate face asta.'; end if;
+  return (select u.email from auth.users u where u.id = uid);
+end $$;
+
+-- the organiser sets a new password for a member (and confirms the email, so they can log in)
+create or replace function public.admin_set_password(uid uuid, pw text) returns void
+language plpgsql security definer set search_path = public, extensions, auth as $$
+begin
+  if not public.is_admin() then raise exception 'Doar organizatorul poate face asta.'; end if;
+  if pw is null or char_length(pw) < 8 then raise exception 'Parola trebuie să aibă minim 8 caractere.'; end if;
+  update auth.users set encrypted_password = crypt(pw, gen_salt('bf')), email_confirmed_at = coalesce(email_confirmed_at, now()), updated_at = now() where id = uid;
+  if not found then raise exception 'Contul nu există.'; end if;
+end $$;
+
+revoke all on function public.admin_user_email(uuid) from public, anon;
+revoke all on function public.admin_set_password(uuid, text) from public, anon;
+grant execute on function public.admin_user_email(uuid) to authenticated;
+grant execute on function public.admin_set_password(uuid, text) to authenticated;
+select (select count(*) from pg_proc where proname in ('admin_user_email','admin_set_password')) as functii, (select count(*) from pg_proc where proname = 'crypt') as crypt;

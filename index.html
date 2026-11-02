@@ -706,7 +706,7 @@ async function write(fn, okMsg){
   } catch(e){
     console.error(e);
     const m = e?.message || "";
-    toast(/Mașina e plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator|Cortul|cort\.|echip|Persoana|Doar |Șoferul|Are deja|Nu ai acces/.test(m) ? m
+    toast(/Mașina e plin/i.test(m) ? "Mașina s-a umplut între timp. Alege alta." : /organizator|Cortul|cort\.|echip|Persoana|Doar |Șoferul|Are deja|Nu ai acces|Parola|Contul/.test(m) ? m
       : /fetch|network|Failed/i.test(m) ? "Nu s-a salvat: nu ai internet." : "Nu s-a salvat. Încearcă din nou.", true);
     lastSnap = ""; scheduleReload(400);
     return false;
@@ -1685,6 +1685,10 @@ function sheetHtml(){
       <div class="stack"><div class="field"><span>Echipa</span><span class="teamchips">${S.teams.map(t => `<button data-setteam="${esc(p.id)}" data-tid="${esc(t.id)}" aria-pressed="${p.team === t.id}">${esc(t.name)}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}">Fără echipă</button></span>
         ${S.teams.length ? "" : '<small>Creează întâi o echipă (Admin › Echipe).</small>'}</div>
       ${self ? "" : sw(`data-arole="${esc(p.id)}"`, "Admin", "Poate aproba oameni și modifica lista.", p.role === "admin")}
+      ${self ? "" : `<div class="field pwreset"><span>A uitat parola?</span>
+        <form class="row" id="tmpPassForm" data-uid="${esc(p.id)}"><label class="sr-only" for="tmpPass">Parolă nouă</label><input class="input" id="tmpPass" value="${esc(tmpPass())}" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1;min-width:0"><button class="btn sm" type="submit">Pune parola</button></form>
+        <small>Îi pui tu o parolă nouă și i-o spui pe WhatsApp. O poate schimba apoi din „Contul meu”.</small>
+        <button class="btn sec sm" type="button" data-reset-mail="${esc(p.id)}" style="align-self:flex-start">Sau trimite-i email de resetare</button></div>`}
       <button class="btn sec" data-aview="${esc(p.id)}">Vezi ce are bifat</button>
       <button class="btn danger" data-areset="${esc(p.id)}">Golește-i bifele</button>
       ${self ? "" : `<button class="btn danger" data-reject="${esc(p.id)}">Scoate din grup</button>${car && ridersOf(car).length ? `<p class="small muted">Are mașină cu ${plural(ridersOf(car).length, "pasager", "pasageri")}. Dacă îl scoți, mașina se șterge și ei rămân fără loc.</p>` : ""}`}</div>`;
@@ -1810,6 +1814,8 @@ async function approve(p, quiet){
   if (ok && m && (m.profile !== p.id || m.ride)) await sb.from("roster").update({ profile: p.id, ride: null }).eq("id", m.id);
   return !!ok;
 }
+/* easy to read out loud on WhatsApp: xcc-4821 */
+const tmpPass = () => "xcc-" + String(Math.floor(1000 + Math.random() * 9000));
 const upd = (id, v, msg) => write(() => sb.from("profiles").update(v).eq("id", id), msg);
 const setRide = (uid, carId, msg) => write(() => sb.from("profiles").update({ ride: carId || null }).eq("id", uid), msg);
 async function copyText(txt, okMsg){
@@ -1945,6 +1951,11 @@ document.addEventListener("click", async e => {
     if (car) await write(() => sb.from("cars").delete().eq("id", car.id));
     await upd(b.dataset.reject, { status: "rejected", ride: null, team: null }, `${firstName(p?.name)} nu mai e în grup`); closeSheet(); return;
   }
+  if ((b = q("[data-reset-mail]"))){ const p = byId(b.dataset.resetMail); if (!arm(b, `Apasă încă o dată: trimit email lui ${shortName(p)}`)) return;
+    await busy(b, async () => { const r = await sb.rpc("admin_user_email", { uid: p.id });
+      if (r.error || !r.data){ toast(r.error?.message && /organizator/.test(r.error.message) ? r.error.message : "Nu am găsit emailul.", true); return; }
+      const m = await sb.auth.resetPasswordForEmail(r.data, { redirectTo: SITE });
+      toast(m.error ? (/rate|limit|seconds/i.test(m.error.message) ? "S-au trimis prea multe emailuri. Pune-i mai bine o parolă nouă." : "Emailul nu s-a trimis. Pune-i mai bine o parolă nouă.") : `Am trimis link de resetare pe ${r.data}`, !!m.error); }); return; }
   if ((b = q("[data-aperson]"))){ openSheet("aperson", b.dataset.aperson); return; }
   if ((b = q("[data-arole]"))){ const on = b.getAttribute("aria-checked") !== "true"; if (!arm(b, on ? "Apasă încă o dată: îl faci admin" : "Apasă încă o dată: nu mai e admin")) return; await upd(b.dataset.arole, { role: on ? "admin" : "member" }, on ? "E admin acum" : "Nu mai e admin"); return; }
   if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, `Am golit bifele lui ${nameOf(b.dataset.areset)}`); return; }
@@ -2029,6 +2040,11 @@ document.addEventListener("submit", async e => {
       const r = await sb.auth.updateUser({ password: pw });
       if (r.error) toast(authErr(r.error.message), true);
       else { S.recovering = false; closeSheet(); toast("Parola a fost schimbată"); try { history.replaceState(null, "", SITE); } catch {} loadAll(); }
+    }
+    if (id === "tmpPassForm"){
+      const uid = e.target.dataset.uid, pw = $("tmpPass").value.trim(), p = byId(uid);
+      if (pw.length < 8){ toast("Parola trebuie să aibă minim 8 caractere.", true); return; }
+      if (await write(() => sb.rpc("admin_set_password", { uid, pw }))){ await copyText(`Parola ta nouă în aplicația XCC: ${pw}\nIntri cu emailul tău și parola asta, apoi o poți schimba din „Contul meu”.\n${SITE}`, `Gata. Parola lui ${shortName(p)} e ${pw}. Mesajul e copiat, trimite-i-l pe WhatsApp.`); }
     }
     if (id === "nameForm"){
       const n = v("pn"); if (!n){ toast("Scrie un nume.", true); return; }
