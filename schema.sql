@@ -448,3 +448,13 @@ revoke all on function public.admin_set_password(uuid, text) from public, anon;
 grant execute on function public.admin_user_email(uuid) to authenticated;
 grant execute on function public.admin_set_password(uuid, text) to authenticated;
 select (select count(*) from pg_proc where proname in ('admin_user_email','admin_set_password')) as functii, (select count(*) from pg_proc where proname = 'crypt') as crypt;
+
+-- migration (v12): "viewer" role: can look around the app but isn't counted anywhere
+do $$ declare c text; begin
+  for c in select con.conname from pg_constraint con join pg_class rel on rel.oid = con.conrelid join pg_namespace ns on ns.oid = rel.relnamespace
+           where ns.nspname = 'public' and rel.relname = 'profiles' and con.contype = 'c' and pg_get_constraintdef(con.oid) ilike '%role%' loop
+    execute format('alter table public.profiles drop constraint %I', c);
+  end loop;
+end $$;
+alter table public.profiles add constraint profiles_role_check check (role in ('member', 'admin', 'viewer'));
+select pg_get_constraintdef(oid) as regula from pg_constraint where conname = 'profiles_role_check';

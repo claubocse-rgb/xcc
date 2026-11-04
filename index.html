@@ -593,7 +593,10 @@ const reqItems = () => S.items.filter(i => !isOpt(i) && !isTeam(i));
 const optItems = () => S.items.filter(i => isOpt(i) && !isTeam(i));
 const teamItems = () => S.items.filter(isTeam);
 const teamReq = () => teamItems().filter(i => !isOpt(i));
-const people = () => S.profiles.filter(p => p.status === "approved");
+/* "viewer": can look around the app but isn't counted anywhere (e.g. someone who only wants to see how it's made) */
+const people = () => S.profiles.filter(p => p.status === "approved" && p.role !== "viewer");
+const isViewer = () => S.me?.role === "viewer";
+const viewers = () => S.profiles.filter(p => p.status === "approved" && p.role === "viewer");
 const pending = () => S.profiles.filter(p => p.status === "pending");
 const isAdmin = () => S.me?.role === "admin" && S.me?.status === "approved";
 const approved = () => S.me?.status === "approved";
@@ -1007,6 +1010,9 @@ function pagePending(){
 
 /* ---------- pages ---------- */
 function pageHome(){
+  if (isViewer()) return `${hero()}<div class="block stack"><span class="kicker">Vizitator</span><h2 class="h3">Salut, ${esc(firstName(S.me.name))}!</h2>
+      <p>Te uiți cum e făcută aplicația grupului pentru XCC. Nu apari în liste și nu trebuie să bifezi nimic.</p>
+      <ul class="small muted" style="margin:0;padding-left:18px;line-height:1.6"><li><b>Echipament</b>: fiecare bifează ce are, ce caută și ce are în plus.</li><li><b>Echipa</b>: echipamentul comun și cine în ce cort doarme.</li><li><b>Transport</b>: mașini, locuri, de unde e luat fiecare.</li><li><b>Grupul</b>: cine ce are și ce se caută.</li></ul></div>${placesBlock()}`;
   const p = S.me, miss = missingOf(p), car = carOf(S.uid), team = teamOf(S.uid), dl = daysLeft();
   const ticked = Object.entries(p.items || {}).some(([k, x]) => k !== DECL && x && (x.ok || x.need || x.lend || x.skip));
   const steps = [];
@@ -1329,7 +1335,7 @@ function pageTransport(){
   };
   const homeLink = x => safeUrl(x.pickup_maps);
   const pk = S.pk || { on: !!p.pickup, maps: p.pickup_maps || "", note: p.pickup_note || "" };
-  const pickupBlock = (!mine || mine.owner !== S.uid) && !ownWay(p) ? `<form class="block stack" id="pickupForm" novalidate>
+  const pickupBlock = !isViewer() && (!mine || mine.owner !== S.uid) && !ownWay(p) ? `<form class="block stack" id="pickupForm" novalidate>
       <label class="pick-toggle"><input type="checkbox" id="pk-on" ${pk.on ? "checked" : ""}><span><b>Vreau să fiu luat de acasă</b><small>Șoferul vede linkul și te ia de acolo.</small></span></label>
       <div class="pk-fields" ${pk.on ? "" : "hidden"}>
         <div class="field"><span>Locația ta</span>
@@ -1350,6 +1356,7 @@ function pageTransport(){
   else if (ownWay(p)) myBlock = `<div class="block stack"><h2 class="h2">Vii pe cont propriu</h2>
       <p class="muted">Nu apari la „Fără loc”. Dacă ai totuși nevoie de loc, schimbă mai jos.</p>
       <div class="row"><button class="btn sec sm" data-ownway="0">Am nevoie de loc</button></div></div>`;
+  else if (isViewer()) myBlock = `<div class="block stack"><h2 class="h2">Ești vizitator</h2><p class="muted">Vezi mașinile și locurile, dar nu ai nevoie de loc.</p></div>`;
   else myBlock = `<div class="block stack"><h2 class="h2">Încă n-ai loc</h2>
       <p class="muted">${free ? `Sunt ${plural(free, "loc liber", "locuri libere")} în mașini.` : "Nu sunt locuri libere acum. Ești pe lista „Fără loc” și Clau te ajută să găsești unul."}</p>
       ${free ? `<button class="btn" data-scroll="cars">Alege un loc ↓</button>` : ""}
@@ -1511,6 +1518,7 @@ function pageAdmin(){
       <div class="list">${shown.map(p => { const m = missingOf(p).length, car = carOf(p.id);
         return `<button class="person" data-aperson="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}${p.role === "admin" ? ' <span class="chip">admin</span>' : ""}</b>
           <span>${esc(teamOf(p.id)?.name || "fără echipă")} · ${m ? `${m} lipsă` : "gata"} · ${car ? (car.owner === p.id ? "șofer" : "are loc") : ownWay(p) ? "pe cont propriu" : "fără loc"}</span></span><span class="chev" aria-hidden="true">›</span></button>`; }).join("") || '<div class="empty">Nimeni aici.</div>'}</div>
+      ${viewers().length ? `<section class="section"><h2 class="h3">Vizitatori</h2><p class="small muted">Văd aplicația, dar nu apar în liste și nu sunt numărați.</p><div class="list">${viewers().map(p => `<button class="person" data-aperson="${esc(p.id)}">${avatar(p)}<span class="t"><b>${esc(p.name)}</b><span>vizitator</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div></section>` : ""}
       ${rej.length ? `<section class="section"><h2 class="h3">Respinși sau scoși</h2><div class="list">${rej.map(p => `<div class="person" style="cursor:default">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><button class="btn sec sm" data-approve="${esc(p.id)}">Aprobă totuși</button></div>`).join("")}</div></section>` : ""}`;
   }
   if (t === "teams"){
@@ -1684,7 +1692,8 @@ function sheetHtml(){
     return `<div class="sheet-head">${avatar(p, "lg")}<div style="flex:1"><h2 class="h2">${esc(p.name)}</h2><p class="muted small">${p.role === "admin" ? "Admin" : "Membru"}</p></div><button class="x" data-close aria-label="Închide">✕</button></div>
       <div class="stack"><div class="field"><span>Echipa</span><span class="teamchips">${S.teams.map(t => `<button data-setteam="${esc(p.id)}" data-tid="${esc(t.id)}" aria-pressed="${p.team === t.id}">${esc(t.name)}</button>`).join("")}<button data-setteam="${esc(p.id)}" data-tid="" aria-pressed="${!teamOf(p.id)}">Fără echipă</button></span>
         ${S.teams.length ? "" : '<small>Creează întâi o echipă (Admin › Echipe).</small>'}</div>
-      ${self ? "" : sw(`data-arole="${esc(p.id)}"`, "Admin", "Poate aproba oameni și modifica lista.", p.role === "admin")}
+      ${self ? "" : sw(`data-aviewer="${esc(p.id)}"`, "Doar vizitator", "Vede aplicația, dar nu apare în liste: fără echipament, echipă, mașină sau cort.", p.role === "viewer")}
+      ${self || p.role === "viewer" ? "" : sw(`data-arole="${esc(p.id)}"`, "Admin", "Poate aproba oameni și modifica lista.", p.role === "admin")}
       ${self ? "" : `<div class="field pwreset"><span>A uitat parola?</span>
         <form class="row" id="tmpPassForm" data-uid="${esc(p.id)}"><label class="sr-only" for="tmpPass">Parolă nouă</label><input class="input" id="tmpPass" value="${esc(tmpPass())}" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1;min-width:0"><button class="btn sm" type="submit">Pune parola</button></form>
         <small>Îi pui tu o parolă nouă și i-o spui pe WhatsApp. O poate schimba apoi din „Contul meu”.</small>
@@ -1729,7 +1738,7 @@ function renderSheet(first){
 }
 
 /* ---------- render ---------- */
-function navBadges(){ const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { home: S.cfg.doc_url && !declOk(S.me) ? "•" : "", team: tg || "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "•", admin: pending().length || "" }; }
+function navBadges(){ if (isViewer()) return {}; const tg = teamOf(S.uid) ? teamGaps(teamOf(S.uid).id).length : 0; return { home: S.cfg.doc_url && !declOk(S.me) ? "•" : "", team: tg || "", transport: carOf(S.uid) || ownWay(S.me) ? "" : "•", admin: pending().length || "" }; }
 function renderChrome(inApp){
   document.body.classList.toggle("noapp", !inApp);
   if (!inApp){ $("rail").innerHTML = ""; $("tabbar").innerHTML = ""; $("avatarBtn").innerHTML = ""; return; }
@@ -1957,6 +1966,11 @@ document.addEventListener("click", async e => {
       const m = await sb.auth.resetPasswordForEmail(r.data, { redirectTo: SITE });
       toast(m.error ? (/rate|limit|seconds/i.test(m.error.message) ? "S-au trimis prea multe emailuri. Pune-i mai bine o parolă nouă." : "Emailul nu s-a trimis. Pune-i mai bine o parolă nouă.") : `Am trimis link de resetare pe ${r.data}`, !!m.error); }); return; }
   if ((b = q("[data-aperson]"))){ openSheet("aperson", b.dataset.aperson); return; }
+  if ((b = q("[data-aviewer]"))){ const p = byId(b.dataset.aviewer), on = b.getAttribute("aria-checked") !== "true";
+    if (!arm(b, on ? "Apasă încă o dată: îl faci vizitator" : "Apasă încă o dată: îl faci membru")) return;
+    const patch = on ? { role: "viewer", team: null, ride: null, tent: null, pickup: false, own_transport: false } : { role: "member" };
+    if (p) Object.assign(p, patch); renderSheet(false); render();
+    await upd(p.id, patch, on ? `${shortName(p)} e vizitator: nu mai apare în liste` : `${shortName(p)} e membru din nou`); return; }
   if ((b = q("[data-arole]"))){ const on = b.getAttribute("aria-checked") !== "true"; if (!arm(b, on ? "Apasă încă o dată: îl faci admin" : "Apasă încă o dată: nu mai e admin")) return; await upd(b.dataset.arole, { role: on ? "admin" : "member" }, on ? "E admin acum" : "Nu mai e admin"); return; }
   if ((b = q("[data-areset]"))){ if (!arm(b)) return; await upd(b.dataset.areset, { items: {} }, `Am golit bifele lui ${nameOf(b.dataset.areset)}`); return; }
   if ((b = q("[data-setteam]"))){ const pid = b.dataset.setteam, tid = b.dataset.tid || null, p = byId(pid); const owns = S.tents.some(t => t.owner === pid), patch = { team: tid, ...(owns ? {} : { tent: null }) }; if (p) Object.assign(p, patch); render(); await upd(pid, patch, tid ? `${shortName(p)} e în ${S.teams.find(x => x.id === tid)?.name}` : `${shortName(p)} e fără echipă`); return; }
